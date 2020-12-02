@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="web,php," />
+  <meta name="keywords" content="exploit," />
 
 
 
@@ -79,19 +79,36 @@
 
 
 
-<meta name="description" content="（还没有开始写） 参考资料: php伪协议总结">
+<meta name="description" content="vulnhub里的 sunset:solstice 靶机 简单难度">
 <meta property="og:type" content="article">
-<meta property="og:title" content="php伪协议">
-<meta property="og:url" content="http://www.ethushiroha.com/php_agreement.html">
+<meta property="og:title" content="vulnhub sunset:nightfall靶机">
+<meta property="og:url" content="http://www.ethushiroha.com/sunset-nightfall.html">
 <meta property="og:site_name" content="stdout">
-<meta property="og:description" content="（还没有开始写） 参考资料: php伪协议总结">
+<meta property="og:description" content="vulnhub里的 sunset:solstice 靶机 简单难度">
 <meta property="og:locale">
-<meta property="article:published_time" content="2020-08-09T06:40:20.000Z">
-<meta property="article:modified_time" content="2020-11-25T13:44:32.219Z">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100609327.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100700298.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100756052.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100949238.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101026630.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101056208.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101135455.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101333781.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101730129.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101806880.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101836182.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101947347.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102126776.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102426797.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102513857.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102608133.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102645471.png">
+<meta property="article:published_time" content="2020-12-20T02:26:10.000Z">
+<meta property="article:modified_time" content="2020-12-02T02:27:06.466Z">
 <meta property="article:author" content="stdout">
-<meta property="article:tag" content="web">
-<meta property="article:tag" content="php">
+<meta property="article:tag" content="exploit">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100609327.png">
 
 
 
@@ -121,13 +138,13 @@
 
 
 
-  <link rel="canonical" href="http://www.ethushiroha.com/php_agreement.html"/>
+  <link rel="canonical" href="http://www.ethushiroha.com/sunset-nightfall.html"/>
 
 
 
 
 
-  <title>php伪协议 | stdout</title>
+  <title>vulnhub sunset:nightfall靶机 | stdout</title>
   
 
 
@@ -298,7 +315,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/php_agreement.html">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/sunset-nightfall.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="">
@@ -315,7 +332,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">php伪协议</h1>
+          <h1 class="post-title" itemprop="name headline">vulnhub sunset:nightfall靶机</h1>
         
 
         <div class="post-meta">
@@ -327,8 +344,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-09T14:40:20+08:00">
-                2020-08-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-20T10:26:10+08:00">
+                2020-12-20
               </time>
             
 
@@ -350,8 +367,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/web/" itemprop="url" rel="index">
-                    <span itemprop="name">web</span>
+                  <a href="/categories/exploit/" itemprop="url" rel="index">
+                    <span itemprop="name">exploit</span>
                   </a>
                 </span>
 
@@ -361,8 +378,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/web/php/" itemprop="url" rel="index">
-                    <span itemprop="name">php</span>
+                  <a href="/categories/exploit/sunset/" itemprop="url" rel="index">
+                    <span itemprop="name">sunset</span>
                   </a>
                 </span>
 
@@ -398,10 +415,60 @@
       
 
       
-        <p>（还没有开始写）</p>
-<p>参考资料: <a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000018991087">php伪协议总结</a></p>
+        <p>vulnhub里的 sunset:solstice 靶机</p>
+<p>简单难度</p>
 <a id="more"></a>
 
+
+
+<h1 id="sunset-nightfall"><a href="#sunset-nightfall" class="headerlink" title="sunset:nightfall"></a>sunset:nightfall</h1><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><ul>
+<li>  靶机：<code>172.16.224.7</code></li>
+<li>  攻击机： <code>172.16.224.2</code></li>
+</ul>
+<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100609327.png" alt="image-20201202100609327"></p>
+<p>目标开放 <strong>21, 22, 80, 3306</strong>端口</p>
+<p>下面的smb扫描结果，看到目标靶机可以使用<code>guest</code>用户登陆</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100700298.png" alt="image-20201202100700298"></p>
+<h2 id="smb-login"><a href="#smb-login" class="headerlink" title="smb login"></a>smb login</h2><p>使用<code>smbclient -L 172.16.224.7 -U guest%</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100756052.png" alt="image-20201202100756052"></p>
+<p>遍历其中没有发现任何有用的东西</p>
+<h2 id="ftp-enum"><a href="#ftp-enum" class="headerlink" title="ftp enum"></a>ftp enum</h2><p>目标转换为爆破<code>ftp/ssh</code>，但是爆破必须要有密码，<code>root</code>用户的密码肯定爆破不了</p>
+<p>用<code>enum4linux</code>工具获得用户名</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202100949238.png" alt="image-20201202100949238"></p>
+<p>把这两个用户写入到<code>user.txt</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101026630.png" alt="image-20201202101026630"></p>
+<p>使用<code>hydra</code>爆破目标用户的密码</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101056208.png" alt="image-20201202101056208"></p>
+<p><code>hydra -L user.txt -P /usr/share/wordlist/rockyou.txt -I -v ftp(/ssh)://172.16.224.7</code></p>
+<p>结果爆破出ftp的密码<strong>为<code>cheese</code></strong></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101135455.png" alt="image-20201202101135455"></p>
+<p>尝试直接用这个密码ssh登陆，可惜失败了</p>
+<p>只能登陆ftp</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101333781.png" alt="image-20201202101333781"></p>
+<p>这个路径显然是<code>~/</code>，可以把自己的ssh密钥写入<code>.ssh/authorized_keys</code>，达到免密登陆的效果。</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>免密登陆ssh之后，权限只是一个<code>matt</code>，目标肯定是得到root权限，所以肯定要去提权</p>
+<p>寻找一下免密运行的程序和有<code>setuid</code>权限的程序</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101730129.png" alt="image-20201202101730129"></p>
+<p>找到一个<code>find</code>，看一下<code>help</code>（skr</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101806880.png" alt="image-20201202101806880"></p>
+<p>也可以通过一个网站</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101836182.png" alt="image-20201202101836182"></p>
+<p>对于有<code>setuid</code>权限的<code>find</code>程序，使用<code>find . -exec /bin/bash -p \; -quit</code>可以提权</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202101947347.png" alt="image-20201202101947347"></p>
+<p>要注意的是默认的<code>find</code>不是<code>/script/find</code>，所以使用的时候需要使用绝对路径</p>
+<p>切换到<code>nightfall</code>用户之后，写入他的<code>~/.ssh/authorized_keys</code>中，免密登陆</p>
+<p>顺便继续看看能够免密运行的程序。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102126776.png" alt="image-20201202102126776"></p>
+<p>发现<code>/usr/bin/cat</code>是可以使用<code>root</code>权限免密运行的，由于<code>cat</code>命令只能够读文件，并不能写入文件，所以无法通过这个直接提权</p>
+<p>但是这使得攻击者可以读取任意文件，在<code>/etc/shadow</code>中存放了各个用户的密码的hash值，如果能够爆破出密码的话，也就起到了相关的作用</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102426797.png" alt="image-20201202102426797"></p>
+<p>写入到<code>hash.txt</code>，使用<code>john</code>工具爆破</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102513857.png" alt="image-20201202102513857"></p>
+<p>得到了root的密码为<code>miguel2</code></p>
+<p>登录<code>root</code>账户，得到flag</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102608133.png" alt="image-20201202102608133"></p>
+<p>字符画太大了，截图不太行（</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202102645471.png" alt="image-20201202102645471"></p>
 
       
     </div>
@@ -419,9 +486,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/web/" rel="tag"><i class="fa fa-tag"></i> web</a>
-          
-            <a href="/tags/php/" rel="tag"><i class="fa fa-tag"></i> php</a>
+            <a href="/tags/exploit/" rel="tag"><i class="fa fa-tag"></i> exploit</a>
           
         </div>
       
@@ -434,8 +499,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/php_fileinclude.html" rel="next" title="php中的文件包含">
-                <i class="fa fa-chevron-left"></i> php中的文件包含
+              <a href="/Upload-Labs03.html" rel="next" title="Upload-Labs 11-15">
+                <i class="fa fa-chevron-left"></i> Upload-Labs 11-15
               </a>
             
           </div>
@@ -443,10 +508,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/buu_HCTF2018_WarmUp.html" rel="prev" title="HCTF_2018_WarmUp">
-                HCTF_2018_WarmUp <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -498,8 +559,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -573,6 +643,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#sunset-nightfall"><span class="nav-number">1.</span> <span class="nav-text">sunset:nightfall</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.2.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#smb-login"><span class="nav-number">1.3.</span> <span class="nav-text">smb login</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ftp-enum"><span class="nav-number">1.4.</span> <span class="nav-text">ftp enum</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.5.</span> <span class="nav-text">提权</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
