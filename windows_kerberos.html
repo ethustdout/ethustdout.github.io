@@ -101,7 +101,7 @@
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208113234301.png">
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208113212734.png">
 <meta property="article:published_time" content="2020-12-05T06:14:10.000Z">
-<meta property="article:modified_time" content="2020-12-08T11:06:55.391Z">
+<meta property="article:modified_time" content="2020-12-08T11:14:25.507Z">
 <meta property="article:author" content="stdout">
 <meta property="article:tag" content="windows">
 <meta property="article:tag" content="kerberos">
@@ -466,6 +466,7 @@
 </li>
 <li><p>KDC 生成密钥<code>KDC_AB_key</code>，一份直接交给A，另一份通过A交给B。为了防止资源B是伪造的，KDC把资源B的密码hash成<code>B_password_hash</code>，用<code>B_password_hash</code>加密<code>KDC_AB_key</code>，做成一张只有B（除了KDC）能解密的票据(<code>Ticket</code>)</p>
 <p> <code>Ticket=B_password_hash(A_info, KDC_AB_key)</code></p>
+<p> <font color='red'>这个<code>Ticket</code>，被称作<code>TGT</code></font></p>
 <p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208104754206.png" alt="image-20201208104754206"></p>
 <p> 发送给账户A的回复<code>TGS_REP = KDC_key(KDC_AB_key), Ticket</code></p>
 <p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208105932502.png" alt="image-20201208105932502"></p>
@@ -540,8 +541,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/windows_NTLM.html" rel="prev" title="windows NTLM协议">
-                windows NTLM协议 <i class="fa fa-chevron-right"></i>
+              <a href="/sunset-midnight.html" rel="prev" title="vulnhub sunset:midnight靶机">
+                vulnhub sunset:midnight靶机 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -623,7 +624,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">57</span>
+                  <span class="site-state-item-count">58</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
