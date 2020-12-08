@@ -101,7 +101,7 @@
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208113234301.png">
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208113212734.png">
 <meta property="article:published_time" content="2020-12-05T06:14:10.000Z">
-<meta property="article:modified_time" content="2020-12-08T06:51:49.969Z">
+<meta property="article:modified_time" content="2020-12-08T11:06:55.391Z">
 <meta property="article:author" content="stdout">
 <meta property="article:tag" content="windows">
 <meta property="article:tag" content="kerberos">
@@ -410,6 +410,7 @@
 <p>参考的资料会在本文最后列出。</p>
 <h1 id="kerberos"><a href="#kerberos" class="headerlink" title="kerberos"></a>kerberos</h1><p><font color='red'>注1：以下代称并非真实名词，只是我为了好记，取得名字。</font></p>
 <h2 id="身份认证"><a href="#身份认证" class="headerlink" title="身份认证"></a>身份认证</h2><p>在<strong>Windows域环境</strong>身份认证的时候会用到它</p>
+<p>(有关域的知识请参见<a href="./net_base_1.html">另一篇文章</a>)</p>
 <p><code>kerberos</code>协议认证的结果是<strong>双向的</strong>，A访问B时，不仅仅是B要确保A不是伪造的，A也要确保请求的资源B不是被伪造的</p>
 <p>然而在身份验证的过程中，不能采取双方直接验证密码的形式（假如其中有一个是冒充的，就会被套到密码），所以<code>kerberos</code>采用了一个可信第三方来进行验证，这个可信第三方就是域控(<code>Domain Controler</code>)，称之为<code>KDC</code></p>
 <h2 id="KDC"><a href="#KDC" class="headerlink" title="KDC"></a>KDC</h2><p>域主机存放着域内所有的账号和密码</p>
@@ -539,6 +540,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/windows_NTLM.html" rel="prev" title="windows NTLM协议">
+                windows NTLM协议 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -618,7 +623,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">56</span>
+                  <span class="site-state-item-count">57</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
