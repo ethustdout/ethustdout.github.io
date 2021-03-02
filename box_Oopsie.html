@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="windows,kerberos," />
+  <meta name="keywords" content="exploit,hack the box,windows," />
 
 
 
@@ -79,34 +79,42 @@
 
 
 
-<meta name="description" content="Windows下kerberos协议的相关认知">
+<meta name="description" content="从零开始的hack_the_box 生活">
 <meta property="og:type" content="article">
-<meta property="og:title" content="windows kerberos协议">
-<meta property="og:url" content="http://www.ethushiroha.com/windows_kerberos.html">
+<meta property="og:title" content="box:Oopsie">
+<meta property="og:url" content="http://www.ethushiroha.com/box_Oopsie.html">
 <meta property="og:site_name" content="stdout">
-<meta property="og:description" content="Windows下kerberos协议的相关认知">
+<meta property="og:description" content="从零开始的hack_the_box 生活">
 <meta property="og:locale">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/epub_729216_208.jpeg">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201205164502067.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201207140843369.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201207141622277.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201207142419208.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208083725805.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208103741964.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208104303690.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208104754206.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208105932502.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208112041712.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208112801386.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208113234301.png">
-<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208113212734.png">
-<meta property="article:published_time" content="2020-12-05T06:14:10.000Z">
-<meta property="article:modified_time" content="2020-12-09T12:12:54.549Z">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302082954260.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302083525395.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302083603915.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084039939.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084521198.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084649936.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084736069.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084933102.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085019626.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085233423.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085426082.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085731375.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085857872.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302091843922.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302092355879.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302090516559.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302090926036.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302092558352.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302093012476.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302093359049.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302093524570.png">
+<meta property="article:published_time" content="2021-02-26T08:14:10.000Z">
+<meta property="article:modified_time" content="2021-03-02T01:35:47.979Z">
 <meta property="article:author" content="stdout">
+<meta property="article:tag" content="exploit">
+<meta property="article:tag" content="hack the box">
 <meta property="article:tag" content="windows">
-<meta property="article:tag" content="kerberos">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/epub_729216_208.jpeg">
+<meta name="twitter:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302082954260.png">
 
 
 
@@ -136,13 +144,13 @@
 
 
 
-  <link rel="canonical" href="http://www.ethushiroha.com/windows_kerberos.html"/>
+  <link rel="canonical" href="http://www.ethushiroha.com/box_Oopsie.html"/>
 
 
 
 
 
-  <title>windows kerberos协议 | stdout</title>
+  <title>box:Oopsie | stdout</title>
   
 
 
@@ -313,7 +321,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/windows_kerberos.html">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/box_Oopsie.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="">
@@ -330,7 +338,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">windows kerberos协议</h1>
+          <h1 class="post-title" itemprop="name headline">box:Oopsie</h1>
         
 
         <div class="post-meta">
@@ -342,8 +350,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-05T14:14:10+08:00">
-                2020-12-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-26T16:14:10+08:00">
+                2021-02-26
               </time>
             
 
@@ -365,8 +373,19 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/intranet-windows/" itemprop="url" rel="index">
-                    <span itemprop="name">intranet - windows</span>
+                  <a href="/categories/exploit/" itemprop="url" rel="index">
+                    <span itemprop="name">exploit</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/exploit/hack-the-box/" itemprop="url" rel="index">
+                    <span itemprop="name">hack the box</span>
                   </a>
                 </span>
 
@@ -402,118 +421,117 @@
       
 
       
-        <p>Windows下<code>kerberos</code>协议的相关认知</p>
+        <p>从零开始的hack_the_box 生活</p>
 <a id="more"></a>
 
-<p>前几天被qax的师傅面试，问到了<code>kerberos</code>协议，<code>黄金白银票据</code>等，答不上来。</p>
-<p>找了点资料，学习学习。</p>
-<p>参考的资料会在本文最后列出。</p>
-<h1 id="kerberos"><a href="#kerberos" class="headerlink" title="kerberos"></a>kerberos</h1><p><font color='red'>注1：以下代称并非真实名词，只是我为了好记，取得名字。</font></p>
-<h2 id="身份认证"><a href="#身份认证" class="headerlink" title="身份认证"></a>身份认证</h2><p>在<strong>Windows域环境</strong>身份认证的时候会用到它</p>
-<p>(有关域的知识请参见<a href="./net_base_1.html">另一篇文章</a>)</p>
-<p><code>kerberos</code>协议认证的结果是<strong>双向的</strong>，A访问B时，不仅仅是B要确保A不是伪造的，A也要确保请求的资源B不是被伪造的</p>
-<p>然而在身份验证的过程中，不能采取双方直接验证密码的形式（假如其中有一个是冒充的，就会被套到密码），所以<code>kerberos</code>采用了一个可信第三方来进行验证，这个可信第三方就是域控(<code>Domain Controler</code>)，称之为<code>KDC</code></p>
-<h3 id="KDC"><a href="#KDC" class="headerlink" title="KDC"></a>KDC</h3><p>域主机存放着域内所有的账号和密码</p>
-<p>通过KDC进行验证，可以减少域管理员的工作量（当发生用户信息变动的时候，不需要在每一台主机上都进行更新信息。</p>
-<p>账号A访问资源B时，会先和KDC进行身份认证，确认A和KDC的身份，账号A请求KDC帮忙认证资源B，</p>
-<h3 id="账户A和KDC之间的认证"><a href="#账户A和KDC之间的认证" class="headerlink" title="账户A和KDC之间的认证"></a>账户A和KDC之间的认证</h3><p>已知：只有 账户A和KDC知道账户A的密码，如何在不泄漏密码的情况下验证自己的身份。</p>
-<p><code>kerberos</code>协议中的验证过程如下：</p>
-<ol>
-<li> 账号A把自己的密码通过hash函数转换成一把密钥，称之为<code>A_password_hash</code></li>
-<li>用<code>A_password_hash</code>加密当前的时间戳，生成一个字符串。用<code>A_password_hash(date-time)</code>来表示<ul>
-<li>为什么会选择使用时间戳来加密？<ul>
-<li>  原因是<code>A_password_hash</code>可能被截获并重放，导致<strong>重放攻击</strong>，但是重放攻击的伪造过程需要时间，KDC会把解密得到的时间戳和当前时间做一个对比，如果相差过大，就判断是重放攻击。</li>
-<li>  所以需要在域中同步所有机器的时间，如果机器时间不对，根据上述的过程，容易被截获后造成重放攻击。</li>
+<h1 id="Oopsie"><a href="#Oopsie" class="headerlink" title="Oopsie"></a>Oopsie</h1><ul>
+<li>  靶机： <code>10.10.10.27</code></li>
+<li>  攻击机：<code>10.10.14.88</code></li>
 </ul>
-</li>
-</ul>
-</li>
-<li> 把上一步生成的字符串<code>A_password_hash(date-time)</code>加上<code>账号A的信息</code>以及<code>一段随机字符串</code>，发送给KDC。用<code>AS_REQ = &#123;A_password_hash(date-time), A_info, random_string&#125;</code>表示这个请求</li>
-</ol>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/epub_729216_208.jpeg" alt="img"></p>
-<blockquote>
-<p>  上图来自《wireshark 网络分析就是这么简单》</p>
-</blockquote>
-<p>本次的<code>AS_REQ</code>发送的账户名是<code>linp1</code>，随机字符串是<code>136224786</code></p>
-<p>​    上述过程的流程大致如下图所示：</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201205164502067.png" alt="image-20201205164502067"></p>
-<ol start="4">
-<li><p>KDC收到<code>AS_REQ</code>之后，先读到账号A的信息<code>linp1</code>，于是去查找A的密码，在用A的密码生成<code>A_password_hash</code>，如果能解密<code>A_password_hash(date-time)</code>则对账号A的验证通过（因为只有A知道自己的密码）</p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201207140843369.png" alt="image-20201207140843369"></p>
-</li>
-</ol>
-<p>既然A已经向KDC证明了自己的身份，那就轮到KDC向A证明了。</p>
-<ol start="5">
-<li><p>KDC生成一个密钥<code>KDC_key</code>，作为账户A和KDC之间认证用（为了避免每一次都要进行繁琐的互相认证），KDC把自己的密码做成hash<code>KDC_password_hash</code>，用它加密<code>KDC_key</code>，得到一个<code>TGT</code></p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201207141622277.png" alt="image-20201207141622277"></p>
-<p> <code>TGT = KDC_password_hash(A_info, KDC_key)</code></p>
-</li>
-<li><p>KDC向账户A返回一个<code>AS_REP</code>包</p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201207142419208.png" alt="image-20201207142419208"></p>
-<p> <code>AS_REP = TGT, A_password_hash(KDC_key, date-time, random_string)</code></p>
-</li>
-<li><p>账户A接收到了<code>AS_REP</code>之后使用<code>A_password_hash()</code>解密<code>A_password_hash(KDC_key, date-time, random_string)</code>，通过验证<code>random_string</code>和<code>date-time</code>来确定KDC身份的真实性，如果是真实的，则把<code>KDC_key</code>和<code>TGT</code>保存起来备用。</p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208083725805.png" alt="image-20201208083725805"></p>
-</li>
-</ol>
-<h3 id="A请KDC帮忙认证资源B"><a href="#A请KDC帮忙认证资源B" class="headerlink" title="A请KDC帮忙认证资源B"></a>A请KDC帮忙认证资源B</h3><ol>
-<li><p>账户A将<code>TGT</code>交还KDC，还有<strong>账户A的相关信息，时间戳，资源B的相关信息</strong>，发送一个<code>TGS-REQ</code></p>
-<p> <code>TGS-REQ = TGT, KDC_key(A_info, date-time), B_info</code></p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208103741964.png" alt="image-20201208103741964"></p>
-</li>
-<li><p>KDC得到<code>TGS-REQ</code>之后，将<code>TGT</code>解密得到<code>KDC_key</code>，用<code>KDC_key</code>解密出<code>A_info date-time</code>用于证明A的身份。</p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208104303690.png" alt="image-20201208104303690"></p>
-</li>
-<li><p>KDC 生成密钥<code>KDC_AB_key</code>，一份直接交给A，另一份通过A交给B。为了防止资源B是伪造的，KDC把资源B的密码hash成<code>B_password_hash</code>，用<code>B_password_hash</code>加密<code>KDC_AB_key</code>，做成一张只有B（除了KDC）能解密的票据(<code>Ticket</code>)</p>
-<p> <code>Ticket=B_password_hash(A_info, KDC_AB_key)</code></p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208104754206.png" alt="image-20201208104754206"></p>
-<p> 发送给账户A的回复<code>TGS_REP = KDC_key(KDC_AB_key), Ticket</code></p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208105932502.png" alt="image-20201208105932502"></p>
-</li>
-<li><p> 账户A收到<code>TGS_REP</code>，用<code>KDC_key</code>解密出<code>KDC_AB_key</code>，并且把<code>Ticket</code>留下，作为之后和资源B进行访问的时候的票据。降低了KDC的负担。</p>
-</li>
-</ol>
-<h3 id="账户A和资源B相互认证"><a href="#账户A和资源B相互认证" class="headerlink" title="账户A和资源B相互认证"></a>账户A和资源B相互认证</h3><p>总结一下到目前为止账户A拥有的数据</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">nmap 10.10.10.28 -A</span><br><span class="line">Starting Nmap 7.91 ( https://nmap.org ) at 2021-03-01 19:19 EST</span><br><span class="line">Nmap scan report for 10.10.10.28</span><br><span class="line">Host is up (0.24s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 61:e4:3f:d4:1e:e2:b2:f1:0d:3c:ed:36:28:36:67:c7 (RSA)</span><br><span class="line">|   256 24:1d:a4:17:d4:e3:2a:9c:90:5c:30:58:8f:60:77:8d (ECDSA)</span><br><span class="line">|_  256 78:03:0e:b4:a1:af:e5:c2:f9:8d:29:05:3e:29:c9:f2 (ED25519)</span><br><span class="line">80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))</span><br><span class="line">|_http-server-header: Apache/2.4.29 (Ubuntu)</span><br><span class="line">|_http-title: Welcome</span><br></pre></td></tr></table></figure>
+
+<p>虽然应该是爆破不出来的，但是看到22端口就习惯性的爆破一下吧，万一就进去了呢</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hydra -l root -P /usr/share/wordlist/rockyou.txt</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><p>访问一下web服务</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302082954260.png" alt="image-20210302082954260"></p>
+<p>啥也没有，所有的链接都跳转不了。</p>
+<h3 id="目录信息收集"><a href="#目录信息收集" class="headerlink" title="目录信息收集"></a>目录信息收集</h3><p>接下来的突破口有两种：</p>
 <ul>
-<li>  <code>Ticket: B_password_hash(KDC_AB_key)</code></li>
-<li>  <code>KDC_AB_key</code></li>
-<li>  <code>KDC_A_key</code></li>
-<li>  <code>TGT</code></li>
+<li>  扫目录，遇到web站点扫一下目录，运气好的话能扫出好多有用的东西。真实环境中要注意线程数和访问速度，太快的话遇到waf/cdn会被ban。这个过程可以使用<code>dirsearch</code>——<a target="_blank" rel="noopener" href="https://github.com/maurosoria/dirsearch">github地址</a></li>
+<li>  看前端源代码，js文件中通常会暴露很多路由和接口信息，通过查看js文件，可以收集子域名和目录信息。这个过程可以使用<code>JSFinder</code>来做——<a target="_blank" rel="noopener" href="https://github.com/Threezh1/JSFinder">github地址</a></li>
 </ul>
-<p>KDC拜托账户A转交给资源B的是<code>KDC_AB_key</code></p>
-<ol>
-<li><p>账户A给资源B发送<code>AP-REQ</code></p>
-<p> <code>AP_REQ = KDC_AB_key(A_info, date-time), Ticket</code></p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208112041712.png" alt="image-20201208112041712"></p>
-</li>
-<li><p>资源B收到<code>AP-REQ</code>，使用自己的密码<code>B_password_hash</code>解开<code>Ticket</code>，得到<code>KDC_AB_key</code>，使用<code>KDC_AB_key</code>解密，得到<code>A_info, date-time</code>以此确认账户A的身份</p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208112801386.png" alt="image-20201208112801386"></p>
-</li>
-<li><p>资源B回复一个<code>AP-REP</code>，来向A证明自己的身份</p>
-<p> <code>AP-REP = KDC_AB_key(date-time)</code></p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208113234301.png" alt="image-20201208113234301"></p>
-</li>
-<li><p>账户A使用<code>KDC_AB_key</code>解开<code>date-time</code>确认资源B的身份</p>
-<p> <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201208113212734.png" alt="image-20201208113212734"></p>
-</li>
-</ol>
-<p>以后账户A和资源B通信使用<code>KDC_AB_key</code>加密流量，这个key<strong>只有KDC， 账户A， 资源B知道</strong>。</p>
-<h2 id="票据"><a href="#票据" class="headerlink" title="票据"></a>票据</h2><p>在上述的验证过程中，如果知道一些内容，就可以导致票据传递攻击</p>
+<h3 id="登录窗口"><a href="#登录窗口" class="headerlink" title="登录窗口"></a>登录窗口</h3><p>这里使用第二种方法，查看网页源代码之后，在最下面发现了：</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302083525395.png" alt="image-20210302083525395"></p>
+<p>访问<code>/cdn-cgi/login</code>:</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302083603915.png" alt="image-20210302083603915"></p>
+<p>对于登录框，接下来要么是sql注入，要么是爆破弱密码（我是真没想到是上一道题的密码啊）</p>
 <ul>
-<li>  白银票据——知道<code>B_password_hash</code></li>
-<li>  黄金票据——知道<code>KDC_password_hash</code></li>
+<li>  如果是sql注入，可以尝试万能密码<code>&#39;||1||&#39;</code>，或者直接使用sqlmap跑一下</li>
+<li>  如果是弱密码，burp抓包后，使用爆破模块即可</li>
 </ul>
-<h3 id="白银票据"><a href="#白银票据" class="headerlink" title="白银票据"></a>白银票据</h3><p>在上述<a href="#%E8%B4%A6%E6%88%B7A%E5%92%8C%E8%B5%84%E6%BA%90B%E7%9B%B8%E4%BA%92%E8%AE%A4%E8%AF%81">账户A和资源B相互认证</a>的过程中，如果账户A本身就有资源B密码的hash值<code>B_password_hash</code>那么就可以伪造一份<code>Ticket: B_password_hash(KDC_AB_key)</code></p>
-<p>由于<code>KDC_AB_key</code>是KDC颁发，用于AB认证，那么账户A可以自己生成一个<code>KDC_AB_key(伪)</code>，然后使用<code>B_password_hash</code>加密这个伪造的key</p>
-<p><code>B_password_hash(KDC_AB_key(伪))</code></p>
-<p>在资源b认证的过程中，使用自己的密钥进行解密的时候，解密出来的key是<code>KDC_AB_key(伪)</code>，同时账户A发送的<code>KDC_AB_key(伪)(A_info, date-time)</code>会被B使用伪造的key成功解密，从而验证了A的身份，绕过了KDC的验证</p>
-<p>特点：</p>
-<ol>
-<li> 不需要与KDC进行交互</li>
-<li> 需要目标资源的hash</li>
-</ol>
-<h3 id="黄金票据"><a href="#黄金票据" class="headerlink" title="黄金票据"></a>黄金票据</h3><p>如果在上述<a href="#%E8%B4%A6%E6%88%B7A%E5%92%8CKDC%E4%B9%8B%E9%97%B4%E7%9A%84%E8%AE%A4%E8%AF%81">账户A和KDC认证</a>时，拥有<code>krbtgt用户的hash</code>(<code>即KDC_password_hash</code>)</p>
-<p>那么在认证的过程中可以使用<code>KDC_password_hash</code>生成一个假的<code>TGT</code>，跳过账户A和KDC认证，通过伪造的<code>TGT</code>和KDC进行交互，欺骗KDC，得到KDC的认证</p>
+<p>密码是上题得到的<code>MEGACORP_4dm1n!!</code></p>
+<h3 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h3><p>登录之后，选项卡中有一个<code>upload</code>，但是需要super admin权限</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084039939.png" alt="image-20210302084039939"></p>
+<p>试试其他的功能，第一个<code>Account</code>，可以看到自己的<code>Access ID</code>，是通过传入<code>id</code>变量的形式，并且cookie保存的信息就是这个<code>Access ID</code>。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084521198.png" alt="image-20210302084521198"></p>
+<p>尝试sql注入或者越权访问</p>
+<ul>
+<li><p>sql注入：</p>
+<ul>
+<li>  直接使用sqlmap跑一下，显而易见的，失败了。</li>
+<li>  手动加入 单引号、双引号、分号等特殊字符，没有报错信息。</li>
+</ul>
+</li>
+<li><p>越权访问：</p>
+<ul>
+<li><p>修改<code>id</code>变量的值，id为4的时候出现了另一个用户</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084649936.png" alt="image-20210302084649936"></p>
+<p>  但是他不是super admin，继续。</p>
+<p>  直到<code>id=30</code>的时候，super admin的<code>Access ID</code>出来了</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084736069.png" alt="image-20210302084736069"></p>
+<p>  修改自己的cookie为这个值，访问<code>uploads</code>选项卡</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302084933102.png" alt="image-20210302084933102"></p>
+<p>  访问到了<code>uploads</code>，越权成功。</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085019626.png" alt="image-20210302085019626"></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>接下来的文件上传比较简单，没有保护措施</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085233423.png" alt="image-20210302085233423"></p>
+<p>但是上传的路径不知道</p>
+<ul>
+<li>  靠猜，通常都是<code>/upload</code> 或 <code>/uploads</code> 或 <code>/uploadfiles</code>这种的样子</li>
+<li>  目录扫描的时候扫出类似的目录</li>
+</ul>
+<p>咱这里用猜的，访问<code>/uploads/shell.php</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085426082.png" alt="image-20210302085426082"></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/AntSwordProject/AntSword-Loader">蚁剑</a>连上webshell</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085731375.png" alt="image-20210302085731375"></p>
+<p>得到第一个flag，在<code>/home/robert/user.txt</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302085857872.png" alt="image-20210302085857872"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><h3 id="robert"><a href="#robert" class="headerlink" title="robert"></a>robert</h3><p>在<code>/var/www/html/login/db.php</code>中发现密码</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302091843922.png" alt="image-20210302091843922"></p>
+<p>ssh连接</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302092355879.png" alt="image-20210302092355879"></p>
+<h3 id="root"><a href="#root" class="headerlink" title="root"></a>root</h3><p>Linux提权的若干方法：</p>
+<ul>
+<li><p>setuid，具有s权限的文件在运行时如果代码中调用了<code>setuid</code>函数，那么会改变自己的uid，如果这个程序能打开一个shell，那么可以得到setuid对象的权限</p>
+<ul>
+<li><p>使用命令<code>find / -perm -u=s -type f 2&gt;/dev/null</code></p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302090516559.png" alt="image-20210302090516559"></p>
+</li>
+</ul>
+</li>
+<li><p>  sudo免密运行，大致原理同上</p>
+</li>
+<li><p>  docker组用户通过docker提权，通过挂载驱动的形式提权</p>
+</li>
+<li><p>  内核漏洞，这个就不多说了。</p>
+</li>
+<li><p>  计划任务，假设root用户每分钟会运行一次<code>/tmp/a</code>，并且该文件可写，那就可以改变文件内容，再次运行就是任意代码执行。</p>
+</li>
+</ul>
+<p>上面找到的<code>bugtracker</code>可能是突破口，下载该文件，是一个Linux可执行文件，简单的分析可以直接使用<code>strings</code>，或者ida反编译</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302090926036.png" alt="image-20210302090926036"></p>
+<p>这里可以有两种利用方法</p>
+<ul>
+<li><p>劫持cat</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302092558352.png" alt="image-20210302092558352"></p>
+<p>  通过环境变量的劫持，达到执行命令的效果</p>
+</li>
+<li><p>命令注入</p>
+<p>  v6变量直接拼接在<code>cat /root/report</code>之后，运行在system函数中，存在命令注入</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302093012476.png" alt="image-20210302093012476"></p>
+<p>  但是不能用空格，因为%s遇到空格就会停止，找个空格替代品<code>$&#123;IFS&#125;</code>就行</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302093359049.png" alt="image-20210302093359049"></p>
+</li>
+</ul>
+<p>flag</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302093524570.png" alt="image-20210302093524570"></p>
 
       
     </div>
@@ -531,9 +549,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/windows/" rel="tag"><i class="fa fa-tag"></i> windows</a>
+            <a href="/tags/exploit/" rel="tag"><i class="fa fa-tag"></i> exploit</a>
           
-            <a href="/tags/kerberos/" rel="tag"><i class="fa fa-tag"></i> kerberos</a>
+            <a href="/tags/hack-the-box/" rel="tag"><i class="fa fa-tag"></i> hack the box</a>
+          
+            <a href="/tags/windows/" rel="tag"><i class="fa fa-tag"></i> windows</a>
           
         </div>
       
@@ -546,8 +566,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/CommonCollections1.html" rel="next" title="CommonCollections1 分析">
-                <i class="fa fa-chevron-left"></i> CommonCollections1 分析
+              <a href="/box_Archetype.html" rel="next" title="box:Archetype">
+                <i class="fa fa-chevron-left"></i> box:Archetype
               </a>
             
           </div>
@@ -555,10 +575,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/sunset-midnight.html" rel="prev" title="vulnhub sunset:midnight靶机">
-                vulnhub sunset:midnight靶机 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -704,7 +720,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#kerberos"><span class="nav-number">1.</span> <span class="nav-text">kerberos</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81"><span class="nav-number">1.1.</span> <span class="nav-text">身份认证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#KDC"><span class="nav-number">1.1.1.</span> <span class="nav-text">KDC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%A6%E6%88%B7A%E5%92%8CKDC%E4%B9%8B%E9%97%B4%E7%9A%84%E8%AE%A4%E8%AF%81"><span class="nav-number">1.1.2.</span> <span class="nav-text">账户A和KDC之间的认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#A%E8%AF%B7KDC%E5%B8%AE%E5%BF%99%E8%AE%A4%E8%AF%81%E8%B5%84%E6%BA%90B"><span class="nav-number">1.1.3.</span> <span class="nav-text">A请KDC帮忙认证资源B</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%A6%E6%88%B7A%E5%92%8C%E8%B5%84%E6%BA%90B%E7%9B%B8%E4%BA%92%E8%AE%A4%E8%AF%81"><span class="nav-number">1.1.4.</span> <span class="nav-text">账户A和资源B相互认证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A5%A8%E6%8D%AE"><span class="nav-number">1.2.</span> <span class="nav-text">票据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BD%E9%93%B6%E7%A5%A8%E6%8D%AE"><span class="nav-number">1.2.1.</span> <span class="nav-text">白银票据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%BB%84%E9%87%91%E7%A5%A8%E6%8D%AE"><span class="nav-number">1.2.2.</span> <span class="nav-text">黄金票据</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Oopsie"><span class="nav-number">1.</span> <span class="nav-text">Oopsie</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web"><span class="nav-number">1.2.</span> <span class="nav-text">web</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.2.1.</span> <span class="nav-text">目录信息收集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BB%E5%BD%95%E7%AA%97%E5%8F%A3"><span class="nav-number">1.2.2.</span> <span class="nav-text">登录窗口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="nav-number">1.2.3.</span> <span class="nav-text">文件上传</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#robert"><span class="nav-number">1.3.1.</span> <span class="nav-text">robert</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#root"><span class="nav-number">1.3.2.</span> <span class="nav-text">root</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
