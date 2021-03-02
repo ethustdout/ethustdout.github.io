@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="windows,exploit,hack the box," />
+  <meta name="keywords" content="exploit,windows,hack the box," />
 
 
 
@@ -97,10 +97,10 @@
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302150620403.png">
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302150933120.png">
 <meta property="article:published_time" content="2021-03-01T08:14:10.000Z">
-<meta property="article:modified_time" content="2021-03-02T07:10:58.695Z">
+<meta property="article:modified_time" content="2021-03-02T07:11:22.517Z">
 <meta property="article:author" content="stdout">
-<meta property="article:tag" content="windows">
 <meta property="article:tag" content="exploit">
+<meta property="article:tag" content="windows">
 <meta property="article:tag" content="hack the box">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302142632173.png">
@@ -433,7 +433,7 @@
 </ul>
 <h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">└─# nmap 10.10.10.30 -A                                                                                                                                                    4 ⚙</span><br><span class="line">Starting Nmap 7.91 ( https://nmap.org ) at 2021-03-02 01:11 EST</span><br><span class="line">Nmap scan report for 10.10.10.30</span><br><span class="line">Host is up (0.22s latency).</span><br><span class="line">Not shown: 989 closed ports</span><br><span class="line">PORT     STATE SERVICE           VERSION</span><br><span class="line">53/tcp   open  domain            Simple DNS Plus</span><br><span class="line">88/tcp   open  kerberos-sec      Microsoft Windows Kerberos (server time: 2021-03-02 14:21:46Z)</span><br><span class="line">135/tcp  open  msrpc             Microsoft Windows RPC</span><br><span class="line">139/tcp  open  netbios-ssn       Microsoft Windows netbios-ssn</span><br><span class="line">389/tcp  open  ldap              Microsoft Windows Active Directory LDAP (Domain: MEGACORP.LOCAL0., Site: Default-First-Site-Name)</span><br><span class="line">445/tcp  open  microsoft-ds?</span><br><span class="line">464/tcp  open  kpasswd5?</span><br><span class="line">593/tcp  open  ncacn_http        Microsoft Windows RPC over HTTP 1.0</span><br><span class="line">636/tcp  open  tcpwrapped</span><br><span class="line">3268/tcp open  ldap              Microsoft Windows Active Directory LDAP (Domain: MEGACORP.LOCAL0., Site: Default-First-Site-Name)</span><br><span class="line">3269/tcp open  globalcatLDAPssl?</span><br></pre></td></tr></table></figure>
 
-<p>nmap扫描出了Kerberos、LDAP等，大致可以断定为是一台DC</p>
+<p>nmap扫描出了Kerberos、LDAP等，大致可以断定为是一台KDC</p>
 <p><strong>由于萌新初次接触域渗透，本机子基本是照着wp复现一遍，学习一下工具的使用和原理什么的。</strong></p>
 <h2 id="先写写自己做了啥"><a href="#先写写自己做了啥" class="headerlink" title="先写写自己做了啥"></a>先写写自己做了啥</h2><p>大多都是无用功</p>
 <h3 id="尝试使用impacket"><a href="#尝试使用impacket" class="headerlink" title="尝试使用impacket"></a>尝试使用impacket</h3><p><a target="_blank" rel="noopener" href="https://github.com/ropnop/impacket_static_binaries/releases/tag/0.9.22.dev-binaries">https://github.com/ropnop/impacket_static_binaries/releases/tag/0.9.22.dev-binaries</a></p>
@@ -508,9 +508,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/windows/" rel="tag"><i class="fa fa-tag"></i> windows</a>
-          
             <a href="/tags/exploit/" rel="tag"><i class="fa fa-tag"></i> exploit</a>
+          
+            <a href="/tags/windows/" rel="tag"><i class="fa fa-tag"></i> windows</a>
           
             <a href="/tags/hack-the-box/" rel="tag"><i class="fa fa-tag"></i> hack the box</a>
           
