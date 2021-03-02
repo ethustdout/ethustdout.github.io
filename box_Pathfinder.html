@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="exploit,windows,hack the box," />
+  <meta name="keywords" content="windows,exploit,hack the box," />
 
 
 
@@ -94,13 +94,15 @@
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302143007960.png">
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302144033652.png">
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302144708936.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302151354457.png">
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302150620403.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302151325897.png">
 <meta property="og:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302150933120.png">
 <meta property="article:published_time" content="2021-03-01T08:14:10.000Z">
-<meta property="article:modified_time" content="2021-03-02T07:11:22.517Z">
+<meta property="article:modified_time" content="2021-03-02T07:13:59.650Z">
 <meta property="article:author" content="stdout">
-<meta property="article:tag" content="exploit">
 <meta property="article:tag" content="windows">
+<meta property="article:tag" content="exploit">
 <meta property="article:tag" content="hack the box">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302142632173.png">
@@ -478,9 +480,14 @@
 </ul>
 </li>
 </ul>
-<h2 id="最后写写自己又干了啥"><a href="#最后写写自己又干了啥" class="headerlink" title="最后写写自己又干了啥"></a>最后写写自己又干了啥</h2><p>在拿到<strong>svc_bes</strong>用户cs上线之后，使用<strong>梼杌</strong>的获取域内全部用户的hash模块，得到了administrator用户的hash值</p>
+<h2 id="最后写写自己又干了啥"><a href="#最后写写自己又干了啥" class="headerlink" title="最后写写自己又干了啥"></a>最后写写自己又干了啥</h2><p>在拿到<strong>svc_bes</strong>用户cs上线之后，使用<strong>梼杌</strong>的获取域内全部用户的hash模块</p>
+<img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302151354457.png" alt="image-20210302151354457" style="zoom:50%;" />
+
+<p>得到了<strong>administrator</strong>用户的hash值</p>
 <p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302150620403.png" alt="image-20210302150620403"></p>
-<p>在用cs自带的<code>psexec</code>使用<code>pass the hash</code>攻击，拿到的权限就是system</p>
+<p>在用cs自带的<code>psexec</code>使用<code>pass the hash</code>攻击</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302151325897.png" alt="image-20210302151325897"></p>
+<p>拿到的权限就是system</p>
 <p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302150933120.png" alt="image-20210302150933120"></p>
 <p>为什么直接是system权限呢</p>
 <blockquote>
@@ -508,9 +515,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/exploit/" rel="tag"><i class="fa fa-tag"></i> exploit</a>
-          
             <a href="/tags/windows/" rel="tag"><i class="fa fa-tag"></i> windows</a>
+          
+            <a href="/tags/exploit/" rel="tag"><i class="fa fa-tag"></i> exploit</a>
           
             <a href="/tags/hack-the-box/" rel="tag"><i class="fa fa-tag"></i> hack the box</a>
           
