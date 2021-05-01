@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="JavaWeb,Fastjson," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="fastjson 历史漏洞的复现，调试，学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fastjson 反序列化">
+<meta property="og:url" content="http://www.ethushiroha.com/Fastjson1.html">
+<meta property="og:site_name" content="stdout">
+<meta property="og:description" content="fastjson 历史漏洞的复现，调试，学习">
+<meta property="og:locale">
+<meta property="og:image" content="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210501100552853.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pic2/raw/master/uPic/Ve0AgC.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210501105842685.png">
+<meta property="article:published_time" content="2021-05-01T03:14:10.000Z">
+<meta property="article:modified_time" content="2021-05-01T06:02:43.217Z">
+<meta property="article:author" content="stdout">
+<meta property="article:tag" content="JavaWeb">
+<meta property="article:tag" content="Fastjson">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210501100552853.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.ethushiroha.com/Fastjson1.html"/>
+
+
+
+
+
+  <title>fastjson 反序列化 | stdout</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">stdout</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-标签">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-文章">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            文章
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-友链">
+          <a href="/py.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            友链
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/Fastjson1.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="stdout">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">fastjson 反序列化</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-01T11:14:10+08:00">
+                2021-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaWeb/" itemprop="url" rel="index">
+                    <span itemprop="name">JavaWeb</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaWeb/ysoserial/" itemprop="url" rel="index">
+                    <span itemprop="name">ysoserial</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>fastjson 历史漏洞的复现，调试，学习</p>
+<a id="more"></a>
+
+
+
+<h1 id="fastjson"><a href="#fastjson" class="headerlink" title="fastjson"></a>fastjson</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将<code>Java Bean</code>序列化为JSON字符串，也可以从JSON字符串反序列化到<code>JavaBean</code></p>
+<blockquote>
+<p>  题外话：之前看到有篇微博说有三个东西养活了大部分的安全人员，第三个就说是fastjson</p>
+</blockquote>
+<h2 id="反序列化史"><a href="#反序列化史" class="headerlink" title="反序列化史"></a>反序列化史</h2><p>从<code>v1.2.24</code>的漏洞公布以来，fastjson对于漏洞的修复大多数只是增加了黑名单，对于黑名单，大师傅们有一套成熟的bypass体系（</p>
+<h3 id="1-2-24"><a href="#1-2-24" class="headerlink" title="1.2.24"></a>1.2.24</h3><p>对于1.2.24以及之前的版本，fastjson没有做任何的防护措施，很容易的就被反序列化链攻击。</p>
+<h3 id="1-2-25"><a href="#1-2-25" class="headerlink" title="1.2.25"></a>1.2.25</h3><p>在1.2.25版本加入了<code>checkAutoType</code>函数，其中有个<code>autoTypeSupport</code>默认为<code>False</code>。</p>
+<ul>
+<li>  当<code>autoTypeSupport</code>为<code>False</code>时，先黑名单过滤，再白名单过滤，若白名单匹配上则直接加载该类，否则报错。</li>
+<li>  当<code>autoTypeSupport</code>为<code>True</code>时，先白名单过滤，匹配成功即可加载该类，否则再黑名单过滤。对于开启或者不开启，都有相应的绕过方法。</li>
+</ul>
+<p>黑名单如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">String[] denyList = <span class="string">&quot;</span></span><br><span class="line"><span class="string">bsh,</span></span><br><span class="line"><span class="string">com.mchange,com.sun.,</span></span><br><span class="line"><span class="string">java.lang.Thread,</span></span><br><span class="line"><span class="string">java.net.Socket,</span></span><br><span class="line"><span class="string">java.rmi,</span></span><br><span class="line"><span class="string">javax.xml,</span></span><br><span class="line"><span class="string">org.apache.bcel,</span></span><br><span class="line"><span class="string">org.apache.commons.beanutils,</span></span><br><span class="line"><span class="string">org.apache.commons.collections.Transformer,</span></span><br><span class="line"><span class="string">org.apache.commons.collections.functors,</span></span><br><span class="line"><span class="string">org.apache.commons.collections4.comparators,</span></span><br><span class="line"><span class="string">org.apache.commons.fileupload,</span></span><br><span class="line"><span class="string">org.apache.myfaces.context.servlet,</span></span><br><span class="line"><span class="string">org.apache.tomcat,org.apache.wicket.util,</span></span><br><span class="line"><span class="string">org.codehaus.groovy.runtime,</span></span><br><span class="line"><span class="string">org.hibernate,org.jboss,</span></span><br><span class="line"><span class="string">org.mozilla.javascript,</span></span><br><span class="line"><span class="string">org.python.core,</span></span><br><span class="line"><span class="string">org.springframework&quot;</span>.split(<span class="string">&quot;,&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到还是非常全面的（大概）</p>
+<p>而后的版本大多都是在黑名单里斗智斗勇，当然，也有一些其他的变化。</p>
+<h2 id="稍稍小分析"><a href="#稍稍小分析" class="headerlink" title="稍稍小分析"></a>稍稍小分析</h2><h3 id="小栗子1——test"><a href="#小栗子1——test" class="headerlink" title="小栗子1——test"></a>小栗子1——test</h3><p>只有<code>@type</code>的情况</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.shiroha.demos;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSONObject;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">demo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String str = <span class="string">&quot;&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;\&quot;@type\&quot;: \&quot;java.lang.String\&quot;,&quot;</span> +</span><br><span class="line">                <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">        JSONObject object = JSON.parseObject(str);</span><br><span class="line">        System.out.println(object.getClass());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在<code>JSON.parseObject()</code>方法经过一系列调用之后（调用栈如下）</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210501100552853.png" alt="image-20210501100552853"></p>
+<p>到达如下位置（320行）</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/Ve0AgC.png" alt="Ve0AgC"></p>
+<p>满足if的条件（<code>key == @type</code>）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 320</span></span><br><span class="line"><span class="keyword">if</span> (key == JSON.DEFAULT_TYPE_KEY &amp;&amp; !lexer.isEnabled(Feature.DisableSpecialKeyDetect)) &#123;</span><br><span class="line">	......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>语法分析器解析了<code>@type</code>字段的字符串，并转化为类名</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 321</span></span><br><span class="line">String typeName = lexer.scanSymbol(symbolTable, <span class="string">&#x27;&quot;&#x27;</span>);</span><br><span class="line"></span><br><span class="line">Class&lt;?&gt; clazz = TypeUtils.loadClass(typeName, config.getDefaultClassLoader());</span><br></pre></td></tr></table></figure>
+
+<p>当clazz不为null的时候，继续解析语法，判断是否还有字段。<code>lexer.nextToken(JSONToken.COMMA)</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 324</span></span><br><span class="line"><span class="keyword">if</span> (clazz == <span class="keyword">null</span>) &#123;</span><br><span class="line">	object.put(JSON.DEFAULT_TYPE_KEY, typeName);</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">lexer.nextToken(JSONToken.COMMA);</span><br><span class="line"></span><br><span class="line"><span class="comment">// JSONLexerBase.java$nextToken: 242</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">nextToken</span><span class="params">(<span class="keyword">int</span> expect)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="keyword">switch</span> (expect) &#123;</span><br><span class="line">            <span class="keyword">case</span> JSONToken.COMMA:</span><br><span class="line">                <span class="keyword">if</span> (ch == <span class="string">&#x27;&#125;&#x27;</span>) &#123;</span><br><span class="line">                    token = JSONToken.RBRACE;</span><br><span class="line">                    next();</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当没有字段的时候，进入了if，创建一个实例<code>instance = clazz.newInstance()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 330</span></span><br><span class="line"><span class="keyword">if</span> (lexer.token() == JSONToken.RBRACE) &#123;</span><br><span class="line">	lexer.nextToken(JSONToken.COMMA);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Object instance = <span class="keyword">null</span>;</span><br><span class="line">        ObjectDeserializer deserializer = <span class="keyword">this</span>.config.getDeserializer(clazz);</span><br><span class="line">        <span class="keyword">if</span> (deserializer <span class="keyword">instanceof</span> JavaBeanDeserializer) &#123;</span><br><span class="line">            instance = ((JavaBeanDeserializer) deserializer).createInstance(<span class="keyword">this</span>, clazz);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (clazz == Cloneable.class) &#123;</span><br><span class="line">                instance = <span class="keyword">new</span> HashMap();</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">&quot;java.util.Collections$EmptyMap&quot;</span>.equals(typeName)) &#123;</span><br><span class="line">                instance = Collections.emptyMap();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                instance = clazz.newInstance();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;create instance error&quot;</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>于此结束。</p>
+<h3 id="小栗子2——dnslog-poc"><a href="#小栗子2——dnslog-poc" class="headerlink" title="小栗子2——dnslog poc"></a>小栗子2——dnslog poc</h3><p>常见的dnslog探测poc</p>
+<h4 id="Version-1-2-24"><a href="#Version-1-2-24" class="headerlink" title="Version 1.2.24"></a>Version 1.2.24</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.shiroha.demos;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSONObject;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">demo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        String str = <span class="string">&quot;&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;\&quot;@type\&quot;: \&quot;java.net.Inet4Address\&quot;, &quot;</span> +</span><br><span class="line">                <span class="string">&quot;\&quot;val\&quot;: \&quot;hello.frkukf.dnslog.cn\&quot;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;&#125;&quot;</span>;</span><br><span class="line">        JSONObject object = JSON.parseObject(str);</span><br><span class="line">        System.out.println(object.getClass());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>直到<code>lexer.nextToken(JSONToken.COMMA)</code>为止都和上面一样。</p>
+<p>由于在<code>@type</code>字段之后，还有一个<code>val</code>字段，所以在<code>lexer.nextToken()</code>函数返回的不是<code>JSONToken.RBRACE</code>，而是<code>JSONToken.COMMA</code>，也就进不到 if 语句中。</p>
+<p>运行到 367 行时，会调用 <code>config.getDeserializer(clazz)</code>，根据<code>clazz</code>找到对应的反序列化对象解析器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 367</span></span><br><span class="line">ObjectDeserializer deserializer = config.getDeserializer(clazz);</span><br><span class="line"><span class="keyword">return</span> deserializer.deserialze(<span class="keyword">this</span>, clazz, fieldName);</span><br></pre></td></tr></table></figure>
+
+<p>在<code>config.getDeserializer(clazz)</code>函数中，调用<code>this.derializers.get(type)</code>来找反序列化解析器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ParserConfig$getDeserializer: 305</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ObjectDeserializer <span class="title">getDeserializer</span><span class="params">(Type type)</span> </span>&#123;</span><br><span class="line">    ObjectDeserializer derializer = <span class="keyword">this</span>.derializers.get(type);</span><br><span class="line">    <span class="keyword">if</span> (derializer != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> derializer;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个<code>this.derializers</code>是一个<code>IdentityHashMap</code>，其中与<code>java.net.Inet4adreess</code>对应的是<code>MiscCodec</code>解析器</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210501105842685.png" alt="image-20210501105842685"></p>
+<p>在<code>MiscCodec$deserialze()</code>函数中，会根据类的名字选择相应的解析方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//MiscCodec$deserialze: 170</span></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">deserialze</span><span class="params">(DefaultJSONParser parser, Type clazz, Object fieldName)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// line: 299</span></span><br><span class="line">    <span class="keyword">if</span> (clazz == InetAddress.class || clazz == Inet4Address.class || clazz == Inet6Address.class) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> (T) InetAddress.getByName(strVal);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (UnknownHostException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;deserialize inet adress error&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在line: 301 <code>InetAddress.getByName()</code>触发dns查询。</p>
+<p>这个<code>strVal</code>对象由前面的<code>objVal</code>变化而来</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line: 241</span></span><br><span class="line"><span class="keyword">if</span> (objVal == <span class="keyword">null</span>) &#123;</span><br><span class="line">    strVal = <span class="keyword">null</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (objVal <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">    strVal = (String) objVal;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而<code>objVal</code>由解析器解析</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line: 215</span></span><br><span class="line">Object objVal;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (parser.resolveStatus == DefaultJSONParser.TypeNameRedirect) &#123;</span><br><span class="line">    parser.resolveStatus = DefaultJSONParser.NONE;</span><br><span class="line">    parser.accept(JSONToken.COMMA);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lexer.token() == JSONToken.LITERAL_STRING) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="string">&quot;val&quot;</span>.equals(lexer.stringVal())) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;syntax error&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        lexer.nextToken();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;syntax error&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    parser.accept(JSONToken.COLON);</span><br><span class="line"></span><br><span class="line">    objVal = parser.parse();</span><br><span class="line"></span><br><span class="line">    parser.accept(JSONToken.RBRACE);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    objVal = parser.parse();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="checkAutoType"><a href="#checkAutoType" class="headerlink" title="checkAutoType"></a>checkAutoType</h3><h4 id="java-net-Inet4Address"><a href="#java-net-Inet4Address" class="headerlink" title="java.net.Inet4Address"></a>java.net.Inet4Address</h4><p>在 1.2.24 之后，最主要的问题就是加入了 <code>checkAutoType()</code>函数</p>
+<p>这里以 <code>1.2.67</code> 为例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DefaultJSONParser$parseObject: 332</span></span><br><span class="line"><span class="keyword">if</span> (!allDigits) &#123;</span><br><span class="line">    clazz = config.checkAutoType(typeName, <span class="keyword">null</span>, lexer.getFeatures());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ParserConfig$checkAutoType: 1196 </span></span><br><span class="line"><span class="keyword">public</span> Class&lt;?&gt; checkAutoType(String typeName, Class&lt;?&gt; expectClass, <span class="keyword">int</span> features) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>来逐步分析一下这个函数。</p>
+<p>首先检查合法性：</p>
+<ol>
+<li> 不为 null</li>
+<li> 长度在 3～192 之间</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ParserConfig$checkAutoType: 1197 - 1221</span></span><br><span class="line"><span class="keyword">if</span> (typeName == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (typeName.length() &gt;= <span class="number">192</span> || typeName.length() &lt; <span class="number">3</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;autoType is not support. &quot;</span> + typeName);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">boolean</span> expectClassFlag;</span><br><span class="line"><span class="comment">// 传入的参数 exceptClass 为 null 。</span></span><br><span class="line"><span class="keyword">if</span> (expectClass == <span class="keyword">null</span>) &#123;</span><br><span class="line">    expectClassFlag = <span class="keyword">false</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>而后，根据某种算法进行黑名单过滤、内部白名单过滤。</p>
+<p>对于白名单，在之前使用的是 <code>Class</code> 对象，而现在用了他的 <code>hashcodes</code> ，说明开发者并不想让人知道到底哪些是白名单。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">long</span> h1 = (BASIC ^ className.charAt(<span class="number">0</span>)) * PRIME;</span><br><span class="line"><span class="keyword">if</span> (h1 == <span class="number">0xaf64164c86024f1aL</span>) &#123; <span class="comment">// [</span></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;autoType is not support. &quot;</span> + typeName);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ((h1 ^ className.charAt(className.length() - <span class="number">1</span>)) * PRIME == <span class="number">0x9198507b5af98f0L</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;autoType is not support. &quot;</span> + typeName);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">long</span> h3 = (((((BASIC ^ className.charAt(<span class="number">0</span>))</span><br><span class="line">        * PRIME)</span><br><span class="line">        ^ className.charAt(<span class="number">1</span>))</span><br><span class="line">        * PRIME)</span><br><span class="line">        ^ className.charAt(<span class="number">2</span>))</span><br><span class="line">        * PRIME;</span><br><span class="line"></span><br><span class="line"><span class="keyword">long</span> fullHash = TypeUtils.fnv1a_64(className);</span><br><span class="line"><span class="keyword">boolean</span> internalWhite = Arrays.binarySearch(INTERNAL_WHITELIST_HASHCODES,  fullHash) &gt;= <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果是在白名单内，也就是 <code>internalWhite == true</code> 的情况，会在下面直接 <code>loadClass</code>，也就没了一堆过滤保护措施。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line: 1290</span></span><br><span class="line"><span class="keyword">if</span> (internalWhite) &#123;</span><br><span class="line">    clazz = TypeUtils.loadClass(typeName, defaultClassLoader, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当然 <code>java.net.Inet4Address</code> 这个类并不在 <code>INTERNAL_WHITELIST_HASHCODES</code> 中，继续分析。</p>
+<p>而后就是一个黑名单过滤</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line: 1248</span></span><br><span class="line"><span class="comment">// 这里 internalDenyHashCodes 默认是 null</span></span><br><span class="line"><span class="keyword">if</span> (internalDenyHashCodes != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">long</span> hash = h3;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">3</span>; i &lt; className.length(); ++i) &#123;</span><br><span class="line">        hash ^= className.charAt(i);</span><br><span class="line">        hash *= PRIME;</span><br><span class="line">        <span class="keyword">if</span> (Arrays.binarySearch(internalDenyHashCodes, hash) &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;autoType is not support. &quot;</span> + typeName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再之后，去找到这个类（我不太清楚这里为什么需要分三步走分别判断，有理解的师傅可以教教我，感谢）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line: 1280-1288</span></span><br><span class="line">clazz = TypeUtils.getClassFromMapping(typeName);</span><br><span class="line"><span class="comment">// java.net.Inet4Address 在这里找到了 clazz</span></span><br><span class="line"><span class="keyword">if</span> (clazz == <span class="keyword">null</span>) &#123;</span><br><span class="line">    clazz = deserializers.findClass(typeName);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (clazz == <span class="keyword">null</span>) &#123;</span><br><span class="line">    clazz = typeMapping.get(typeName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据 <code>expectClass</code> 处理 type，由于传递进来的参数是 null ， 因此不触发 if 语句， 直接返回了 <code>clazz</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// line: 1294-1302</span></span><br><span class="line"><span class="keyword">if</span> (clazz != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (expectClass != <span class="keyword">null</span></span><br><span class="line">            &amp;&amp; clazz != java.util.HashMap.class</span><br><span class="line">            &amp;&amp; !expectClass.isAssignableFrom(clazz)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> JSONException(<span class="string">&quot;type not match. &quot;</span> + typeName + <span class="string">&quot; -&gt; &quot;</span> + expectClass.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> clazz;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>顺利通过 <code>checkAutoType</code> 函数 ， 在这之后就和普通的没啥区别了。</p>
+<h4 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h4><p>未完待续。。。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaWeb/" rel="tag"><i class="fa fa-tag"></i> JavaWeb</a>
+          
+            <a href="/tags/Fastjson/" rel="tag"><i class="fa fa-tag"></i> Fastjson</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/java-agent.html" rel="next" title="Java-agent 入门">
+                <i class="fa fa-chevron-left"></i> Java-agent 入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://gitee.com/ethustdout/pics/raw/master/uPic/head.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">70</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ethushiroha" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#fastjson"><span class="nav-number">1.</span> <span class="nav-text">fastjson</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%8F%B2"><span class="nav-number">1.2.</span> <span class="nav-text">反序列化史</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-24"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.2.24</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-25"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2.25</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8D%E7%A8%8D%E5%B0%8F%E5%88%86%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">稍稍小分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E6%A0%97%E5%AD%901%E2%80%94%E2%80%94test"><span class="nav-number">1.3.1.</span> <span class="nav-text">小栗子1——test</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E6%A0%97%E5%AD%902%E2%80%94%E2%80%94dnslog-poc"><span class="nav-number">1.3.2.</span> <span class="nav-text">小栗子2——dnslog poc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Version-1-2-24"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">Version 1.2.24</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#checkAutoType"><span class="nav-number">1.3.3.</span> <span class="nav-text">checkAutoType</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#java-net-Inet4Address"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">java.net.Inet4Address</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%95%E8%BF%87"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">绕过</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <!--
+<div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">stdout</span>
+
+  
+</div>
+-->
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
