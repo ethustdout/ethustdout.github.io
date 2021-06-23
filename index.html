@@ -542,36 +542,14 @@
 
       
         
-          
-            <a id="more"></a>
-
-<h1 id="Tomcat-历史漏洞"><a href="#Tomcat-历史漏洞" class="headerlink" title="Tomcat 历史漏洞"></a>Tomcat 历史漏洞</h1><h2 id="CVE-2017-12615"><a href="#CVE-2017-12615" class="headerlink" title="CVE-2017-12615"></a>CVE-2017-12615</h2><p>适用版本：Tomcat 全版本（只要关闭了 readonly）</p>
-<p>漏洞成因：在 tomcat  conf/web.xml 中错误的配置，将 <strong>readonly</strong> 字段设置为 <strong>false</strong>， 默认是 <strong>true</strong>。</p>
-<h3 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h3><p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603133316778.png" alt="image-20210603133316778"></p>
-<p>导致用户可以使用 http PUT 方式上传文件</p>
-<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603133447934.png" alt="image-20210603133447934"></p>
-<p>返回 201 表示上传成功，返回网页端查看</p>
-<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603133531908.png" alt="image-20210603133531908"></p>
-<p>尝试上传 jsp， 失败</p>
-<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603133925242.png" alt="image-20210603133925242"></p>
-<p>tomcat 对于上传的文件有检测，不能直接写 jsp，需要有一定的绕过，常见的几种绕过有：</p>
-<ol>
-<li> /1.jsp/ ， tomcat 在解析的时候会把最后的 / 去掉</li>
-<li> /1.jsp::$DATA， windows 常见绕过</li>
-<li> 。。。</li>
-</ol>
-<p>尝试 / 绕过</p>
-<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603134520819.png" alt="image-20210603134520819"></p>
-<p>在 docker 中查看，确实上传成功</p>
-<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603134620761.png" alt="image-20210603134620761"></p>
-<p>访问，输出了 <code>hello world</code></p>
-<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603134659200.png" alt="image-20210603134659200"></p>
-<p>将配置文件中的 readonly 改为 true </p>
-<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603135617452.png" alt="image-20210603135617452"></p>
-<p>上传失败</p>
-<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603135525800.png" alt="image-20210603135525800"></p>
-
-          
+          <p>Tomcat 历史漏洞的学习</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/Tomcat1.html#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
