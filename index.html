@@ -293,6 +293,241 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/%E6%B8%97%E9%80%8F%E5%B7%A5%E5%85%B7/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/Socks5">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="stdout">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/%E6%B8%97%E9%80%8F%E5%B7%A5%E5%85%B7/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/Socks5" itemprop="url">未命名</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-12-30T21:40:56+08:00">
+                2021-12-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Socks5"><a href="#Socks5" class="headerlink" title="Socks5"></a>Socks5</h1><h2 id="协议分析"><a href="#协议分析" class="headerlink" title="协议分析"></a>协议分析</h2><p>以 <code>proxychains curl google.com</code> 为例</p>
+<h3 id="样例pcap"><a href="#样例pcap" class="headerlink" title="样例pcap"></a>样例pcap</h3><p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230214259745.png" alt="image-20211230214259745"></p>
+<p>首先看到 1、2、3 号流量包为 tcp 三次握手。紧接着 5号包为 <code>Socks</code> 协议。</p>
+<blockquote>
+<p>  注：下面的阶段名只是伴随个人理解的命名，并不是协议上真实的命名</p>
+</blockquote>
+<h3 id="协商阶段"><a href="#协商阶段" class="headerlink" title="协商阶段"></a>协商阶段</h3><p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230214333848.png" alt="image-20211230214333848"></p>
+<p><code>Socks</code>协议的第一步由两部分组成</p>
+<ol>
+<li>Version<ul>
+<li>  版本号，socks5 就是 0x5</li>
+</ul>
+</li>
+<li>Client Authentication Method<ul>
+<li>  验证方式，socks5协议支持多种校验方式</li>
+<li>  Authentication Method Count：客户端使用多少种校验方式</li>
+<li>  Method[]: 校验方式</li>
+</ul>
+</li>
+</ol>
+<p>随后 <code>Server</code> 回复一个 Socks 包（中间的TCP ACK就忽略了）</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230214523682.png" alt="image-20211230214523682"></p>
+<p>也是两部分组成</p>
+<ol>
+<li>Version<ul>
+<li>  版本号，和 <code>Client</code> 发过来的一致</li>
+</ul>
+</li>
+<li>Accept Auth Method<ul>
+<li>  从 <code>Client</code> 的 <code>Method[]</code> 字段里面选取一种校验方式</li>
+</ul>
+</li>
+</ol>
+<p>本样例里面没有验证</p>
+<h3 id="指令阶段"><a href="#指令阶段" class="headerlink" title="指令阶段"></a>指令阶段</h3><p>首先是 <code>Client</code> 告诉 <code>Server</code> 需要代理连接的目标</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230215042671.png" alt="image-20211230215042671"></p>
+<ol>
+<li>Version<ul>
+<li>  版本号</li>
+</ul>
+</li>
+<li>Command<ul>
+<li>  指令，包内为 Connect，表示连接</li>
+</ul>
+</li>
+<li>Reserved<ul>
+<li>  保留字段，0x00</li>
+</ul>
+</li>
+<li>Address Type<ul>
+<li>  0x01: IPV4，ipv4地址</li>
+<li>  0x03: Domain，域名</li>
+<li>  0x04: IPV6，ipv6地址</li>
+</ul>
+</li>
+<li>Remote name<ul>
+<li>  目标的域名/ipv4/ipv6</li>
+<li>  如果 <code>Address Type</code> 字段为 <code>Domain</code>，那么第一个字节为域名的长度（样例中为 0x0a）。</li>
+</ul>
+</li>
+<li>Port<ul>
+<li>  目标端口</li>
+</ul>
+</li>
+</ol>
+<p><code>Server</code> 收到请求之后和目标 <code>Remote name:Port</code>尝试建立连接</p>
+<p>而后根据连接的情况返回给 <code>Client</code> 响应包</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230215650062.png" alt="image-20211230215650062"></p>
+<ol>
+<li>  Version</li>
+<li>Results<ul>
+<li>  回复类型</li>
+<li>  0x00：Success</li>
+</ul>
+</li>
+<li>Reserved<ul>
+<li>  保留字段</li>
+</ul>
+</li>
+<li>Address Type<ul>
+<li>  地址类型，和请求包里面一样</li>
+</ul>
+</li>
+<li>Remote Address<ul>
+<li>  服务端的ip地址，由于客户端一般用不到这个，所以这个字段无所谓（写成0.0.0.0都没关系）</li>
+</ul>
+</li>
+<li>Port<ul>
+<li>  服务端端口</li>
+</ul>
+</li>
+</ol>
+<p><strong>在实验过程中，不论目标端口是否打开，服务端和目标的连接是否成功，<code>Result</code> 字段都返回了 <code>Success</code>，不知道在什么情况下会返回其他的值？</strong></p>
+<h3 id="转发阶段"><a href="#转发阶段" class="headerlink" title="转发阶段"></a>转发阶段</h3><p>此时的 <code>Server</code> 只作为目标和 <code>Client</code>  的转发器</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230220207003.png" alt="image-20211230220207003"></p>
+<h2 id="Sock5-demo"><a href="#Sock5-demo" class="headerlink" title="Sock5_demo"></a>Sock5_demo</h2><p>正好最近在学go， 尝试用 go 写一个demo</p>
+<h3 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h3><p>首先写一个普通的 Socket</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Process</span><span class="params">(client net.Conn)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ShowErr</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;Error: %s\n&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	server, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1080&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;listen start\n&quot;</span>)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		client, err := server.Accept()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			ShowErr(err)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">go</span> Process(client)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="协商阶段-1"><a href="#协商阶段-1" class="headerlink" title="协商阶段"></a>协商阶段</h3><p>首先是协商阶段</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	SOCKS5_VERSION 		<span class="keyword">byte</span> = <span class="number">5</span></span><br><span class="line">	AUTH_COUNT  		<span class="keyword">byte</span> = <span class="number">1</span></span><br><span class="line">	AUTH_METHOD 		<span class="keyword">byte</span> = <span class="number">0</span></span><br><span class="line">	ACCEPT_AUTH 		<span class="keyword">byte</span> = <span class="number">0</span></span><br><span class="line">	COMMAND_CONNECT 	<span class="keyword">byte</span> = <span class="number">1</span></span><br><span class="line">	TYPE_IPV4			<span class="keyword">byte</span> = <span class="number">1</span></span><br><span class="line">	TYPE_DOMAIN			<span class="keyword">byte</span> = <span class="number">3</span></span><br><span class="line">	TYPE_IPV6			<span class="keyword">byte</span> = <span class="number">4</span></span><br><span class="line">	RESULT_SUCCESS		<span class="keyword">byte</span> = <span class="number">0</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5Auth</span><span class="params">(conn net.Conn)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">	reader := bufio.NewReader(conn)</span><br><span class="line">	<span class="keyword">var</span> buf [<span class="number">4</span>]<span class="keyword">byte</span></span><br><span class="line">	n, err := reader.Read(buf[:])</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> n != <span class="number">3</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;auth length error: %d\n&quot;</span>, n)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> buf[<span class="number">0</span>] != SOCKS5_VERSION || buf[<span class="number">1</span>] != AUTH_COUNT || buf[<span class="number">2</span>] != AUTH_METHOD &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;auth failed, buf: 0x%x, 0x%x, 0x%x\n&quot;</span>, buf[<span class="number">0</span>], buf[<span class="number">1</span>], buf[<span class="number">2</span>])</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;auth success\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> responseBuf = [] <span class="keyword">byte</span> &#123;SOCKS5_VERSION, ACCEPT_AUTH&#125;</span><br><span class="line">	conn.Write(responseBuf)</span><br><span class="line"></span><br><span class="line">	fmt.Printf(<span class="string">&quot;send auth response: 0x%x, 0x%x\n&quot;</span>, responseBuf[<span class="number">0</span>], responseBuf[<span class="number">1</span>])</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>先从 socket 里面读取数据，判断是否是 0x05, 0x01, 0x00</p>
+<p>即 <code>SOCKS5_VERSION</code> 、<code>AUTH_COUNT</code>、<code>AUTH_METHOD</code></p>
+<p>也就是不进行验证</p>
+<h3 id="指令阶段-1"><a href="#指令阶段-1" class="headerlink" title="指令阶段"></a>指令阶段</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> RemoteAddress <span class="keyword">struct</span> &#123;</span><br><span class="line">	Domain 	<span class="keyword">string</span></span><br><span class="line">	Ipv4	[]<span class="keyword">byte</span></span><br><span class="line">	Type	<span class="keyword">byte</span></span><br><span class="line">	Port	<span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5SendCommand</span><span class="params">(conn net.Conn, remote *RemoteAddress)</span> <span class="title">net</span>.<span class="title">Conn</span></span>&#123;</span><br><span class="line">	<span class="keyword">var</span> address <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">if</span> remote.Type == TYPE_DOMAIN &#123;</span><br><span class="line">		address = remote.Domain</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> remote.Type == TYPE_IPV4 &#123;</span><br><span class="line">		address = fmt.Sprintf(<span class="string">&quot;%d.%d.%d.%d&quot;</span>,</span><br><span class="line">			remote.Ipv4[<span class="number">0</span>], remote.Ipv4[<span class="number">1</span>], remote.Ipv4[<span class="number">2</span>], remote.Ipv4[<span class="number">3</span>])</span><br><span class="line">	&#125;</span><br><span class="line">	address = fmt.Sprintf(<span class="string">&quot;%s:%d&quot;</span>, address, remote.Port)</span><br><span class="line">	client, err := net.Dial(<span class="string">&quot;tcp&quot;</span>, address)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		conn.Close()</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> sendBytes = []<span class="keyword">byte</span> &#123; SOCKS5_VERSION, RESULT_SUCCESS, <span class="number">0x0</span>, TYPE_IPV4, <span class="number">0x0</span>,<span class="number">0x0</span>,<span class="number">0x0</span>,<span class="number">0x0</span>, <span class="keyword">byte</span>(remote.Port &gt;&gt; <span class="number">8</span>), <span class="keyword">byte</span>(remote.Port) &#125;</span><br><span class="line">	_, err = conn.Write(sendBytes)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;send command response\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> client</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5RecvCommand</span><span class="params">(conn net.Conn)</span> *<span class="title">RemoteAddress</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> remote = <span class="built_in">new</span>(RemoteAddress)</span><br><span class="line"></span><br><span class="line">	reader := bufio.NewReader(conn)</span><br><span class="line">	<span class="keyword">var</span> buf [<span class="number">128</span>]<span class="keyword">byte</span></span><br><span class="line">	n, err := reader.Read(buf[:])</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> buf[<span class="number">0</span>] != SOCKS5_VERSION &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;command version error: 0x%x\n&quot;</span>, buf[<span class="number">0</span>])</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> buf[<span class="number">1</span>] != COMMAND_CONNECT &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;command connect error: 0x%x\n&quot;</span>, buf[<span class="number">1</span>])</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	remote.Type = buf[<span class="number">3</span>]</span><br><span class="line">	<span class="keyword">switch</span> remote.Type &#123;</span><br><span class="line">	<span class="keyword">case</span> TYPE_IPV4:</span><br><span class="line">		remote.Ipv4 = buf[<span class="number">4</span>:<span class="number">8</span>]</span><br><span class="line">	<span class="keyword">case</span> TYPE_DOMAIN:</span><br><span class="line">		addrBytes := buf[<span class="number">5</span>:n<span class="number">-2</span>]</span><br><span class="line">		remote.Domain = <span class="keyword">string</span>(addrBytes)</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	addrPort := buf[n<span class="number">-2</span>:n]</span><br><span class="line">	remote.Port = <span class="keyword">int</span>(addrPort[<span class="number">0</span>])*<span class="number">256</span> + <span class="keyword">int</span>(addrPort[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> remote</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5Command</span><span class="params">(conn net.Conn)</span> <span class="title">net</span>.<span class="title">Conn</span></span> &#123;</span><br><span class="line">	remote := Socks5RecvCommand(conn)</span><br><span class="line">	<span class="keyword">if</span> remote == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">var</span> address <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">if</span> remote.Type == TYPE_DOMAIN &#123;</span><br><span class="line">		address = remote.Domain</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> remote.Type == TYPE_IPV4 &#123;</span><br><span class="line">		address = fmt.Sprintf(<span class="string">&quot;%d.%d.%d.%d&quot;</span>,</span><br><span class="line">			remote.Ipv4[<span class="number">0</span>], remote.Ipv4[<span class="number">1</span>], remote.Ipv4[<span class="number">2</span>], remote.Ipv4[<span class="number">3</span>])</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;remote address: %s:%d\n&quot;</span>, address, remote.Port)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> Socks5SendCommand(conn, remote)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先接受到 Client 发来的目标信息，然后尝试和目标建立连接，再返回 response 给 Client</p>
+<h3 id="转发阶段-1"><a href="#转发阶段-1" class="headerlink" title="转发阶段"></a>转发阶段</h3><p>最后就是转发阶段，此时 Server 只是目标和 Client 的转发器</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5Forward</span><span class="params">(client net.Conn, remote net.Conn)</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;start forward\n&quot;</span>)</span><br><span class="line">	forward := <span class="function"><span class="keyword">func</span><span class="params">(dst net.Conn, src net.Conn)</span></span> &#123;</span><br><span class="line">		<span class="keyword">defer</span> dst.Close()</span><br><span class="line">		<span class="keyword">defer</span> src.Close()</span><br><span class="line">		io.Copy(src, dst)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">go</span> forward(client, remote)</span><br><span class="line">	<span class="keyword">go</span> forward(remote, client)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>双向转发，所以用两个 go-runtime</p>
+<p>完整代码在</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ethushiroha/small_tools/blob/main/Socks5/Server.go">https://github.com/ethushiroha/small_tools/blob/main/Socks5/Server.go</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/AntSword.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1729,174 +1964,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.ethushiroha.com/box_Oopsie.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="https://gitee.com/ethustdout/pics/raw/master/uPic/head.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="stdout">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/box_Oopsie.html" itemprop="url">box:Oopsie</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-26T16:14:10+08:00">
-                2021-02-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/exploit/" itemprop="url" rel="index">
-                    <span itemprop="name">exploit</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/exploit/hack-the-box/" itemprop="url" rel="index">
-                    <span itemprop="name">hack the box</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/exploit/hack-the-box/start-point/" itemprop="url" rel="index">
-                    <span itemprop="name">start point</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>从零开始的hack_the_box 生活</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/box_Oopsie.html#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1951,7 +2018,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-count">74</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

